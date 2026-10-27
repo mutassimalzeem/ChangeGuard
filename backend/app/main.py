@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.database import init_db, close_db
 from app.core.logging import instrument_app, get_logger
+from app.core.request_logging import RequestLoggingMiddleware
 from app.api.exceptions import ChangeGuardException
 from app.api.v1.router import api_router
 
@@ -46,6 +47,7 @@ app.add_middleware(
 
 # Instrument with OpenTelemetry
 instrument_app(app)
+app.add_middleware(RequestLoggingMiddleware)
 
 
 # Exception handlers

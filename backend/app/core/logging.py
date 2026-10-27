@@ -2,6 +2,8 @@
 
 import logging
 import sys
+import json
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -16,37 +18,61 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from app.core.config import get_settings
+from app.core.redaction import redact
+from app.core.request_logging import request_context
 
 
 settings = get_settings()
 
 
+class JSONFormatter(logging.Formatter):
+    """One redaction boundary for structlog and standard library records."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        # Third-party free-form messages can contain request URLs, SQL values,
+        # document text, or credentials. Keep metadata, never their message text.
+        fields = dict(record.msg) if isinstance(record.msg, dict) else {
+            "event": "stdlib_log", "logger": record.name,
+        }
+        # Include structured stdlib extras, but never raw traceback/stack messages.
+        reserved = logging.makeLogRecord({}).__dict__
+        fields.update({k: v for k, v in record.__dict__.items() if k not in reserved and not k.startswith("_")})
+        fields.pop("exc_info", None)
+        fields.pop("stack_info", None)
+        context = request_context.get() or {}
+        fields.update({k: context[k] for k in ("tenant_id", "user_id") if context.get(k) is not None})
+        fields.update(
+            timestamp=datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
+            level=record.levelname.lower(),
+            service=settings.otel_service_name,
+            environment=settings.environment,
+            request_id=context.get("request_id"),
+        )
+        if record.exc_info:
+            fields["failure_type"] = record.exc_info[0].__name__
+        return json.dumps(redact(fields), ensure_ascii=True, allow_nan=False)
+
+
 def configure_logging() -> None:
-    """Configure structured logging with structlog."""
-
-    # Configure standard library logging
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=getattr(logging, settings.log_level.upper()),
-    )
-
-    # Configure structlog
+    """Always emit JSON, including third-party logs propagated to the root."""
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(JSONFormatter())
+    logging.basicConfig(handlers=[handler], level=settings.log_level.upper(), force=True)
+    for name in ("uvicorn", "uvicorn.error", "uvicorn.access", "sqlalchemy.engine"):
+        logger = logging.getLogger(name)
+        logger.handlers.clear()
+        logger.propagate = True
+    # Our middleware replaces access logs that can expose query strings.
+    logging.getLogger("uvicorn.access").disabled = True
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
-            structlog.processors.add_log_level,
-            structlog.processors.StackInfoRenderer(),
-            structlog.dev.set_exc_info,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.processors.JSONRenderer() if settings.log_format == "json"
-            else structlog.dev.ConsoleRenderer(colors=True),
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(logging, settings.log_level.upper())
-        ),
+        wrapper_class=structlog.stdlib.BoundLogger,
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
 

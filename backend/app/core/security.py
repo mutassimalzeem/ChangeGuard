@@ -47,7 +47,7 @@ def create_access_token(
         "iat": datetime.now(timezone.utc),
         "type": "access",
     }
-    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 
 def create_refresh_token(
@@ -70,12 +70,12 @@ def create_refresh_token(
         "iat": datetime.now(timezone.utc),
         "type": "refresh",
     }
-    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 
 def decode_token(token: str) -> dict[str, Any]:
     """Decode and validate a JWT token."""
-    return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
 
 
 def generate_api_key() -> str:
