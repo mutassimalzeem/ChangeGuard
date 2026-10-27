@@ -3,6 +3,8 @@
 import pytest
 from httpx import AsyncClient
 
+from app.main import app
+
 
 class TestHealthEndpoints:
     """Tests for health check endpoints."""
@@ -10,7 +12,7 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_health_check(self, client: AsyncClient):
         """Test basic health check endpoint."""
-        response = await client.get("/api/v1/health")
+        response = await client.get(str(app.url_path_for("health_check")))
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
@@ -19,7 +21,7 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_health_check_db(self, client: AsyncClient):
         """Test database health check endpoint."""
-        response = await client.get("/api/v1/health/db")
+        response = await client.get(str(app.url_path_for("health_check_db")))
         assert response.status_code == 200
         data = response.json()
         assert data["status"] in ("healthy", "unhealthy")
@@ -28,7 +30,7 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_readiness_check(self, client: AsyncClient):
         """Test readiness check endpoint."""
-        response = await client.get("/api/v1/health/ready")
+        response = await client.get(str(app.url_path_for("readiness_check")))
         assert response.status_code == 200
         data = response.json()
         assert data["status"] in ("ready", "not_ready")
