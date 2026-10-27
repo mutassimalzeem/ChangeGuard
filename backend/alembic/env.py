@@ -1,29 +1,31 @@
 """Alembic environment configuration."""
 
 import sys
-from logging.config import fileConfig
 from pathlib import Path
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic import context
+
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.core.database import Base
 from app.core.config import get_settings
+from app.core.database import Base
+from app.core.logging import configure_logging
+from app.domain import models  # noqa: F401 - register all declarative tables
 
 config = context.config
 settings = get_settings()
 
 # Interpret the config file for Python logging
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+configure_logging()
 
 # Set the database URL
-config.set_main_option("sqlalchemy.url", str(settings.database_url))
+database_url = config.attributes.get("database_url", str(settings.database_url))
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 # Target metadata for autogenerate
 target_metadata = Base.metadata
@@ -74,8 +76,13 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    import asyncio
-    asyncio.run(run_async_migrations())
+    connection = config.attributes.get("connection")
+    if connection is not None:
+        do_run_migrations(connection)
+    else:
+        import asyncio
+
+        asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():

@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+from sqlalchemy import MetaData, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -14,13 +15,21 @@ from sqlalchemy.pool import NullPool
 
 from app.core.config import get_settings
 
-
 settings = get_settings()
 
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy models."""
-    pass
+
+    metadata = MetaData(
+        naming_convention={
+            "ix": "ix_%(table_name)s_%(column_0_name)s",
+            "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+            "ck": "ck_%(table_name)s_%(constraint_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s",
+        }
+    )
 
 
 def create_engine() -> AsyncEngine:
@@ -82,14 +91,9 @@ async def get_session_context() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Initialize database - create tables and extensions."""
-    async with engine.begin() as conn:
-        # Enable pgvector extension
-        await conn.exec_driver_sql("CREATE EXTENSION IF NOT EXISTS vector")
-        # Enable pg_trgm for fuzzy search
-        await conn.exec_driver_sql("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-        # Create all tables
-        await conn.run_sync(Base.metadata.create_all)
+    """Check connectivity. Apply schema changes explicitly with Alembic."""
+    async with engine.connect() as conn:
+        await conn.execute(text("SELECT 1"))
 
 
 async def close_db() -> None:
