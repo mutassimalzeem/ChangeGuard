@@ -30,7 +30,8 @@ def create_engine() -> AsyncEngine:
         return create_async_engine(
             str(settings.database_url),
             poolclass=NullPool,
-            echo=settings.debug,
+            echo=False,
+            hide_parameters=True,
         )
     return create_async_engine(
         str(settings.database_url),
@@ -38,7 +39,8 @@ def create_engine() -> AsyncEngine:
         max_overflow=settings.database_max_overflow,
         pool_timeout=settings.database_pool_timeout,
         pool_pre_ping=True,
-        echo=settings.debug,
+        echo=False,
+        hide_parameters=True,
     )
 
 
