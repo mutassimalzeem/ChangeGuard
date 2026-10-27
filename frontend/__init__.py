@@ -1,0 +1,1 @@
+"""Frontend module - Next.js + React application."""

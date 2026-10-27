@@ -1,0 +1,1 @@
+"""Retrieval module - Hybrid search, reranking, permission filtering, citations."""

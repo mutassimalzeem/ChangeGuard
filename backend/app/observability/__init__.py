@@ -1,0 +1,1 @@
+"""Observability module - Logs, traces, metrics, audit events."""

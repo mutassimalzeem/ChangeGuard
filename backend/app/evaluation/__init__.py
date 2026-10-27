@@ -1,0 +1,1 @@
+"""Evaluation module - Golden datasets, test runners, quality metrics."""
