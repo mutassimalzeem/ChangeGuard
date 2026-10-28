@@ -4,6 +4,7 @@ import hashlib
 import math
 from copy import deepcopy
 from datetime import UTC, datetime
+from decimal import Decimal
 from time import monotonic
 from uuid import UUID
 
@@ -77,7 +78,9 @@ def classification_input(document, text):
 def classification_review_reason(result, text):
     if result.confidence < get_settings().classification_review_threshold:
         return "low_classification_confidence"
-    return "visual_document_without_text" if not text.strip() else None
+    if not text.strip():
+        return "visual_document_without_text"
+    return "visual_document_requires_review" if result.document_type == "site_photo" else None
 
 
 async def execute_stage(stage, document, data, session, services, storage):
@@ -154,10 +157,26 @@ async def execute_stage(stage, document, data, session, services, storage):
         # Store raw provider output before schema validation, even if it is invalid.
         return await run_in_threadpool(
             services.extract,
-            extraction_result(data["extract_text"]).text,
+            extraction_result(data["extract_text"]),
             data["classify_document"],
         )
     if stage == "validate_extraction":
+        if data["extract_fields"].get("schema_version") == 1:
+            from app.document_processing.structured.pipeline import pipeline_summary
+            from app.document_processing.structured.service import validate_result
+
+            validated = validate_result(
+                data["extract_fields"],
+                extraction_result(data["extract_text"]),
+                document.document_type,
+            )
+            document.structured_extraction = validated
+            document.extraction_confidence = min(
+                validated["confidence"], data["classify_document"]["confidence"]
+            )
+            return pipeline_summary(validated)
+        # Legacy checkpoints lack typed provenance. Preserve resumability without
+        # pretending they are schema-constrained extraction results.
         result = Extraction.model_validate(data["extract_fields"])
         document.extraction_confidence = min(
             result.confidence, data["classify_document"]["confidence"]
@@ -263,7 +282,7 @@ async def execute_stage(stage, document, data, session, services, storage):
     if stage == "risk_checks":
         fields = data["validate_extraction"]
         codes = []
-        if fields["amount"] is not None and fields["amount"] < 0:
+        if fields["amount"] is not None and Decimal(str(fields["amount"])) < 0:
             codes.append("negative_amount")
         if fields["amount"] is not None and not fields["currency"]:
             codes.append("missing_currency")
@@ -286,7 +305,11 @@ async def execute_stage(stage, document, data, session, services, storage):
             )
         return codes
     if stage == "create_review_task":
-        low = float(document.extraction_confidence) < get_settings().processing_review_threshold
+        # The public Numeric(5,4) summary may round a just-below-threshold value up.
+        confidence = min(
+            data["validate_extraction"]["confidence"], data["classify_document"]["confidence"]
+        )
+        low = confidence < get_settings().processing_review_threshold
         required = low or bool(data["risk_checks"])
         if required:
             session.add(
@@ -391,6 +414,10 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
                 from datetime import timedelta
 
                 await session.refresh(document)
+                from app.document_processing.structured.service import StructuredExtractionError
+
+                if isinstance(exc, StructuredExtractionError):
+                    state["structured_extraction_attempts"] = exc.attempts
                 data.pop(stage, None)
                 outcome = "failed"
                 # Never persist exception messages: providers can echo document text/secrets.
