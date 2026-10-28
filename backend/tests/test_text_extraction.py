@@ -288,7 +288,13 @@ async def test_real_fixture_pipeline_persists_chunk_fields(pipeline, test_sessio
     for _ in STAGES:
         await pipeline.step()
     rows = list(
-        await test_session.scalars(select(DocumentChunk).order_by(DocumentChunk.chunk_index))
+        await test_session.scalars(
+            select(DocumentChunk)
+            .where(
+                DocumentChunk.document_id == document.id,
+            )
+            .order_by(DocumentChunk.chunk_index)
+        )
     )
     assert len(rows) == 2
     for row in rows:

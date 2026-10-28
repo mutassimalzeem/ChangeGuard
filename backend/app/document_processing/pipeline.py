@@ -12,6 +12,7 @@ from sqlalchemy import select
 from starlette.concurrency import run_in_threadpool
 
 from app.core.config import get_settings
+from app.document_processing.classification import ClassificationInput, RuleFirstClassifier
 from app.document_processing.extraction.chunking import logical_chunks
 from app.document_processing.extraction.types import ExtractionResult, TextBlock
 from app.document_processing.providers import Services
@@ -63,6 +64,22 @@ def extraction_result(value):
     return ExtractionResult.model_validate(value)
 
 
+def classification_input(document, text):
+    metadata = {
+        **(document.attributes or {}),
+        "file_type": document.file_type,
+        "mime_type": document.mime_type,
+        "document_type": document.document_type or "",
+    }
+    return ClassificationInput(filename=document.filename, metadata=metadata, extracted_text=text)
+
+
+def classification_review_reason(result, text):
+    if result.confidence < get_settings().classification_review_threshold:
+        return "low_classification_confidence"
+    return "visual_document_without_text" if not text.strip() else None
+
+
 async def execute_stage(stage, document, data, session, services, storage):
     async def original():
         content = await run_in_threadpool(storage.download_file, document.storage_key)
@@ -79,18 +96,59 @@ async def execute_stage(stage, document, data, session, services, storage):
         await original()
         return {"storage_key": document.storage_key, "checksum": document.checksum}
     if stage == "extract_text":
-        result = await run_in_threadpool(services.extraction, await original(), document.file_type)
+        image = document.file_type in {"png", "jpg", "jpeg"}
+        settings = get_settings()
+        if (
+            image
+            and RuleFirstClassifier(
+                rule_threshold=settings.classification_rule_threshold,
+                margin=settings.classification_rule_margin,
+            )
+            .rules(classification_input(document, ""))
+            .document_type
+            == "site_photo"
+        ):
+            # A known site photo need not incur vision-LLM OCR just to classify it.
+            return ExtractionResult().model_dump(mode="json")
+        from app.document_processing.providers import ProviderUnavailable
+
+        try:
+            result = await run_in_threadpool(
+                services.extraction, await original(), document.file_type
+            )
+        except ProviderUnavailable:
+            if not image:
+                raise
+            result = ExtractionResult()
         text = result.text
-        if not isinstance(text, str) or not text.strip():
+        if not isinstance(text, str) or (not text.strip() and not image):
             raise ValueError("No document text extracted")
         if len(text) > 2_000_000:
             raise ValueError("Extracted text exceeds processing limit")
         return result.model_dump(mode="json")
     if stage == "classify_document":
+        text = extraction_result(data["extract_text"]).text
         result = Classification.model_validate(
-            await run_in_threadpool(services.classify, extraction_result(data["extract_text"]).text)
+            await run_in_threadpool(services.classify, classification_input(document, text))
         )
         document.document_type = result.document_type
+        document.classification_result = result.model_dump(mode="json")
+        reason = classification_review_reason(result, text)
+        if reason:
+            existing = await session.scalar(
+                scoped(DocumentReviewTask, document).where(
+                    DocumentReviewTask.document_id == document.id,
+                )
+            )
+            if existing is None:
+                session.add(
+                    DocumentReviewTask(
+                        tenant_id=document.tenant_id,
+                        project_id=document.project_id,
+                        document_id=document.id,
+                        reason=reason,
+                    )
+                )
         return result.model_dump(mode="json")
     if stage == "extract_fields":
         # Store raw provider output before schema validation, even if it is invalid.
@@ -316,7 +374,14 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
                 document.processing_status = f"{stage}_done"
                 document.error_message = None
                 delay = 0
-                if stage == STAGES[-1]:
+                if stage == "classify_document" and classification_review_reason(
+                    Classification.model_validate(data[stage]),
+                    extraction_result(data["extract_text"]).text,
+                ):
+                    document.processing_status = "review_required"
+                    document.status = "review_required"
+                    delay = None
+                elif stage == STAGES[-1]:
                     document.processing_status = (
                         "review_required" if data[stage]["required"] else "completed"
                     )

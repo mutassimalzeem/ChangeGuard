@@ -11,14 +11,18 @@ class Classification(BaseModel):
     document_type: Literal[
         "contract",
         "boq",
+        "drawing",
         "rfi",
         "daily_report",
         "change_order",
-        "invoice",
-        "correspondence",
+        "site_photo",
+        "email",
+        "quotation",
         "other",
     ]
     confidence: float = Field(ge=0, le=1)
+    reasoning: str = Field(min_length=1, max_length=2000)
+    model_or_rule_used: str = Field(min_length=1, max_length=255)
 
 
 class EntityReference(BaseModel):

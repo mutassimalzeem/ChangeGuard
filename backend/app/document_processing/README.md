@@ -17,9 +17,11 @@ celery -A app.core.celery_app.celery_app beat
 Run one Beat scheduler. Compose includes both services and enables Redis AOF.
 Configure `DATABASE_URL`, `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`, and
 `OBJECT_STORAGE_*`. Provision the private object bucket before uploading.
-Set `LLM_PROVIDER=openai` and `LLM_API_KEY` for classification, structured
-extraction and embeddings. There is no fabricated local AI fallback: missing
-providers send the job to the operator queue with its partial results intact.
+Set `LLM_PROVIDER=openai` and `LLM_API_KEY` for inconclusive classification,
+structured extraction and embeddings. Feature 3.3 adds
+[rules-first classification and early review](classification/README.md):
+unconfigured classification falls back to low-confidence human review. Missing
+field-extraction/embedding providers retain the existing dead-letter policy.
 Embeddings use the configured model with 1536 dimensions, matching the existing
 database column. `PROCESSING_REVIEW_THRESHOLD` defaults to 0.8.
 

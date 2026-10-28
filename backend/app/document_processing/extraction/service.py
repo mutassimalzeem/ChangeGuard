@@ -38,7 +38,9 @@ class DocumentExtractionService:
         if extension not in self.extractors:
             raise ValueError("Unsupported extraction format")
         result = self.extractors[extension].extract(content)
-        if not result.text.strip() or len(result.text) > 2_000_000:
+        if (not result.text.strip() and extension not in {"jpg", "jpeg", "png"}) or len(
+            result.text
+        ) > 2_000_000:
             raise ValueError("Empty or oversized extracted text")
         return result
 

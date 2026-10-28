@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.document_processing.schema import Classification
+
 
 class ProcessingStatus(StrEnum):
     RECEIVED = "received"
@@ -40,6 +42,7 @@ class DocumentRead(BaseModel):
     processing_status: str
     status: ProcessingStatus
     document_type: str | None
+    classification_result: Classification | None = None
     document_version: int
     access_level: str
     extraction_confidence: float | None

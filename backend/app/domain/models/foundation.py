@@ -156,6 +156,7 @@ class Document(ProjectRecord, Base):
     file_type: Mapped[str] = mapped_column(String(32), server_default="unknown")
     source: Mapped[str] = mapped_column(String(64), server_default="upload")
     document_type: Mapped[str | None] = mapped_column(String(100))
+    classification_result: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     document_version: Mapped[int] = mapped_column(Integer, server_default="1")
     access_level: Mapped[str] = mapped_column(String(32), server_default="project")
     extraction_confidence: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
