@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     CheckConstraint,
     Date,
@@ -134,13 +135,26 @@ class Project(TenantRecord, Base):
 
 class Document(ProjectRecord, Base):
     __tablename__ = "documents"
-    __table_args__ = project_constraints(user_reference("uploaded_by_id"))
+    __table_args__ = project_constraints(
+        user_reference("uploaded_by_id"),
+        UniqueConstraint("tenant_id", "project_id", "checksum"),
+        CheckConstraint("status IN ('received','validating','stored','queued','processing','extracted','classified','indexed','linked','review_required','failed','quarantined')", name="document_status_allowed"),
+        CheckConstraint("access_level IN ('project','restricted')", name="document_access_allowed"),
+    )
     filename: Mapped[str] = mapped_column(String(512))
     storage_key: Mapped[str] = mapped_column(Text)
     mime_type: Mapped[str] = mapped_column(String(255))
-    size_bytes: Mapped[int] = mapped_column(Integer)
+    size_bytes: Mapped[int] = mapped_column(BigInteger)
     checksum: Mapped[str | None] = mapped_column(String(64), index=True)
-    status: Mapped[str] = mapped_column(String(32), server_default="uploaded", index=True)
+    status: Mapped[str] = mapped_column(String(32), server_default="received", index=True)
+    file_type: Mapped[str] = mapped_column(String(32), server_default="unknown")
+    source: Mapped[str] = mapped_column(String(64), server_default="upload")
+    document_type: Mapped[str | None] = mapped_column(String(100))
+    document_version: Mapped[int] = mapped_column(Integer, server_default="1")
+    access_level: Mapped[str] = mapped_column(String(32), server_default="project")
+    extraction_confidence: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
+    error_message: Mapped[str | None] = mapped_column(Text)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     uploaded_by_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
     uploaded_by: Mapped["User | None"] = relationship(foreign_keys=[uploaded_by_id])
     attributes: Mapped[dict[str, Any]] = mapped_column(

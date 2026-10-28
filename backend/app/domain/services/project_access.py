@@ -25,7 +25,7 @@ class ProjectAccessService:
             )
         )
         if project is None:
-            raise NotFoundError("Project", project_id)
+            raise NotFoundError("Project", str(project_id))
         return project
 
     async def records(self, model, project_id: UUID) -> list[dict]:

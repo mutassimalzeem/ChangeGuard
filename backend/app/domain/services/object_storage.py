@@ -87,6 +87,16 @@ class ObjectStorageService:
         self._client = None
         self._bucket = settings.object_storage_bucket
 
+    def store_original(self, object_key: str, stream: BinaryIO, mime_type: str) -> None:
+        """Create once; an existing original must never be overwritten."""
+        try:
+            self.client.put_object(
+                Bucket=self._bucket, Key=object_key, Body=stream,
+                ContentType=mime_type, IfNoneMatch="*",
+            )
+        except ClientError as exc:
+            raise StorageError("Failed to preserve original") from exc
+
     @property
     def client(self):
         """Get or create S3 client."""
