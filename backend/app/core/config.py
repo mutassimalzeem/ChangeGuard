@@ -171,6 +171,7 @@ class Settings(BaseSettings):
     classification_review_threshold: float = Field(default=0.8, ge=0, le=1)
     classification_rule_threshold: float = Field(default=0.85, ge=0, le=1)
     classification_rule_margin: float = Field(default=0.12, ge=0, le=1)
+    structured_extraction_repair_retries: int = Field(default=1, ge=0, le=2)
     vector_dimension: int = 1536
     search_top_k: int = 20
     rerank_top_k: int = 10

@@ -4,7 +4,7 @@ import base64
 import json
 
 from app.core.config import get_settings
-from app.document_processing.schema import Classification, Extraction
+from app.document_processing.schema import Classification
 
 
 class ProviderUnavailable(RuntimeError):
@@ -152,7 +152,68 @@ class Services:
         return Classification.model_validate(result)
 
     def extract(self, text, classification):
-        return self.structured(text, Extraction, self.settings.default_extraction_model)
+        from app.document_processing.extraction.types import ExtractionResult, TextBlock
+        from app.document_processing.structured.service import SchemaConstrainedExtractor
+
+        source = ExtractionResult(blocks=[TextBlock(text=text)]) if isinstance(text, str) else text
+        return SchemaConstrainedExtractor(
+            self.generate_extraction,
+            model=self.settings.default_extraction_model,
+            repair_retries=self.settings.structured_extraction_repair_retries,
+        ).extract(source, classification["document_type"])
+
+    def generate_extraction(self, *, schema, payload, instructions, previous):
+        from app.document_processing.structured.service import (
+            IncompleteStructuredOutput,
+            StructuredExtractionRefused,
+        )
+
+        messages = [
+            {"role": "system", "content": instructions},
+            {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+        ]
+        if previous:
+            messages.extend(
+                [
+                    {"role": "assistant", "content": previous["raw_output"]},
+                    {
+                        "role": "user",
+                        "content": json.dumps(
+                            {
+                                "repair_errors": previous["errors"],
+                                "instruction": (
+                                    "Return a corrected complete object. Verify each fact against "
+                                    "the original source; mark unsupported facts missing. "
+                                    "Never compute totals."
+                                ),
+                            }
+                        ),
+                    },
+                ]
+            )
+        result = self.client().chat.completions.create(
+            model=self.settings.default_extraction_model,
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema.__name__,
+                    "strict": True,
+                    "schema": schema.model_json_schema(),
+                },
+            },
+            max_completion_tokens=self.settings.max_tokens_per_request,
+            timeout=min(self.settings.ai_request_timeout, 60),
+        )
+        choice = result.choices[0]
+        if getattr(choice.message, "refusal", None) or choice.finish_reason not in {
+            "stop",
+            "length",
+        }:
+            raise StructuredExtractionRefused("Structured extraction was refused")
+        if choice.finish_reason == "length":
+            raise IncompleteStructuredOutput(choice.message.content or "")
+        return choice.message.content or ""
 
     def embed(self, texts):
         result = self.client().embeddings.create(

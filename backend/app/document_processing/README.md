@@ -26,6 +26,7 @@ Embeddings use the configured model with 1536 dimensions, matching the existing
 database column. `PROCESSING_REVIEW_THRESHOLD` defaults to 0.8.
 
 Feature 3.2 supplies [structured text extraction and logical chunking](extraction/README.md).
+Feature 3.4 supplies [typed field extraction, evidence validation and repair](structured/README.md).
 Text adapters handle PDF, DOCX (including tables), XLSX, EML plain-text bodies,
 MSG plain-text bodies, images and validated ZIP members. Nested ZIPs and
 unsupported archive members require an adapter and fail explicitly. Scanned and
