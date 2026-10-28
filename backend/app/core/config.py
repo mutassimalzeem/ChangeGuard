@@ -166,6 +166,7 @@ class Settings(BaseSettings):
     chunk_size: int = 1000
     chunk_overlap: int = 200
     max_chunks_per_document: int = 500
+    processing_review_threshold: float = Field(default=0.8, ge=0, le=1)
     vector_dimension: int = 1536
     search_top_k: int = 20
     rerank_top_k: int = 10

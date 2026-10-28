@@ -22,6 +22,8 @@ WORKDIR /app
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
+    tesseract-ocr \
+    poppler-utils \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

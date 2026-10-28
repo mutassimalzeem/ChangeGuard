@@ -147,6 +147,10 @@ class Document(ProjectRecord, Base):
     size_bytes: Mapped[int] = mapped_column(BigInteger)
     checksum: Mapped[str | None] = mapped_column(String(64), index=True)
     status: Mapped[str] = mapped_column(String(32), server_default="received", index=True)
+    processing_status: Mapped[str] = mapped_column(String(32), server_default="queued", index=True)
+    processing_data: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, server_default=sql_text("'{}'::jsonb")
+    )
     file_type: Mapped[str] = mapped_column(String(32), server_default="unknown")
     source: Mapped[str] = mapped_column(String(64), server_default="upload")
     document_type: Mapped[str | None] = mapped_column(String(100))
@@ -168,6 +172,14 @@ class DocumentChunk(ProjectRecord, Base):
         project_reference("document_id", "documents"),
         UniqueConstraint("document_id", "chunk_index"),
         CheckConstraint("chunk_index >= 0", name="chunk_index_nonnegative"),
+        Index(
+            "ix_document_chunks_search", sql_text("to_tsvector('english', text)"),
+            postgresql_using="gin",
+        ),
+        Index(
+            "ix_document_chunks_vector", "embedding", postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
     )
     document_id: Mapped[UUID] = mapped_column(Uuid, index=True)
     chunk_index: Mapped[int] = mapped_column(Integer)
@@ -179,6 +191,46 @@ class DocumentChunk(ProjectRecord, Base):
         JSONB, server_default=sql_text("'{}'::jsonb")
     )
     document: Mapped["Document"] = relationship(foreign_keys=[document_id], backref="chunks")
+
+
+class DocumentReviewTask(ProjectRecord, Base):
+    __tablename__ = "document_review_tasks"
+    __table_args__ = project_constraints(
+        project_reference("document_id", "documents"), UniqueConstraint("document_id")
+    )
+    document_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    reason: Mapped[str] = mapped_column(String(100))
+    status: Mapped[str] = mapped_column(String(32), server_default="pending", index=True)
+
+
+class DocumentEntityLink(ProjectRecord, Base):
+    __tablename__ = "document_entity_links"
+    __table_args__ = project_constraints(
+        project_reference("document_id", "documents"),
+        project_reference("contract_id", "contracts"),
+        project_reference("rfi_id", "rfis"),
+        project_reference("change_order_id", "change_orders"),
+        CheckConstraint("num_nonnulls(contract_id, rfi_id, change_order_id) = 1", name="one_entity"),
+        UniqueConstraint("document_id", "contract_id"),
+        UniqueConstraint("document_id", "rfi_id"),
+        UniqueConstraint("document_id", "change_order_id"),
+    )
+    document_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    contract_id: Mapped[UUID | None] = mapped_column(Uuid)
+    rfi_id: Mapped[UUID | None] = mapped_column(Uuid)
+    change_order_id: Mapped[UUID | None] = mapped_column(Uuid)
+
+
+class ProcessingDeadLetter(ProjectRecord, Base):
+    __tablename__ = "processing_dead_letters"
+    __table_args__ = project_constraints(
+        project_reference("document_id", "documents"), UniqueConstraint("document_id")
+    )
+    document_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    stage: Mapped[str] = mapped_column(String(32))
+    attempts: Mapped[int] = mapped_column(Integer)
+    error_type: Mapped[str] = mapped_column(String(100))
+    status: Mapped[str] = mapped_column(String(32), server_default="pending", index=True)
 
 
 class ProjectEvent(ProjectRecord, Base):
