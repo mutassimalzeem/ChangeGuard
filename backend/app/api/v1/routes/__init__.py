@@ -1,3 +1,5 @@
 """API v1 routes package."""
 
-from app.api.v1.routes import health
+from app.api.v1.routes import health, projects
+
+__all__ = ["health", "projects"]

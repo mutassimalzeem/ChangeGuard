@@ -30,7 +30,7 @@ An AI-powered system that ingests fragmented construction project evidence and t
 ## 2. Founder context
 
 **Builder:** Mutassim Al Shahriar Zeem  
-**Background:** EEE student with Python, ML, embedded systems, backend, and AI interests.  
+**Background:** EEE student with Python, ML, backend, and AI Development.  
 **Strategic advantage:** Combining electrical/embedded systems knowledge with AI systems engineering.
 
 **Career positioning:**
