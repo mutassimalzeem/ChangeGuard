@@ -96,23 +96,27 @@ def logical_chunks(result: ExtractionResult, document_type="other", *, max_chars
             if not block.text.strip():
                 continue
             text = block.text.strip()
-            special = block.kind == "email_message" or (
-                block.kind == "table_row"
-                and (
-                    document_type != "contract"
-                    or len(
-                        {str(h).strip().lower() for h in block.location.get("headers", [])}
-                        & BOQ_HEADERS
-                    )
-                    >= 2
+            boq = (
+                document_type == "boq"
+                or len(
+                    {str(h).strip().lower() for h in block.location.get("headers", [])}
+                    & BOQ_HEADERS
                 )
+                >= 2
+            )
+            special = block.kind == "email_message" or (
+                block.kind == "table_row" and (boq or block.location.get("source") == "xlsx")
             )
             if special:
                 flush()
                 if block.kind == "email_message":
                     section, kind = block.section or "Email message", "email_thread_message"
                 else:
-                    kind = "table_header" if block.location.get("is_header") else "boq_item"
+                    kind = (
+                        "table_header"
+                        if block.location.get("is_header")
+                        else ("boq_item" if boq else "table_row")
+                    )
                     section = f"{block.section or 'Table'} / {kind} {text.split(chr(9))[0]}"
                 current.append((block, source_offset))
                 flush()

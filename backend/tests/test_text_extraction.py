@@ -259,6 +259,23 @@ def test_unpunctuated_business_headings(kind, text):
     assert len(parts) == 2
 
 
+def test_daily_report_table_stays_with_its_section():
+    result = ExtractionResult(
+        blocks=[
+            TextBlock(text="Activities", kind="heading", section="Activities"),
+            TextBlock(
+                text="Concrete crew\t5",
+                kind="table_row",
+                section="Activities",
+                location={"source": "docx", "headers": ["Crew", "Count"]},
+            ),
+        ]
+    )
+    parts = logical_chunks(result, "daily_report")
+    assert len(parts) == 1 and parts[0].kind == "daily_report_section"
+    assert "Concrete crew" in parts[0].text
+
+
 async def test_real_fixture_pipeline_persists_chunk_fields(pipeline, test_session):  # noqa: F811
     document = pipeline.document
     content = fixture("contract.docx")
