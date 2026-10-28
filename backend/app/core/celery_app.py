@@ -42,6 +42,7 @@ celery_app.conf.update(
         "app.workflow.tasks.*": {"queue": "workflow"},
     },
     beat_schedule={
+        "recover-document-queue": {"task": "app.ingestion.tasks.recover_document_queue", "schedule": 60.0},
         # Periodic tasks can be added here
         # "cleanup-expired-tokens": {
         #     "task": "app.core.tasks.cleanup_expired_tokens",
