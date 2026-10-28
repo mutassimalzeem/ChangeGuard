@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.pool import NullPool
 
 from alembic import command
-from app.core.database import get_session
+from app.core.database import ScopedAsyncSession, get_session
 from app.domain.models import Project, Tenant, User
 from app.main import app
 
@@ -72,7 +72,7 @@ async def test_session(test_engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
     async with test_engine.connect() as connection:
         transaction = await connection.begin()
         try:
-            async with AsyncSession(
+            async with ScopedAsyncSession(
                 bind=connection,
                 expire_on_commit=False,
                 join_transaction_mode="create_savepoint",
