@@ -18,9 +18,14 @@ model changes. `alembic downgrade base` removes the 16 application tables and th
 timestamp trigger function; it deliberately leaves the shared vector extension.
 Do not downgrade a database containing data you need.
 
+Feature 1.2 additionally introduces authentication state and system audit tables;
+see [authentication documentation](../services/AUTHENTICATION.md) for their lifecycle.
+System-owned authentication events and limits also cover unknown accounts and are
+intentionally distinct from tenant-owned domain records.
+
 All records have UUID primary keys (Python and PostgreSQL defaults), timezone-aware
 `created_at`/`updated_at`, and database triggers that maintain `updated_at` for SQL
-and ORM writers. All tables except `tenants` have a non-null tenant foreign key.
+and ORM writers. All domain tables except `tenants` have a non-null tenant foreign key.
 Project-scoped records also enforce `(project_id, tenant_id)` ownership, and links
 to project records include both project and tenant in their foreign keys. User
 references include tenant ownership. Parent deletion is restricted to protect

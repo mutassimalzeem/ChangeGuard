@@ -105,6 +105,7 @@ class User(TenantRecord, Base):
     email: Mapped[str] = mapped_column(String(320))
     full_name: Mapped[str] = mapped_column(String(255))
     password_hash: Mapped[str] = mapped_column(Text)
+    token_version: Mapped[int] = mapped_column(Integer, server_default="0")
     role: Mapped[str] = mapped_column(String(32), server_default="member")
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=sql_text("true"))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -1,5 +1,11 @@
 """Domain models package."""
 
+from app.domain.models.authentication import (
+    AuthenticationEvent,
+    AuthRateLimit,
+    AuthSession,
+    PasswordResetGrant,
+)
 from app.domain.models.foundation import (
     RFI,
     AITrace,
@@ -20,6 +26,10 @@ from app.domain.models.foundation import (
 )
 
 __all__ = [
+    "AuthSession",
+    "PasswordResetGrant",
+    "AuthRateLimit",
+    "AuthenticationEvent",
     "AITrace",
     "Approval",
     "AuditEvent",
