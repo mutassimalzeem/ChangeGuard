@@ -30,7 +30,11 @@ FOUNDATION_TABLES = {
     "ai_traces",
 }
 SYSTEM_TABLES = {"auth_rate_limits", "authentication_events"}
-TABLES = FOUNDATION_TABLES | SYSTEM_TABLES | {"auth_sessions", "password_reset_grants"}
+TABLES = (
+    FOUNDATION_TABLES
+    | SYSTEM_TABLES
+    | {"auth_sessions", "password_reset_grants", "project_memberships"}
+)
 
 
 def test_all_tables_have_uuid_keys_and_timestamps():

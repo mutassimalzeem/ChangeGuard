@@ -63,11 +63,12 @@ and operational dates; audit/AI history also has tenant-plus-creation-time index
 Money uses fixed-precision numeric columns. Status/role strings deliberately avoid
 database enums while subsequent workflow and authorization features are defined.
 
-This foundation models one tenant per user. Memberships, authentication endpoints,
-role enforcement, row-level security, and query-level tenant filtering are not
-implemented here. Composite keys prevent inconsistent links; they do not filter
-SELECT queries. Callers must apply tenant filters when those services are built.
-Audit immutability/retention policies are also outside this schema foundation.
+Users belong to one tenant. Authentication is implemented in Feature 1.2;
+project memberships, role enforcement, and scoped query filtering are implemented
+in Feature 1.3; see [the permission matrix and integration guide](../../policy/README.md).
+Composite keys protect links while the authenticated session protects reads.
+PostgreSQL row-level security and audit immutability/retention policies remain
+outside this foundation; direct database connections are trusted infrastructure.
 
 ## Isolated PostgreSQL tests
 

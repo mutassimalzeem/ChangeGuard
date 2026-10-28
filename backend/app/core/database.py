@@ -55,11 +55,34 @@ def create_engine() -> AsyncEngine:
 
 engine = create_engine()
 
+
+class ScopedAsyncSession(AsyncSession):
+    def __init__(self, *args, **kwargs):
+        from app.policy import scope  # noqa: F401 - install mandatory query guards
+
+        super().__init__(*args, **kwargs)
+
+    async def get(self, entity, ident, **kwargs):
+        if self.info.get("access_principal") is not None:
+            # Session.get normally bypasses SELECT criteria for identity-map hits.
+            kwargs["populate_existing"] = True
+        return await super().get(entity, ident, **kwargs)
+
+    async def get_one(self, entity, ident, **kwargs):
+        from sqlalchemy.exc import NoResultFound
+
+        result = await self.get(entity, ident, **kwargs)
+        if result is None:
+            raise NoResultFound()
+        return result
+
+
 async_session_maker = async_sessionmaker(
     engine,
-    class_=AsyncSession,
+    class_=ScopedAsyncSession,
     expire_on_commit=False,
     autoflush=False,
+    info={"require_project_scope": True},
 )
 
 

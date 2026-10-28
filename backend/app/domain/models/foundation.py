@@ -101,12 +101,19 @@ class Tenant(Record, Base):
 
 class User(TenantRecord, Base):
     __tablename__ = "users"
-    __table_args__ = (UniqueConstraint("id", "tenant_id"), UniqueConstraint("tenant_id", "email"))
+    __table_args__ = (
+        UniqueConstraint("id", "tenant_id"),
+        UniqueConstraint("tenant_id", "email"),
+        CheckConstraint(
+            "role IN ('owner', 'admin', 'project_manager', 'commercial_manager', 'site_engineer', 'viewer', 'auditor')",
+            name="role_allowed",
+        ),
+    )
     email: Mapped[str] = mapped_column(String(320))
     full_name: Mapped[str] = mapped_column(String(255))
     password_hash: Mapped[str] = mapped_column(Text)
     token_version: Mapped[int] = mapped_column(Integer, server_default="0")
-    role: Mapped[str] = mapped_column(String(32), server_default="member")
+    role: Mapped[str] = mapped_column(String(32), server_default="viewer")
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=sql_text("true"))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -120,7 +127,9 @@ class Project(TenantRecord, Base):
     status: Mapped[str] = mapped_column(String(32), server_default="active", index=True)
     start_date: Mapped[date | None] = mapped_column(Date, index=True)
     end_date: Mapped[date | None] = mapped_column(Date, index=True)
-    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    currency: Mapped[str] = mapped_column(
+        String(3), server_default="USD", deferred=True, deferred_raiseload=True
+    )
 
 
 class Document(ProjectRecord, Base):
@@ -183,8 +192,12 @@ class Contract(ProjectRecord, Base):
     reference: Mapped[str] = mapped_column(String(100))
     title: Mapped[str] = mapped_column(String(255))
     status: Mapped[str] = mapped_column(String(32), server_default="draft", index=True)
-    value: Mapped[Decimal | None] = mapped_column(Numeric(18, 2))
-    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    value: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 2), deferred=True, deferred_raiseload=True
+    )
+    currency: Mapped[str] = mapped_column(
+        String(3), server_default="USD", deferred=True, deferred_raiseload=True
+    )
     effective_date: Mapped[date | None] = mapped_column(Date, index=True)
     expiry_date: Mapped[date | None] = mapped_column(Date, index=True)
     document: Mapped["Document | None"] = relationship(
@@ -218,8 +231,12 @@ class BOQItem(ProjectRecord, Base):
     description: Mapped[str] = mapped_column(Text)
     unit: Mapped[str] = mapped_column(String(32))
     quantity: Mapped[Decimal] = mapped_column(Numeric(18, 4))
-    unit_rate: Mapped[Decimal] = mapped_column(Numeric(18, 4))
-    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    unit_rate: Mapped[Decimal] = mapped_column(
+        Numeric(18, 4), deferred=True, deferred_raiseload=True
+    )
+    currency: Mapped[str] = mapped_column(
+        String(3), server_default="USD", deferred=True, deferred_raiseload=True
+    )
     contract: Mapped["Contract | None"] = relationship(
         foreign_keys=[contract_id], backref="boq_items"
     )
@@ -259,8 +276,12 @@ class ChangeOrder(ProjectRecord, Base):
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(32), server_default="draft", index=True)
-    amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2))
-    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    amount: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 2), deferred=True, deferred_raiseload=True
+    )
+    currency: Mapped[str] = mapped_column(
+        String(3), server_default="USD", deferred=True, deferred_raiseload=True
+    )
     time_impact_days: Mapped[int | None] = mapped_column(Integer)
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     contract_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
@@ -288,8 +309,12 @@ class Risk(ProjectRecord, Base):
     category: Mapped[str | None] = mapped_column(String(64), index=True)
     severity: Mapped[str] = mapped_column(String(32), server_default="medium", index=True)
     status: Mapped[str] = mapped_column(String(32), server_default="open", index=True)
-    exposure_amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2))
-    currency: Mapped[str] = mapped_column(String(3), server_default="USD")
+    exposure_amount: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 2), deferred=True, deferred_raiseload=True
+    )
+    currency: Mapped[str] = mapped_column(
+        String(3), server_default="USD", deferred=True, deferred_raiseload=True
+    )
     detected_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
@@ -424,7 +449,9 @@ class AITrace(TenantRecord, Base):
     input_tokens: Mapped[int | None] = mapped_column(Integer)
     output_tokens: Mapped[int | None] = mapped_column(Integer)
     duration_ms: Mapped[int | None] = mapped_column(Integer)
-    cost: Mapped[Decimal | None] = mapped_column(Numeric(18, 6))
+    cost: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 6), deferred=True, deferred_raiseload=True
+    )
     attributes: Mapped[dict[str, Any]] = mapped_column(
         JSONB, server_default=sql_text("'{}'::jsonb")
     )

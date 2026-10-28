@@ -6,6 +6,7 @@ from app.domain.models.authentication import (
     AuthSession,
     PasswordResetGrant,
 )
+from app.domain.models.authorization import ProjectMembership
 from app.domain.models.foundation import (
     RFI,
     AITrace,
@@ -26,6 +27,7 @@ from app.domain.models.foundation import (
 )
 
 __all__ = [
+    "ProjectMembership",
     "AuthSession",
     "PasswordResetGrant",
     "AuthRateLimit",
