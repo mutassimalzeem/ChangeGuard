@@ -23,6 +23,7 @@ providers send the job to the operator queue with its partial results intact.
 Embeddings use the configured model with 1536 dimensions, matching the existing
 database column. `PROCESSING_REVIEW_THRESHOLD` defaults to 0.8.
 
+Feature 3.2 supplies [structured text extraction and logical chunking](extraction/README.md).
 Text adapters handle PDF, DOCX (including tables), XLSX, EML plain-text bodies,
 MSG plain-text bodies, images and validated ZIP members. Nested ZIPs and
 unsupported archive members require an adapter and fail explicitly. Scanned and
@@ -44,11 +45,11 @@ document rather than trusting a project supplied in a message.
 | --- | --- |
 | `validate_file` | Verified format and SHA-256 |
 | `store_original` | Verified immutable original key and checksum |
-| `extract_text` | Text/OCR output |
+| `extract_text` | Structured text/OCR blocks and locations |
 | `classify_document` | Pydantic-validated document type and confidence |
 | `extract_fields` | Raw structured provider output |
 | `validate_extraction` | Pydantic-validated fields and combined confidence |
-| `create_chunks` | Ordered, overlapping document chunk records |
+| `create_chunks` | Logical chunks with source locations and provenance |
 | `generate_embeddings` | Validated finite vectors on chunks |
 | `index_chunks` | Verified complete chunks in transactional PostgreSQL indexes |
 | `link_entities` | Tenant/project constrained links to existing contracts, RFIs, change orders |

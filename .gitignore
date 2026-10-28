@@ -88,6 +88,9 @@ uploads/
 *.docx
 *.xlsx
 *.zip
+!backend/tests/fixtures/extraction/*.pdf
+!backend/tests/fixtures/extraction/*.docx
+!backend/tests/fixtures/extraction/*.xlsx
 
 # Alembic
 alembic/versions/*.pyc

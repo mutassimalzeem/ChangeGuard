@@ -8,7 +8,16 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class Classification(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    document_type: Literal["contract", "rfi", "change_order", "invoice", "correspondence", "other"]
+    document_type: Literal[
+        "contract",
+        "boq",
+        "rfi",
+        "daily_report",
+        "change_order",
+        "invoice",
+        "correspondence",
+        "other",
+    ]
     confidence: float = Field(ge=0, le=1)
 
 

@@ -1,6 +1,8 @@
 """PostgreSQL domain schema. Composite foreign keys enforce ownership boundaries."""
 
+import hashlib
 from datetime import date, datetime
+from datetime import date as DateValue
 from decimal import Decimal
 from typing import Any
 from uuid import UUID, uuid4
@@ -166,12 +168,17 @@ class Document(ProjectRecord, Base):
     )
 
 
+def chunk_text_hash(context):
+    return hashlib.sha256(context.get_current_parameters()["text"].encode("utf-8")).hexdigest()
+
+
 class DocumentChunk(ProjectRecord, Base):
     __tablename__ = "document_chunks"
     __table_args__ = project_constraints(
         project_reference("document_id", "documents"),
         UniqueConstraint("document_id", "chunk_index"),
         CheckConstraint("chunk_index >= 0", name="chunk_index_nonnegative"),
+        CheckConstraint("access_level IN ('project','restricted')", name="chunk_access_allowed"),
         Index(
             "ix_document_chunks_search", sql_text("to_tsvector('english', text)"),
             postgresql_using="gin",
@@ -185,6 +192,14 @@ class DocumentChunk(ProjectRecord, Base):
     chunk_index: Mapped[int] = mapped_column(Integer)
     text: Mapped[str] = mapped_column(Text)
     page_number: Mapped[int | None] = mapped_column(Integer)
+    section: Mapped[str] = mapped_column(String(512), server_default="document")
+    revision: Mapped[str] = mapped_column(String(100), server_default="1")
+    date: Mapped[DateValue | None] = mapped_column(Date)
+    author: Mapped[str | None] = mapped_column(Text)
+    access_level: Mapped[str] = mapped_column(String(32), server_default="restricted")
+    language: Mapped[str] = mapped_column(String(35), server_default="und")
+    chunk_hash: Mapped[str] = mapped_column(String(64), default=chunk_text_hash)
+    embedding_model: Mapped[str] = mapped_column(String(255), server_default="unknown")
     token_count: Mapped[int | None] = mapped_column(Integer)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(1536))
     attributes: Mapped[dict[str, Any]] = mapped_column(
