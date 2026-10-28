@@ -41,7 +41,12 @@ def providers(confidence=0.95):
             )
         ]
     )
-    services.classify.return_value = {"document_type": "contract", "confidence": confidence}
+    services.classify.return_value = {
+        "document_type": "contract",
+        "confidence": confidence,
+        "reasoning": "Mock classifier evidence",
+        "model_or_rule_used": "mock:classifier",
+    }
     services.extract.return_value = {
         "title": "Works",
         "summary": "Contract terms",
@@ -350,7 +355,13 @@ async def test_ocr_classify_extract_and_embed_unit():
     """No database or network; all requested service boundaries are mocked."""
     services = providers()
     document = SimpleNamespace(
-        file_type="png", checksum=hashlib.sha256(b"image").hexdigest(), storage_key="key"
+        file_type="png",
+        filename="file.png",
+        mime_type="image/png",
+        attributes={},
+        document_type=None,
+        checksum=hashlib.sha256(b"image").hexdigest(),
+        storage_key="key",
     )
     storage = Mock(download_file=Mock(return_value=b"image"))
     session = Mock(add=Mock())

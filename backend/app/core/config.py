@@ -168,6 +168,9 @@ class Settings(BaseSettings):
     max_chunks_per_document: int = 500
     logical_chunk_max_chars: int = Field(default=8000, ge=256, le=24000)
     processing_review_threshold: float = Field(default=0.8, ge=0, le=1)
+    classification_review_threshold: float = Field(default=0.8, ge=0, le=1)
+    classification_rule_threshold: float = Field(default=0.85, ge=0, le=1)
+    classification_rule_margin: float = Field(default=0.12, ge=0, le=1)
     vector_dimension: int = 1536
     search_top_k: int = 20
     rerank_top_k: int = 10

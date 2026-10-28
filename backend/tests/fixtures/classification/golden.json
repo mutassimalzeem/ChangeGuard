@@ -1,0 +1,238 @@
+[
+  {
+    "id": "contract_filename",
+    "expected": "contract",
+    "input": {
+      "filename": "signed_contract_A17.pdf",
+      "extracted_text": "General conditions and payment terms.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "contract_heading",
+    "expected": "contract",
+    "input": {
+      "filename": "scan_001.pdf",
+      "extracted_text": "Construction Agreement\nThe employer and contractor agree to the scope below.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "boq_filename",
+    "expected": "boq",
+    "input": {
+      "filename": "BOQ_revision_03.xlsx",
+      "extracted_text": "Item Description Quantity Unit Rate Amount",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "boq_columns",
+    "expected": "boq",
+    "input": {
+      "filename": "schedule_003.xlsx",
+      "extracted_text": "Description\tQuantity\tUnit\tRate\nConcrete\t12\tm3\t100",
+      "metadata": {
+        "file_type": "xlsx"
+      }
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "drawing_filename",
+    "expected": "drawing",
+    "input": {
+      "filename": "structural_drawing_S102.pdf",
+      "extracted_text": "Level 01 foundation layout.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "drawing_titleblock",
+    "expected": "drawing",
+    "input": {
+      "filename": "S102.pdf",
+      "extracted_text": "Drawing No: S-102\nScale: 1:100\nRevision: C",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "rfi_filename",
+    "expected": "rfi",
+    "input": {
+      "filename": "RFI_017.pdf",
+      "extracted_text": "Question: Confirm foundation levels.\nResponse: Pending.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "rfi_heading",
+    "expected": "rfi",
+    "input": {
+      "filename": "query_017.docx",
+      "extracted_text": "Request for Information\nPlease clarify the beam connection.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "change_order_filename",
+    "expected": "change_order",
+    "input": {
+      "filename": "change-order-009.pdf",
+      "extracted_text": "Additional works are described below.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "change_order_heading",
+    "expected": "change_order",
+    "input": {
+      "filename": "instruction_009.pdf",
+      "extracted_text": "Variation Order\nApproved scope changes and valuation.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "daily_report_filename",
+    "expected": "daily_report",
+    "input": {
+      "filename": "daily_site_report_2026-01-15.docx",
+      "extracted_text": "Weather: Clear\nActivities: Concrete placement.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "daily_report_heading",
+    "expected": "daily_report",
+    "input": {
+      "filename": "log_101.pdf",
+      "extracted_text": "Site Diary\nLabour: 25\nEquipment: 2 excavators",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "site_photo_filename",
+    "expected": "site_photo",
+    "input": {
+      "filename": "site_photo_pour_014.jpg",
+      "extracted_text": "",
+      "metadata": {
+        "file_type": "jpg",
+        "mime_type": "image/jpeg"
+      }
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "site_photo_metadata",
+    "expected": "site_photo",
+    "input": {
+      "filename": "IMG_014.png",
+      "extracted_text": "",
+      "metadata": {
+        "file_type": "png",
+        "title": "Site inspection photo"
+      }
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "email_eml",
+    "expected": "email",
+    "input": {
+      "filename": "message_100.eml",
+      "extracted_text": "Subject: Monthly progress",
+      "metadata": {
+        "file_type": "eml",
+        "mime_type": "message/rfc822"
+      }
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "email_msg",
+    "expected": "email",
+    "input": {
+      "filename": "quotation_attached.msg",
+      "extracted_text": "Price offer enclosed.",
+      "metadata": {
+        "file_type": "msg"
+      }
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "quotation_filename",
+    "expected": "quotation",
+    "input": {
+      "filename": "quotation_supplier_04.pdf",
+      "extracted_text": "Steel reinforcement supply prices.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "quotation_heading",
+    "expected": "quotation",
+    "input": {
+      "filename": "supplier_offer_04.pdf",
+      "extracted_text": "Quotation\nMaterials, rates and validity period.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": false
+  },
+  {
+    "id": "other_misc",
+    "expected": "other",
+    "input": {
+      "filename": "notes_001.pdf",
+      "extracted_text": "Lunch arrangements for the team.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": true
+  },
+  {
+    "id": "other_legacy_invoice",
+    "expected": "other",
+    "input": {
+      "filename": "invoice_009.pdf",
+      "extracted_text": "Invoice\nSubtotal 900.00",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": true
+  },
+  {
+    "id": "rfi_misleading_filename",
+    "expected": "rfi",
+    "input": {
+      "filename": "contract_attachment.pdf",
+      "extracted_text": "Request for Information\nConfirm which detail applies.",
+      "metadata": {}
+    },
+    "requires_fallback_or_review": true
+  },
+  {
+    "id": "unlabelled_photo",
+    "expected": "site_photo",
+    "input": {
+      "filename": "IMG_0072.jpg",
+      "extracted_text": "",
+      "metadata": {
+        "file_type": "jpg",
+        "mime_type": "image/jpeg"
+      }
+    },
+    "requires_fallback_or_review": true
+  }
+]
