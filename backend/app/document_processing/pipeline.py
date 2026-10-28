@@ -12,6 +12,8 @@ from sqlalchemy import select
 from starlette.concurrency import run_in_threadpool
 
 from app.core.config import get_settings
+from app.document_processing.extraction.chunking import logical_chunks
+from app.document_processing.extraction.types import ExtractionResult, TextBlock
 from app.document_processing.providers import Services
 from app.document_processing.schema import Classification, Extraction
 from app.domain.models import (
@@ -54,17 +56,11 @@ def scoped(model, document):
     )
 
 
-def chunks(text, size, overlap, limit):
-    if size <= 0 or not 0 <= overlap < size:
-        raise ValueError("Invalid chunk configuration")
-    result = []
-    for offset in range(0, len(text), size - overlap):
-        result.append(text[offset : offset + size])
-        if offset + size >= len(text):
-            break
-    if not result or len(result) > limit:
-        raise ValueError("Document chunk limit exceeded or no text")
-    return result
+def extraction_result(value):
+    """Read 3.1 string checkpoints without discarding completed work."""
+    if isinstance(value, str):
+        return ExtractionResult(blocks=[TextBlock(text=value, location={"source": "legacy_text"})])
+    return ExtractionResult.model_validate(value)
 
 
 async def execute_stage(stage, document, data, session, services, storage):
@@ -83,22 +79,25 @@ async def execute_stage(stage, document, data, session, services, storage):
         await original()
         return {"storage_key": document.storage_key, "checksum": document.checksum}
     if stage == "extract_text":
-        text = await run_in_threadpool(services.text, await original(), document.file_type)
+        result = await run_in_threadpool(services.extraction, await original(), document.file_type)
+        text = result.text
         if not isinstance(text, str) or not text.strip():
             raise ValueError("No document text extracted")
         if len(text) > 2_000_000:
             raise ValueError("Extracted text exceeds processing limit")
-        return text
+        return result.model_dump(mode="json")
     if stage == "classify_document":
         result = Classification.model_validate(
-            await run_in_threadpool(services.classify, data["extract_text"])
+            await run_in_threadpool(services.classify, extraction_result(data["extract_text"]).text)
         )
         document.document_type = result.document_type
         return result.model_dump(mode="json")
     if stage == "extract_fields":
         # Store raw provider output before schema validation, even if it is invalid.
         return await run_in_threadpool(
-            services.extract, data["extract_text"], data["classify_document"]
+            services.extract,
+            extraction_result(data["extract_text"]).text,
+            data["classify_document"],
         )
     if stage == "validate_extraction":
         result = Extraction.model_validate(data["extract_fields"])
@@ -108,23 +107,37 @@ async def execute_stage(stage, document, data, session, services, storage):
         return result.model_dump(mode="json")
     if stage == "create_chunks":
         settings = get_settings()
-        texts = chunks(
-            data["extract_text"],
-            settings.chunk_size,
-            settings.chunk_overlap,
-            settings.max_chunks_per_document,
+        parts = logical_chunks(
+            extraction_result(data["extract_text"]),
+            document.document_type or "other",
+            max_chars=settings.logical_chunk_max_chars,
+            limit=settings.max_chunks_per_document,
         )
-        for index, text in enumerate(texts):
+        for index, part in enumerate(parts):
             session.add(
                 DocumentChunk(
                     tenant_id=document.tenant_id,
                     project_id=document.project_id,
                     document_id=document.id,
                     chunk_index=index,
-                    text=text,
+                    text=part.text,
+                    page_number=part.page_number,
+                    section=part.section,
+                    revision=part.revision or str(document.document_version),
+                    date=part.date,
+                    author=part.author,
+                    access_level=document.access_level,
+                    language=part.language,
+                    chunk_hash=part.chunk_hash,
+                    embedding_model=settings.embedding_model,
+                    attributes={
+                        "kind": part.kind,
+                        "locations": part.locations,
+                        "extraction_version": 1,
+                    },
                 )
             )
-        return {"count": len(texts)}
+        return {"count": len(parts)}
     if stage in {"generate_embeddings", "index_chunks"}:
         rows = list(
             await session.scalars(
@@ -150,6 +163,7 @@ async def execute_stage(stage, document, data, session, services, storage):
                 raise ValueError("Invalid embedding response")
             for row, vector in zip(rows, vectors, strict=True):
                 row.embedding = vector
+                row.embedding_model = get_settings().embedding_model
         elif any(row.embedding is None for row in rows):
             raise ValueError("Missing chunk embeddings")
         # PostgreSQL GIN/HNSW indexes maintain themselves transactionally.

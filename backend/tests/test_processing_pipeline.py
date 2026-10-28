@@ -11,9 +11,9 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.document_processing.extraction.types import ExtractionResult, TextBlock
 from app.document_processing.pipeline import (
     STAGES,
-    chunks,
     execute_stage,
     is_transient,
     run_one_stage,
@@ -32,7 +32,15 @@ from app.domain.models import (
 def providers(confidence=0.95):
     services = Mock(spec=Services)
     services.ocr.return_value = "Document OCR text"
-    services.text.side_effect = lambda content, extension: services.ocr(content, extension)
+    services.extraction.side_effect = lambda content, extension: ExtractionResult(
+        blocks=[
+            TextBlock(
+                text=services.ocr(content, extension),
+                page_number=1,
+                location={"source": "mock_ocr"},
+            )
+        ]
+    )
     services.classify.return_value = {"document_type": "contract", "confidence": confidence}
     services.extract.return_value = {
         "title": "Works",
@@ -116,7 +124,7 @@ async def test_all_stages_and_duplicate_delivery(pipeline, test_session):
             "completed" if stage == STAGES[-1] else f"{stage}_done"
         )
     assert await pipeline.step() is None
-    for name in ("text", "ocr", "classify", "extract", "embed"):
+    for name in ("extraction", "ocr", "classify", "extract", "embed"):
         getattr(pipeline.services, name).assert_called_once()
     assert await test_session.scalar(select(func.count()).select_from(DocumentChunk)) == 1
     assert await test_session.scalar(select(func.count()).select_from(DocumentReviewTask)) == 0
@@ -157,7 +165,7 @@ async def test_transient_failure_backoff_and_partial_resume(pipeline, test_sessi
     assert document.processing_status == "dead_letter"
     assert await test_session.scalar(select(func.count()).select_from(DocumentChunk)) == 1
     await pipeline.step()
-    pipeline.services.text.assert_called_once()
+    pipeline.services.extraction.assert_called_once()
 
 
 async def test_retry_recovers_without_repeating_previous_services(pipeline, test_session):
@@ -331,24 +339,6 @@ async def test_entity_references_cannot_link_across_project(pipeline, test_sessi
     assert await test_session.scalar(select(func.count()).select_from(DocumentEntityLink)) == 0
 
 
-def test_scanned_pdf_uses_ocr_adapter(monkeypatch):
-    from tests.test_documents import pdf_bytes
-
-    services = Services()
-    ocr = Mock(return_value="OCR document text")
-    monkeypatch.setattr(services, "ocr", ocr)
-    assert services.text(pdf_bytes(), "pdf") == "OCR document text"
-    ocr.assert_called_once()
-
-
-def test_chunk_bounds_and_overlap():
-    assert chunks("abcdefghij", 4, 1, 3) == ["abcd", "defg", "ghij"]
-    with pytest.raises(ValueError):
-        chunks("long text", 3, 3, 20)
-    with pytest.raises(ValueError):
-        chunks("long text", 3, 0, 1)
-
-
 def test_retry_policy():
     assert is_transient(TimeoutError())
     assert is_transient(ConnectionError())
@@ -377,7 +367,7 @@ async def test_ocr_classify_extract_and_embed_unit():
     )
     data["create_chunks"] = {"count": 1}
     document.id, document.project_id, document.tenant_id = uuid4(), uuid4(), uuid4()
-    row = SimpleNamespace(text=text, embedding=None)
+    row = SimpleNamespace(text="Document OCR text", embedding=None)
     session.scalars = AsyncMock(return_value=[row])
     await execute_stage("generate_embeddings", document, data, session, services, storage)
     assert len(row.embedding) == 1536
