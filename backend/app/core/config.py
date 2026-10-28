@@ -34,9 +34,19 @@ class Settings(BaseSettings):
         min_length=32,
         validation_alias="JWT_SECRET",
     )
-    jwt_algorithm: str = Field(default="HS256", validation_alias="JWT_ALGORITHM")
-    access_token_expire_minutes: int = Field(default=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
-    refresh_token_expire_days: int = 7
+    jwt_algorithm: Literal["HS256", "HS384", "HS512"] = Field(default="HS256", validation_alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(default=15, ge=1, le=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, ge=1, le=90)
+    password_reset_expire_minutes: int = Field(default=30, ge=1, le=60)
+    login_max_failures: int = Field(default=5, ge=1, le=100)
+    login_window_seconds: int = Field(default=900, ge=1)
+    auth_request_limit: int = Field(default=10, ge=1)
+    smtp_host: str | None = None
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from_email: str = "noreply@changeguard.invalid"
+    smtp_starttls: bool = True
     password_hash_rounds: int = 12
 
     # Database
@@ -224,7 +234,7 @@ class Settings(BaseSettings):
         if self.environment == "production":
             errors = []
 
-            if self.jwt_secret in ("your-super-secret-key-change-in-production-at-least-32-chars-long", "changeme", "secret"):
+            if self.jwt_secret in ("your-super-secret-key-change-in-production-at-least-32-chars-long", "local-development-secret-key-change-in-production-32-chars-min", "changeme", "secret"):
                 errors.append("JWT_SECRET must be a strong random secret in production")
 
             db_url = str(self.database_url)
@@ -239,6 +249,9 @@ class Settings(BaseSettings):
 
             if self.llm_provider != "none" and not self.llm_api_key:
                 errors.append(f"LLM_API_KEY is required when LLM_PROVIDER is '{self.llm_provider}'")
+
+            if self.smtp_host and (not self.smtp_starttls or not self.frontend_url.startswith("https://")):
+                errors.append("Password reset delivery in production requires STARTTLS and an HTTPS FRONTEND_URL")
 
             if errors:
                 raise ValueError(

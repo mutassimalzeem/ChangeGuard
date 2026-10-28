@@ -11,7 +11,7 @@ from alembic import command
 from app.core.database import Base
 from app.domain import models
 
-TABLES = {
+FOUNDATION_TABLES = {
     "tenants",
     "users",
     "projects",
@@ -29,6 +29,8 @@ TABLES = {
     "audit_events",
     "ai_traces",
 }
+SYSTEM_TABLES = {"auth_rate_limits", "authentication_events"}
+TABLES = FOUNDATION_TABLES | SYSTEM_TABLES | {"auth_sessions", "password_reset_grants"}
 
 
 def test_all_tables_have_uuid_keys_and_timestamps():
@@ -45,7 +47,7 @@ def test_all_tables_have_uuid_keys_and_timestamps():
 
 def test_tenant_and_project_ownership_is_constrained_and_indexed():
     for table in Base.metadata.tables.values():
-        if table.name == "tenants":
+        if table.name == "tenants" or table.name in SYSTEM_TABLES:
             continue
         assert not table.c.tenant_id.nullable
         assert any(fk.target_fullname == "tenants.id" for fk in table.c.tenant_id.foreign_keys)
@@ -75,4 +77,4 @@ def test_offline_migration_contains_all_tables_and_timestamp_triggers():
 
 
 def test_models_are_publicly_exported():
-    assert len(models.__all__) == 16
+    assert len(models.__all__) == len(TABLES)

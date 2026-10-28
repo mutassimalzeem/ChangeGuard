@@ -5,6 +5,7 @@ description = "ChangeGuard - Construction Change Order Management System"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "argon2-cffi>=23.1.0",
     # Core
     "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",

@@ -34,7 +34,7 @@ from app.domain.models import (
     User,
 )
 from tests.conftest import migration_config
-from tests.test_database_schema import TABLES
+from tests.test_database_schema import FOUNDATION_TABLES, TABLES
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
@@ -195,6 +195,8 @@ async def test_persist_complete_project_graph(test_session, tenant, project, use
     assert len(stored_order.approvals) == 1
     assert (await session.get(Contract, contract.id)).value == Decimal("1234.56")
     for table in Base.metadata.sorted_tables:
+        if table.name not in FOUNDATION_TABLES:
+            continue
         assert await session.scalar(select(table.c.id).limit(1)) is not None
 
 
