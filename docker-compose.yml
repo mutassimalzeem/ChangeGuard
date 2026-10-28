@@ -20,6 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    command: redis-server --appendonly yes
     container_name: changeguard-redis
     ports:
       - "6379:6379"
@@ -59,11 +60,11 @@ services:
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
-      STORAGE_ENDPOINT: minio:9000
-      STORAGE_ACCESS_KEY: minioadmin
-      STORAGE_SECRET_KEY: minioadmin
-      STORAGE_BUCKET: changeguard
-      STORAGE_SECURE: "false"
+      OBJECT_STORAGE_ENDPOINT: minio:9000
+      OBJECT_STORAGE_ACCESS_KEY: minioadmin
+      OBJECT_STORAGE_SECRET_KEY: minioadmin
+      OBJECT_STORAGE_BUCKET: changeguard
+      OBJECT_STORAGE_SECURE: "false"
       SECRET_KEY: "your-super-secret-key-change-in-production-at-least-32-chars"
       ENVIRONMENT: local
       DEBUG: "true"
@@ -83,6 +84,8 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   worker:
+    healthcheck:
+      disable: true
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -92,16 +95,19 @@ services:
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
-      STORAGE_ENDPOINT: minio:9000
-      STORAGE_ACCESS_KEY: minioadmin
-      STORAGE_SECRET_KEY: minioadmin
-      STORAGE_BUCKET: changeguard
-      STORAGE_SECURE: "false"
+      OBJECT_STORAGE_ENDPOINT: minio:9000
+      OBJECT_STORAGE_ACCESS_KEY: minioadmin
+      OBJECT_STORAGE_SECRET_KEY: minioadmin
+      OBJECT_STORAGE_BUCKET: changeguard
+      OBJECT_STORAGE_SECURE: "false"
       SECRET_KEY: "your-super-secret-key-change-in-production-at-least-32-chars"
       ENVIRONMENT: local
       DEBUG: "true"
       LOG_LEVEL: INFO
       LOG_FORMAT: console
+      LLM_PROVIDER: ${LLM_PROVIDER:-none}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      OCR_PROVIDER: ${OCR_PROVIDER:-none}
     volumes:
       - ./backend:/app
     depends_on:
@@ -111,7 +117,25 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-    command: celery -A app.core.celery_app worker --loglevel=info --concurrency=4
+    command: celery -A app.core.celery_app worker --loglevel=info --concurrency=4 -Q celery,ingestion,document_processing,ai,workflow
+
+  beat:
+    healthcheck:
+      disable: true
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/changeguard
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      ENVIRONMENT: local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.core.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
 
   # Frontend placeholder
   frontend:

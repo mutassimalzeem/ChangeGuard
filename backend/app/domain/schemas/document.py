@@ -37,7 +37,8 @@ class DocumentRead(BaseModel):
     uploaded_by: UUID | None = Field(validation_alias="uploaded_by_id")
     uploaded_at: datetime = Field(validation_alias="created_at")
     source: str
-    processing_status: ProcessingStatus = Field(validation_alias="status")
+    processing_status: str
+    status: ProcessingStatus
     document_type: str | None
     document_version: int
     access_level: str

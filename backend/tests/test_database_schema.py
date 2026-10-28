@@ -34,6 +34,7 @@ TABLES = (
     FOUNDATION_TABLES
     | SYSTEM_TABLES
     | {"auth_sessions", "password_reset_grants", "project_memberships"}
+    | {"document_entity_links", "document_review_tasks", "processing_dead_letters"}
 )
 
 

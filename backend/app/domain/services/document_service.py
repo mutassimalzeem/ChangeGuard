@@ -105,6 +105,7 @@ class DocumentService:
             file_type=extension,
             uploaded_by_id=self.user.id,
             status="received",
+            processing_status="received",
             source=source,
             document_type=document_type,
             document_version=1,
@@ -121,10 +122,12 @@ class DocumentService:
             raise
         try:
             document.status = "validating"
+            document.processing_status = "validating"
             await self.session.commit()
             await run_in_threadpool(self.storage.store_original, key, file.file, mime)
         except Exception:
             document.status = "failed"
+            document.processing_status = "failed"
             document.error_message = (
                 "Original storage failed; upload must be retried by an operator"
             )
@@ -133,9 +136,11 @@ class DocumentService:
                 503, "Original storage unavailable; failed registry entry retained"
             ) from None
         document.status = "quarantined" if error else "stored"
+        document.processing_status = document.status
         await self.session.commit()
         if not error:
             document.status = "queued"
+            document.processing_status = "queued"
             await self.session.commit()
             from app.ingestion.tasks import process_uploaded_file
 

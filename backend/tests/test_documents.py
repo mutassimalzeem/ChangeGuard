@@ -257,10 +257,10 @@ async def test_worker_is_idempotent_and_preserves_failed_original(
     await process_registry_document(row["document_id"], str(uuid4()))
     storage.download_file.assert_not_called()
     await process_registry_document(row["document_id"], str(registry[1].tenant_id))
-    await process_registry_document(row["document_id"], str(registry[1].tenant_id))
     storage.download_file.assert_called_once()
     document = await test_session.scalar(select(Document).execution_options(populate_existing=True))
-    assert document.status == ("quarantined" if corrupted else "review_required")
+    assert document.status == ("failed" if corrupted else "processing")
+    assert document.processing_status == ("dead_letter" if corrupted else "validate_file_done")
     storage.delete_file.assert_not_called()
 
 

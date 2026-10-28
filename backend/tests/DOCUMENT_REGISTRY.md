@@ -62,18 +62,15 @@ celery -A app.core.celery_app.celery_app worker -Q ingestion,document_processing
 celery -A app.core.celery_app.celery_app beat
 ```
 
-Beat scans every 60 seconds for incomplete/pending records older than five
-minutes. It republishes up to 100 per scan, recovering API interruptions and
-broker outages. Row locks and status checks make repeated deliveries harmless.
-The worker verifies the stored hash and content, moves through `processing`,
-and ends at `review_required`. Text extraction, classification, indexing and
-linking remain separate pipeline features; this change does not claim that
-those placeholder stages have executed. All requested states are represented:
-received, validating, stored, queued, processing, extracted, classified, indexed,
-linked, review_required, failed, quarantined.
+Feature 3.1 now runs the complete processing pipeline. See
+[the pipeline operations guide](../app/document_processing/README.md) for stages,
+provider configuration, retries, durable checkpoints and dead-letter handling.
+`processing_status` reports each stage; `status` retains the coarse registry state.
+Beat recovers interrupted processing and dispatches dead-letter notifications.
 
-Processing failures quarantine the record in place and preserve its immutable
-original key; they do not move/delete the original. Storage outages return 503
+Processing failures preserve the immutable original and completed stage results.
+Permanent/exhausted failures enter the dead-letter queue. Storage outages during
+upload return 503
 with a persisted `failed` registry record and an operator-facing error. An object
 store that is unavailable cannot guarantee retention of bytes it did not accept;
 operators must reconcile the key and retry from the source after recovery.

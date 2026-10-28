@@ -1,12 +1,20 @@
 """Celery application configuration."""
 
 from celery import Celery
-from celery.schedules import crontab
+from celery.signals import setup_logging
+from kombu import Queue
 
 from app.core.config import get_settings
 
-
 settings = get_settings()
+
+
+@setup_logging.connect
+def configure_worker_logging(**kwargs):
+    from app.core.logging import configure_logging
+
+    configure_logging()
+
 
 celery_app = Celery(
     "changeguard",
@@ -35,6 +43,20 @@ celery_app.conf.update(
     result_expires=3600,
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+    task_ignore_result=True,
+    worker_hijack_root_logger=False,
+    broker_transport_options={"visibility_timeout": 3600},
+    task_queues=tuple(
+        Queue(name)
+        for name in (
+            "celery",
+            "ingestion",
+            "document_processing",
+            "ai",
+            "workflow",
+            "document_dead_letter",
+        )
+    ),
     task_routes={
         "app.ingestion.tasks.*": {"queue": "ingestion"},
         "app.document_processing.tasks.*": {"queue": "document_processing"},
@@ -42,7 +64,10 @@ celery_app.conf.update(
         "app.workflow.tasks.*": {"queue": "workflow"},
     },
     beat_schedule={
-        "recover-document-queue": {"task": "app.ingestion.tasks.recover_document_queue", "schedule": 60.0},
+        "recover-document-queue": {
+            "task": "app.ingestion.tasks.recover_document_queue",
+            "schedule": 60.0,
+        },
         # Periodic tasks can be added here
         # "cleanup-expired-tokens": {
         #     "task": "app.core.tasks.cleanup_expired_tokens",
