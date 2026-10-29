@@ -186,6 +186,10 @@ class DocumentChunk(ProjectRecord, Base):
             postgresql_using="gin",
         ),
         Index(
+            "ix_document_chunks_identifiers", sql_text("to_tsvector('simple', text)"),
+            postgresql_using="gin",
+        ),
+        Index(
             "ix_document_chunks_vector", "embedding", postgresql_using="hnsw",
             postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
