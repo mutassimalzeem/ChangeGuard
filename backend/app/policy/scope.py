@@ -37,6 +37,9 @@ _WRITE_ACTIONS = {
     "change_orders": Action.CHANGE_WRITE,
     "risks": Action.RISK_WRITE,
     "evidence_links": Action.CHANGE_WRITE,
+    "claims": Action.CHANGE_WRITE,
+    "ai_answers": Action.CHANGE_WRITE,
+    "site_photos": Action.DOCUMENT_WRITE,
     "users": Action.USERS_MANAGE,
     "tenants": Action.TENANT_MANAGE,
 }
