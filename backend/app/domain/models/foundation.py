@@ -29,7 +29,7 @@ from sqlalchemy import (
     text as sql_text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship, synonym
 
 from app.core.database import Base
 
@@ -444,50 +444,70 @@ class Approval(ProjectRecord, Base):
     )
 
 
+class AIAnswer(ProjectRecord, Base):
+    __tablename__ = "ai_answers"
+    __table_args__ = project_constraints(
+        user_reference("created_by"),
+        CheckConstraint("status IN ('supported','insufficient_evidence')", name="answer_status"),
+    )
+    text: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(
+        String(32), server_default="insufficient_evidence", index=True
+    )
+    created_by: Mapped[UUID | None] = mapped_column(Uuid)
+
+
+class Claim(ProjectRecord, Base):
+    __tablename__ = "claims"
+    __table_args__ = project_constraints(
+        project_reference("ai_answer_id", "ai_answers"),
+        CheckConstraint(
+            "status IN ('draft','verified','insufficient_evidence')", name="claim_status"
+        ),
+    )
+    text: Mapped[str] = mapped_column(Text)
+    ai_generated: Mapped[bool] = mapped_column(Boolean, server_default=sql_text("false"))
+    ai_answer_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
+    status: Mapped[str] = mapped_column(String(32), server_default="draft", index=True)
+
+
+class SitePhoto(ProjectRecord, Base):
+    __tablename__ = "site_photos"
+    __table_args__ = project_constraints(project_reference("document_id", "documents"))
+    document_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    caption: Mapped[str | None] = mapped_column(Text)
+
+
 class EvidenceLink(ProjectRecord, Base):
     __tablename__ = "evidence_links"
     __table_args__ = project_constraints(
-        project_reference("change_order_id", "change_orders"),
-        project_reference("risk_id", "risks"),
-        project_reference("document_id", "documents"),
-        project_reference("document_chunk_id", "document_chunks"),
-        project_reference("project_event_id", "project_events"),
-        project_reference("boq_item_id", "boq_items"),
-        project_reference("contract_clause_id", "contract_clauses"),
-        CheckConstraint("num_nonnulls(change_order_id, risk_id) = 1", name="exactly_one_claim"),
+        user_reference("created_by"),
         CheckConstraint(
-            "num_nonnulls(document_id, document_chunk_id, project_event_id, boq_item_id, contract_clause_id) = 1",
-            name="exactly_one_source",
+            "subject_type IN ('claim','risk','project_event','change_order','ai_answer')",
+            name="subject_type",
         ),
+        CheckConstraint(
+            "source_type IN ('document','document_chunk','site_photo','project_event','boq_item','contract_clause')",
+            name="source_type",
+        ),
+        CheckConstraint("relevance >= 0 AND relevance <= 1", name="relevance_range"),
+        CheckConstraint("confidence >= 0 AND confidence <= 1", name="confidence_range"),
+        CheckConstraint("source_page > 0", name="source_page_positive"),
+        Index("ix_evidence_links_subject", "tenant_id", "project_id", "subject_type", "subject_id"),
+        Index("ix_evidence_links_source", "source_type", "source_id"),
     )
-    change_order_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    risk_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    document_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    document_chunk_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    project_event_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    boq_item_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    contract_clause_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
-    rationale: Mapped[str | None] = mapped_column(Text)
+    subject_type: Mapped[str] = mapped_column(String(32))
+    subject_id: Mapped[UUID] = mapped_column(Uuid)
+    source_type: Mapped[str] = mapped_column(String(32))
+    source_id: Mapped[UUID] = mapped_column(Uuid)
+    relevance: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
     confidence: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
-    change_order: Mapped["ChangeOrder | None"] = relationship(
-        foreign_keys=[change_order_id], backref="evidence_links"
-    )
-    risk: Mapped["Risk | None"] = relationship(foreign_keys=[risk_id], backref="evidence_links")
-    document: Mapped["Document | None"] = relationship(
-        foreign_keys=[document_id], backref="evidence_links"
-    )
-    document_chunk: Mapped["DocumentChunk | None"] = relationship(
-        foreign_keys=[document_chunk_id], backref="evidence_links"
-    )
-    project_event: Mapped["ProjectEvent | None"] = relationship(
-        foreign_keys=[project_event_id], backref="evidence_links"
-    )
-    boq_item: Mapped["BOQItem | None"] = relationship(
-        foreign_keys=[boq_item_id], backref="evidence_links"
-    )
-    contract_clause: Mapped["ContractClause | None"] = relationship(
-        foreign_keys=[contract_clause_id], backref="evidence_links"
-    )
+    source_page: Mapped[int | None] = mapped_column(Integer)
+    source_text_snippet: Mapped[str | None] = mapped_column(Text)
+    rationale: Mapped[str | None] = mapped_column(Text)
+    created_by: Mapped[UUID | None] = mapped_column(Uuid)
+
+    evidence_link_id = synonym("id")
 
 
 class AuditEvent(TenantRecord, Base):

@@ -48,13 +48,17 @@ evidence and history. Explicit removal/retention workflows are future features.
 | change_orders | Project, optional contract, RFI, and creator |
 | risks | Project, optional change order, document, event, and owner |
 | approvals | Exactly one change order or risk; optional assignee and decision maker |
-| evidence_links | Exactly one change order/risk claim and exactly one typed source |
+| evidence_links | Immutable typed subject/source reference with provenance and scores |
+| claims | Factual assertion; AI-generated and verified claims require evidence |
+| ai_answers | Grounded answer or insufficient_evidence status |
+| site_photos | Project photo backed by a document |
 | audit_events | Tenant, optional project/actor; action and entity reference |
 | ai_traces | Tenant, optional project; provider/model, operation, usage, timing |
 
 Typed evidence sources are documents (including uploaded images), document chunks,
-project events, BOQ items, or contract clauses. Database check constraints enforce
-unambiguous claims/sources. Audit entity references remain generic identifiers;
+site photos, project events, BOQ items, or contract clauses. Checked PostgreSQL
+triggers enforce reference ownership, immutability, and factual support. See
+[the evidence service contract](../services/EVIDENCE.md). Audit entity references remain generic identifiers;
 they are not polymorphic foreign keys. JSON attributes are stored in the database,
 not automatically logged. Do not store credentials in these attributes.
 

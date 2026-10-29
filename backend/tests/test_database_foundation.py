@@ -160,8 +160,10 @@ async def test_persist_complete_project_graph(test_session, tenant, project, use
             EvidenceLink(
                 tenant_id=tenant.id,
                 project_id=project.id,
-                risk_id=risk.id,
-                document_chunk_id=chunk.id,
+                subject_type="risk",
+                subject_id=risk.id,
+                source_type="document_chunk",
+                source_id=chunk.id,
             ),
             AuditEvent(
                 tenant_id=tenant.id,
@@ -338,9 +340,10 @@ async def test_evidence_requires_one_claim_and_one_source(test_session, tenant, 
                 EvidenceLink(
                     tenant_id=tenant.id,
                     project_id=project.id,
-                    change_order_id=None if invalid == "no_claim" else order.id,
-                    document_id=None if invalid == "no_source" else document.id,
-                    project_event_id=event.id if invalid == "multiple_sources" else None,
+                    subject_type="change_order",
+                    subject_id=uuid4() if invalid == "no_claim" else order.id,
+                    source_type="invalid" if invalid == "multiple_sources" else "document",
+                    source_id=uuid4() if invalid == "no_source" else document.id,
                 )
             )
             await test_session.flush()
