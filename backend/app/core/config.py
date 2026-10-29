@@ -7,6 +7,8 @@ from typing import Literal
 from pydantic import Field, PostgresDsn, computed_field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.ai.gateway.config import ModelPricing, TaskPolicy, TaskType
+
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -119,6 +121,8 @@ class Settings(BaseSettings):
     max_tokens_per_request: int = 8192
     ai_request_timeout: int = 120
     ai_max_retries: int = 3
+    model_gateway_tasks: dict[TaskType, TaskPolicy] = Field(default_factory=dict)
+    model_gateway_prices: dict[str, ModelPricing] = Field(default_factory=dict)
 
     # OCR
     ocr_provider: Literal["tesseract", "aws_textract", "azure_form_recognizer", "none"] = Field(

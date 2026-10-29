@@ -84,6 +84,13 @@ def classification_review_reason(result, text):
 
 
 async def execute_stage(stage, document, data, session, services, storage):
+    from app.ai.gateway.context import model_scope
+
+    with model_scope(document.tenant_id, document.project_id):
+        return await _execute_stage(stage, document, data, session, services, storage)
+
+
+async def _execute_stage(stage, document, data, session, services, storage):
     async def original():
         content = await run_in_threadpool(storage.download_file, document.storage_key)
         if hashlib.sha256(content).hexdigest() != document.checksum:
@@ -463,7 +470,6 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
 def is_transient(exc):
     from botocore.exceptions import ConnectionClosedError, EndpointConnectionError
     from celery.exceptions import SoftTimeLimitExceeded
-    from openai import APIConnectionError, APIStatusError, APITimeoutError
     from sqlalchemy.exc import OperationalError
 
     from app.domain.services.object_storage import StorageError
@@ -475,10 +481,8 @@ def is_transient(exc):
             TimeoutError,
             ConnectionClosedError,
             EndpointConnectionError,
-            APIConnectionError,
-            APITimeoutError,
             OperationalError,
             SoftTimeLimitExceeded,
             StorageError,
         ),
-    ) or (isinstance(exc, APIStatusError) and (exc.status_code == 429 or exc.status_code >= 500))
+    )

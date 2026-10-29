@@ -1,6 +1,7 @@
 """Golden documents and adversarial/fallback cases; no network model calls."""
 
 import json
+from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
@@ -93,28 +94,33 @@ def test_services_stamp_actual_model_and_limit_metadata(monkeypatch):
     services = Services()
     monkeypatch.setattr(services.settings, "llm_provider", "openai")
     monkeypatch.setattr(services.settings, "llm_api_key", "unit-test-not-a-secret")
-    structured = Mock(return_value={**result(), "model_or_rule_used": "rules:forged"})
-    monkeypatch.setattr(services, "structured", structured)
+    from app.document_processing.schema import Classification
+
+    structured = Mock(
+        return_value=SimpleNamespace(
+            value=Classification(**{**result(), "model_or_rule_used": "rules:forged"}),
+            model="fallback-classifier",
+        )
+    )
+    monkeypatch.setattr(services.gateway, "generate", structured)
     classified = services.classify(
         ClassificationInput(
             filename="unknown.pdf", metadata={"api_key": "NEVER_SEND", "tenant_id": "PRIVATE"}
         )
     )
+    assert classified["model_or_rule_used"] == "llm:fallback-classifier"
     assert (
-        classified["model_or_rule_used"] == f"llm:{services.settings.default_classification_model}"
+        "NEVER_SEND" not in structured.call_args.args[1][1]["content"]
+        and "PRIVATE" not in structured.call_args.args[1][1]["content"]
     )
-    assert (
-        "NEVER_SEND" not in structured.call_args.args[0]
-        and "PRIVATE" not in structured.call_args.args[0]
-    )
-    assert "untrusted" in structured.call_args.kwargs["instructions"]
+    assert "untrusted" in structured.call_args.args[1][0]["content"]
 
 
 def test_unconfigured_llm_returns_safe_low_confidence_other(monkeypatch):
     services = Services()
     monkeypatch.setattr(services.settings, "llm_provider", "none")
     client = Mock(side_effect=AssertionError("No LLM should be invoked"))
-    monkeypatch.setattr(services, "client", client)
+    monkeypatch.setattr(services.gateway, "generate", client)
     assert services.classify(ClassificationInput())["document_type"] == "other"
     client.assert_not_called()
 

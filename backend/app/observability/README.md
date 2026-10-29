@@ -25,3 +25,9 @@ structured extras, but their free-form message, traceback, and stack text are
 suppressed because they can contain arbitrary secrets or document text. Use
 structlog for diagnostic events. SQL echo and parameter logging are disabled;
 the middleware replaces Uvicorn access logging.
+
+The [model gateway](../ai/gateway/README.md) emits attempt and final trace events
+with scope IDs, task/model, version, hashes, token counts, latency, estimated cost
+and validation outcome. Redaction permits only nonnegative integer token counters
+and bounded version identifiers for those audit fields. Raw model output remains
+redacted, including the `raw_output` key used by internal extraction diagnostics.

@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from sqlalchemy import and_, case, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.gateway.context import model_scope
 from app.domain.models import Document, DocumentChunk, User
 from app.domain.services.project_access import ProjectAccessService
 from app.policy.permissions import TENANT_WIDE_ROLES, Action, has_permission
@@ -141,8 +142,9 @@ class HybridRetrieval:
         )
         return list(result.mappings())
 
-    async def vectors(self, base, query, count):
-        vector = validate_embedding(await self.embedder.embed(query))
+    async def vectors(self, base, query, count, project_id=None):
+        with model_scope(self.user.tenant_id, project_id):
+            vector = validate_embedding(await self.embedder.embed(query))
         distance = DocumentChunk.embedding.cosine_distance(vector)
         result = await self.session.execute(
             base.add_columns((1 - distance).label("vector_similarity"))
@@ -203,7 +205,7 @@ class HybridRetrieval:
             semantic_status = "unavailable"
             if self.embedder is not None:
                 try:
-                    vectors = await self.vectors(base, request.query, count)
+                    vectors = await self.vectors(base, request.query, count, request.filters.project_id)
                     semantic_status = "used"
                 except EmbeddingUnavailableError:
                     pass

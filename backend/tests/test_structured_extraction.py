@@ -205,26 +205,26 @@ def test_provider_errors_are_not_repaired_as_invalid_json():
 
 
 def test_provider_request_uses_strict_json_schema(monkeypatch):
+    from app.ai.gateway.provider import OpenAIProvider
+    from app.ai.gateway.service import ModelGateway
+
     services = Services()
+    data, source = case("contract")
     response = SimpleNamespace(
         choices=[
             SimpleNamespace(
-                finish_reason="stop", message=SimpleNamespace(content="{}", refusal=None)
+                finish_reason="stop",
+                message=SimpleNamespace(content=json.dumps(data), refusal=None),
             )
-        ]
+        ],
+        usage=None,
     )
     client = Mock()
     client.chat.completions.create.return_value = response
-    monkeypatch.setattr(services, "client", lambda: client)
-    assert (
-        services.generate_extraction(
-            schema=Contract,
-            payload={"source": "fixture"},
-            instructions="Never calculate totals",
-            previous=None,
-        )
-        == "{}"
+    services.gateway = ModelGateway(
+        settings=services.settings, provider=OpenAIProvider(services.settings, client=client)
     )
+    assert services.extract(source, {"document_type": "contract"})["fields"] == data
     request = client.chat.completions.create.call_args.kwargs
     assert request["response_format"]["json_schema"]["strict"] is True
     assert request["response_format"]["json_schema"]["schema"]["additionalProperties"] is False
