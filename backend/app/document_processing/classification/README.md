@@ -10,7 +10,7 @@ Types: `contract`, `boq`, `drawing`, `rfi`, `change_order`, `daily_report`,
 
 Every result includes `document_type`, `confidence`, `reasoning`, and
 `model_or_rule_used`. Rules have versioned provenance (`rules:v1:…`); the provider
-stamps `llm:<configured model>` rather than trusting generated provenance.
+stamps `llm:<selected model>` (including gateway fallback) rather than trusting generated provenance.
 Pydantic rejects invalid types, confidence ranges, empty reasoning and extra fields.
 
 ## Routing and evidence
@@ -27,11 +27,11 @@ Rule explanations summarize evidence categories without quoting document text.
 `CLASSIFICATION_RULE_MARGIN` defaults to 0.12. Only inconclusive rules invoke an
 available LLM. The provider receives allowlisted metadata and at most the first
 16,000 extracted characters, with document instructions treated as untrusted data.
-The existing configured OpenAI model and structured-output adapter are reused.
+The central [model gateway](../../ai/gateway/README.md) applies the classification
+task policy, validates JSON, and permits one malformed-output repair.
 
 Without a configured LLM, inconclusive evidence returns low-confidence `other`
-for review. Configured provider failures propagate to the pipeline's existing
-retry/dead-letter policy; they are not converted into fabricated classifications.
+for review. Exhausted gateway requests propagate to the pipeline dead-letter path; they are not converted into fabricated classifications.
 Confidence scores are heuristics, not calibrated probabilities.
 
 ## Persistence and review

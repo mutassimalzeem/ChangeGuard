@@ -355,6 +355,7 @@ async def test_ocr_classify_extract_and_embed_unit():
     """No database or network; all requested service boundaries are mocked."""
     services = providers()
     document = SimpleNamespace(
+        tenant_id=uuid4(), project_id=uuid4(),
         file_type="png",
         filename="file.png",
         mime_type="image/png",

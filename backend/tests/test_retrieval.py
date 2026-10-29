@@ -562,3 +562,24 @@ async def test_api_rejects_foreign_tenant_filter(client, user, corpus):
         json={"query": "steel", "filters": {"tenant_id": str(corpus["foreign_tenant"])}},
     )
     assert result.status_code == 403
+
+
+async def test_retrieval_passes_authenticated_scope_to_embedding(test_session, user, corpus):
+    from app.ai.gateway.context import current_scope
+
+    observed = []
+
+    class ScopedEmbedder(FixtureEmbedder):
+        async def embed(self, query):
+            observed.append(current_scope())
+            return vector()
+
+    service = HybridRetrieval(test_session, user, embedder=ScopedEmbedder())
+    await service.search(
+        SearchRequest(query="schedule overrun", filters=SearchFilters(project_id=corpus["project"]))
+    )
+    await service.search(SearchRequest(query="schedule overrun"))
+    assert observed[0].tenant_id == corpus["tenant"]
+    assert observed[0].project_id == corpus["project"]
+    assert observed[1].tenant_id == corpus["tenant"] and observed[1].project_id is None
+    assert current_scope().tenant_id is None

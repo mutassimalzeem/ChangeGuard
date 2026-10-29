@@ -80,7 +80,7 @@ calls may be repeated after a process dies before committing, but durable chunk,
 link, risk and review records are not duplicated. Successful earlier stages stay
 intact if later ones fail. Raw extraction output survives schema rejection.
 
-Transient connection, storage, provider 429/5xx and timeout failures retry at
+Transient storage/database connection and timeout failures retry at
 30, 60, and 120 seconds (four total attempts). Retry eligibility and next-attempt
 time live in PostgreSQL, so duplicate messages and worker restarts cannot reset
 the budget or bypass backoff. Invalid content/schema and missing provider
@@ -132,3 +132,7 @@ DEBUG=false TEST_DATABASE_ADMIN_URL=postgresql+asyncpg://USER:PASS@HOST:PORT/pos
 Use an isolated Redis instance; the worker consumes its ingestion queue. This
 verifies real broker delivery and continuation, not provider accuracy or native
 OCR quality. Live model calls and OCR binaries are not exercised by mock tests.
+
+All LLM and embedding calls use the [model gateway](../ai/gateway/README.md).
+It owns provider retries, fallback, validation and one repair attempt. Exhausted
+gateway calls enter the dead-letter path without an additional Celery provider retry loop.

@@ -77,14 +77,17 @@ Requests use `response_format.type=json_schema`, `strict=true`, closed objects
 validation remains mandatory after generation. Duplicate JSON keys, fenced or
 malformed JSON, non-finite constants, invalid types/enums and unsupported evidence
 trigger a repair request containing the original source, prior response and safe
-validation error codes/paths. Repairs regenerate a complete object and may mark
+validation instructions. Repairs regenerate a complete object and may mark
 unsupported values missing; they cannot invent facts to satisfy a schema.
 
-`STRUCTURED_EXTRACTION_REPAIR_RETRIES` defaults to one (two total calls), bounded
-to zero through two. Truncated output can be repaired; refusals/content filtering
-are not retried as repair prompts. Transport/rate-limit errors retain the existing
-Celery backoff/dead-letter policy. Each model request is limited to 60 seconds
-and the configured output-token limit.
+Production extraction uses the [model gateway](../../ai/gateway/README.md) for
+schema/evidence validation and exactly one repair attempt. It does not stack
+another extraction repair loop on top. The legacy
+`STRUCTURED_EXTRACTION_REPAIR_RETRIES` setting applies only to callers that
+explicitly construct the standalone extractor. Refusals/content filtering are
+terminal. Task policy controls model, temperature, token limit, per-attempt timeout,
+transport retries and fallback. Exhausted gateway requests enter the worker's
+dead-letter path without another provider retry loop.
 
 Migration 0008 adds nullable `documents.structured_extraction`. The pipeline
 revalidates evidence before persisting validated fields, missing-field paths,
