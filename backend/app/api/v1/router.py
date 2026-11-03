@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.api.v1.routes import (
     auth,
+    change_orders,
     documents,
     evidence,
     health,
@@ -14,6 +15,7 @@ from app.api.v1.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(change_orders.router)
 api_router.include_router(potential_changes.router)
 api_router.include_router(risks.router)
 api_router.include_router(evidence.router)

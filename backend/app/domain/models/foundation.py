@@ -368,12 +368,27 @@ class ChangeOrder(ProjectRecord, Base):
         project_reference("contract_id", "contracts"),
         project_reference("rfi_id", "rfis"),
         user_reference("created_by_id"),
+        user_reference("submitted_by_id"),
+        project_reference("source_event_id", "project_events"),
+        UniqueConstraint("source_event_id"),
+        CheckConstraint(
+            "status IN ('potential','under_review','drafted','submitted',"
+            "'approved','rejected','disputed','closed')", name="workflow_status"
+        ),
         UniqueConstraint("tenant_id", "project_id", "reference"),
     )
     reference: Mapped[str] = mapped_column(String(100))
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(Text)
-    status: Mapped[str] = mapped_column(String(32), server_default="draft", index=True)
+    status: Mapped[str] = mapped_column(String(32), server_default="potential", index=True)
+    source_event_id: Mapped[UUID | None] = mapped_column(Uuid)
+    submitted_by_id: Mapped[UUID | None] = mapped_column(Uuid)
+    cost_items: Mapped[list] = mapped_column(
+        JSONB, server_default=sql_text("'[]'::jsonb"), deferred=True, deferred_raiseload=True
+    )
+    draft_content: Mapped[dict | None] = mapped_column(
+        JSONB, deferred=True, deferred_raiseload=True
+    )
     amount: Mapped[Decimal | None] = mapped_column(
         Numeric(18, 2), deferred=True, deferred_raiseload=True
     )
