@@ -120,6 +120,8 @@ class Settings(BaseSettings):
     default_drafting_model: str = "gpt-4o"
     max_tokens_per_request: int = 8192
     ai_request_timeout: int = 120
+    investigation_max_tool_depth: int = Field(default=6, ge=1, le=12)
+    investigation_max_seconds: float = Field(default=20, gt=0, le=60, allow_inf_nan=False)
     ai_max_retries: int = 3
     model_gateway_tasks: dict[TaskType, TaskPolicy] = Field(default_factory=dict)
     model_gateway_prices: dict[str, ModelPricing] = Field(default_factory=dict)

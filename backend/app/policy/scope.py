@@ -298,6 +298,21 @@ def enforce_write_scope(session, flush_context, instances):
         workflow_order = workflow is not None and instance is workflow[0]
         workflow_audit = workflow is not None and instance is workflow[1] and instance in session.new
         workflow_approval = workflow is not None and instance is workflow[2]
+        investigation_review = session.info.get("investigation_review")
+        investigation_audit = (investigation_review is not None and instance is investigation_review[1]
+                               and instance in session.new)
+        investigation_task = investigation_review is not None and instance is investigation_review[0]
+        if investigation_audit or investigation_task:
+            task, audit = investigation_review
+            if (not has_permission(principal.role, Action.DOCUMENT_WRITE)
+                    or inspect(task).mapper.local_table.name != "document_review_tasks"
+                    or audit not in session.new
+                    or audit.actor_id != principal.user_id or audit.tenant_id != principal.tenant_id
+                    or task.tenant_id != principal.tenant_id or audit.project_id != task.project_id
+                    or audit.entity_id != task.id or audit.entity_type != "document_review_task"
+                    or audit.action != "investigation.request_human_review"
+                    or not audit.details.get("evidence")):
+                raise AuthorizationError("Invalid investigation review request")
         if workflow_order or workflow_audit or workflow_approval:
             order, audit, approval = workflow
             required_action = {
@@ -330,7 +345,8 @@ def enforce_write_scope(session, flush_context, instances):
         action = _WRITE_ACTIONS.get(table.name)
         if table.name == "projects" and instance in session.new:
             action = Action.PROJECT_CREATE
-        if not (review_audit or workflow_audit or workflow_approval) and (
+        if not (review_audit or workflow_audit or workflow_approval
+                or investigation_audit or investigation_task) and (
             action is None or not has_permission(principal.role, action)
         ):
             raise AuthorizationError()
