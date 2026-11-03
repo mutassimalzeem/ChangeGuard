@@ -392,6 +392,12 @@ class Risk(ProjectRecord, Base):
         user_reference("owner_id"),
     )
     title: Mapped[str] = mapped_column(String(255))
+    risk_type: Mapped[str | None] = mapped_column(String(64))
+    rule_key: Mapped[str | None] = mapped_column(String(255), unique=True)
+    schedule_impact_days: Mapped[int | None] = mapped_column(Integer)
+    responsible_party: Mapped[str | None] = mapped_column(String(255))
+    recommended_action: Mapped[str | None] = mapped_column(Text)
+    confidence: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
     description: Mapped[str | None] = mapped_column(Text)
     category: Mapped[str | None] = mapped_column(String(64), index=True)
     severity: Mapped[str] = mapped_column(String(32), server_default="medium", index=True)

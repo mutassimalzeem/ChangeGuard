@@ -126,13 +126,13 @@ async def test_all_stages_and_duplicate_delivery(pipeline, test_session):
         document = await pipeline.refresh()
         assert stage in document.processing_data["results"]
         assert document.processing_status == (
-            "completed" if stage == STAGES[-1] else f"{stage}_done"
+            "review_required" if stage == STAGES[-1] else f"{stage}_done"
         )
     assert await pipeline.step() is None
     for name in ("extraction", "ocr", "classify", "extract", "embed"):
         getattr(pipeline.services, name).assert_called_once()
     assert await test_session.scalar(select(func.count()).select_from(DocumentChunk)) == 1
-    assert await test_session.scalar(select(func.count()).select_from(DocumentReviewTask)) == 0
+    assert await test_session.scalar(select(func.count()).select_from(DocumentReviewTask)) == 1
     pipeline.storage.store_original.assert_not_called()
     pipeline.storage.delete_file.assert_not_called()
 
@@ -187,7 +187,7 @@ async def test_retry_recovers_without_repeating_previous_services(pipeline, test
     pipeline.services.embed.side_effect = lambda texts: [[0.1] * 1536 for _ in texts]
     for _ in range(5):
         await pipeline.step()
-    assert (await pipeline.refresh()).processing_status == "completed"
+    assert (await pipeline.refresh()).processing_status == "review_required"
     pipeline.services.ocr.assert_called_once()
     pipeline.services.classify.assert_called_once()
     pipeline.services.extract.assert_called_once()
@@ -250,9 +250,10 @@ async def test_risk_checks_and_entity_links(pipeline, test_session, project, ten
     links = document.processing_data["results"]["link_entities"]
     assert links["links"][0]["record_id"] == str(contract.id)
     assert links["unresolved"][0]["reference"] == "MISSING"
-    assert await test_session.scalar(select(func.count()).select_from(Risk)) == 4
+    # Legacy summaries cannot substantiate financial or approval findings.
+    assert await test_session.scalar(select(func.count()).select_from(Risk)) == 1
     await pipeline.step()
-    assert await test_session.scalar(select(func.count()).select_from(Risk)) == 4
+    assert await test_session.scalar(select(func.count()).select_from(Risk)) == 1
 
 
 async def test_dead_letter_outbox(pipeline, test_session, monkeypatch):
