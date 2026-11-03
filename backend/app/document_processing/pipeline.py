@@ -141,6 +141,16 @@ async def _execute_stage(stage, document, data, session, services, storage):
         )
         document.document_type = result.document_type
         document.classification_result = result.model_dump(mode="json")
+        if result.document_type == "site_photo":
+            from app.domain.services.potential_changes import process
+
+            await process(
+                document,
+                extraction_result(data["extract_text"]),
+                session,
+                services,
+                image=await original(),
+            )
         reason = classification_review_reason(result, text)
         if reason:
             existing = await session.scalar(
@@ -283,7 +293,12 @@ async def _execute_stage(stage, document, data, session, services, storage):
                     }
                 )
         # Composite foreign keys enforce ownership of both ends of each link.
-        return {"links": links, "unresolved": unresolved}
+        from app.domain.services.potential_changes import process
+
+        potential_changes = await process(
+            document, extraction_result(data["extract_text"]), session, services
+        )
+        return {"links": links, "unresolved": unresolved, "potential_changes": potential_changes}
     if stage == "risk_checks":
         from app.domain.services.risk_engine import run_risk_checks
 
@@ -294,14 +309,30 @@ async def _execute_stage(stage, document, data, session, services, storage):
             data["validate_extraction"]["confidence"], data["classify_document"]["confidence"]
         )
         low = confidence < get_settings().processing_review_threshold
-        required = low or bool(data["risk_checks"])
-        if required:
+        existing = await session.scalar(
+            scoped(DocumentReviewTask, document).where(
+                DocumentReviewTask.document_id == document.id
+            )
+        )
+        required = (
+            low
+            or bool(data["risk_checks"])
+            or bool(data["link_entities"].get("potential_changes"))
+            or existing is not None
+        )
+        if required and existing is None:
             session.add(
                 DocumentReviewTask(
                     tenant_id=document.tenant_id,
                     project_id=document.project_id,
                     document_id=document.id,
-                    reason="low_confidence" if low else "risk_check",
+                    reason=(
+                        "low_confidence"
+                        if low
+                        else "risk_check"
+                        if data["risk_checks"]
+                        else "potential_change"
+                    ),
                 )
             )
         return {"required": required}
