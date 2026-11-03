@@ -8,6 +8,7 @@ from app.api.v1.routes import (
     documents,
     evidence,
     health,
+    investigations,
     potential_changes,
     projects,
     retrieval,
@@ -15,6 +16,7 @@ from app.api.v1.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(investigations.router)
 api_router.include_router(change_orders.router)
 api_router.include_router(potential_changes.router)
 api_router.include_router(risks.router)
