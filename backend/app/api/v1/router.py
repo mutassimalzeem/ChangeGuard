@@ -2,9 +2,10 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.routes import auth, documents, evidence, health, projects, retrieval
+from app.api.v1.routes import auth, documents, evidence, health, projects, retrieval, risks
 
 api_router = APIRouter()
+api_router.include_router(risks.router)
 api_router.include_router(evidence.router)
 api_router.include_router(retrieval.router)
 api_router.include_router(documents.router)

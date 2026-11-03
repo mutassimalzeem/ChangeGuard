@@ -12,14 +12,21 @@ def pipeline_summary(result):
             money = field.value
             break
     due = getattr(facts, "due_date", None)
+    entities = [
+        {"kind": ref.value.kind, "reference": ref.value.reference}
+        for ref in facts.document_references
+        if not ref.missing and ref.value.kind in {"contract", "rfi", "change_order"}
+    ]
+    own_reference = {"contract": "reference", "rfi": "rfi_number", "change_order": "co_number"}
+    name = own_reference.get(result["document_type"])
+    if name and not getattr(facts, name).missing:
+        own = {"kind": result["document_type"], "reference": getattr(facts, name).value}
+        if own not in entities:
+            entities.append(own)
     return {
         **result,
         "amount": str(money.amount) if money else None,
         "currency": money.currency if money else None,
         "due_date": due.value if due is not None and not due.missing else None,
-        "entities": [
-            {"kind": ref.value.kind, "reference": ref.value.reference}
-            for ref in facts.document_references
-            if not ref.missing and ref.value.kind in {"contract", "rfi", "change_order"}
-        ],
+        "entities": entities,
     }

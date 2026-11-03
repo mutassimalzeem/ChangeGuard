@@ -361,7 +361,7 @@ async def test_field_confidence_rounding_cannot_bypass_review(pipeline, test_ses
     assert document.processing_status == "review_required"
 
 
-async def test_decimal_credit_reaches_deterministic_risk_check(pipeline, test_session):  # noqa: F811
+async def test_decimal_credit_is_not_a_false_positive_risk(pipeline, test_session):  # noqa: F811
     from app.domain.models import Risk
 
     data, source = case("change_order")
@@ -374,8 +374,8 @@ async def test_decimal_credit_reaches_deterministic_risk_check(pipeline, test_se
     )
     for _ in range(12):
         await pipeline.step()
-    assert (await pipeline.refresh()).processing_status == "review_required"
-    assert (await test_session.scalar(select(Risk))).title == "Negative amount"
+    assert (await pipeline.refresh()).processing_status == "completed"
+    assert await test_session.scalar(select(Risk)) is None
 
 
 async def test_site_photo_with_caption_still_requires_visual_review(pipeline, test_session):  # noqa: F811

@@ -46,7 +46,7 @@ _WRITE_ACTIONS = {
 _REVIEWED_STATUSES = {
     "change_orders": frozenset({"submitted", "approved", "accepted", "executed", "paid"}),
     "contracts": frozenset({"active", "signed", "executed", "committed"}),
-    "risks": frozenset({"accepted"}),
+    "risks": frozenset({"accepted", "dismissed", "overridden"}),
 }
 
 
@@ -290,18 +290,33 @@ def enforce_write_scope(session, flush_context, instances):
     for instance in session.new | session.dirty | session.deleted:
         state = inspect(instance)
         table = state.mapper.local_table
+        review = session.info.get("risk_review")
+        reviewed_risk = review is not None and instance is review[0]
+        review_audit = review is not None and instance is review[1] and instance in session.new
+        if reviewed_risk or review_audit:
+            risk, audit = review
+            if (not has_permission(principal.role, Action.RISK_ACCEPT)
+                    or audit not in session.new or audit.actor_id != principal.user_id
+                    or audit.tenant_id != principal.tenant_id or audit.entity_id != risk.id
+                    or audit.project_id != risk.project_id or not audit.details.get("reason")):
+                raise AuthorizationError("Invalid risk review")
         tenant_id = instance.id if table.name == "tenants" else getattr(instance, "tenant_id", None)
         if tenant_id != principal.tenant_id:
             raise AuthorizationError("Tenant access denied")
         action = _WRITE_ACTIONS.get(table.name)
         if table.name == "projects" and instance in session.new:
             action = Action.PROJECT_CREATE
-        if action is None or not has_permission(principal.role, action):
+        if not review_audit and (action is None or not has_permission(principal.role, action)):
             raise AuthorizationError()
+        if table.name == "risks" and instance not in session.new and not reviewed_risk:
+            reviewed_fields = ("severity", "exposure_amount", "schedule_impact_days",
+                               "responsible_party", "recommended_action", "confidence")
+            if any(state.attrs[name].history.has_changes() for name in reviewed_fields):
+                raise AuthorizationError("Risk overrides require an audited human review")
         if table.name == "projects" and instance in session.deleted:
             raise AuthorizationError("Project deletion requires human approval")
         if "status" in state.attrs and state.attrs.status.history.has_changes():
-            if instance.status in _REVIEWED_STATUSES.get(table.name, ()):
+            if instance.status in _REVIEWED_STATUSES.get(table.name, ()) and not reviewed_risk:
                 raise AuthorizationError(
                     "This status transition requires a verified human workflow"
                 )

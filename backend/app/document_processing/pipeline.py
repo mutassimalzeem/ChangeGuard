@@ -4,7 +4,6 @@ import hashlib
 import math
 from copy import deepcopy
 from datetime import UTC, datetime
-from decimal import Decimal
 from time import monotonic
 from uuid import UUID
 
@@ -27,7 +26,6 @@ from app.domain.models import (
     DocumentEntityLink,
     DocumentReviewTask,
     ProcessingDeadLetter,
-    Risk,
 )
 from app.domain.services.document_files import validate_document
 from app.domain.services.object_storage import get_object_storage_service
@@ -287,30 +285,9 @@ async def _execute_stage(stage, document, data, session, services, storage):
         # Composite foreign keys enforce ownership of both ends of each link.
         return {"links": links, "unresolved": unresolved}
     if stage == "risk_checks":
-        fields = data["validate_extraction"]
-        codes = []
-        if fields["amount"] is not None and Decimal(str(fields["amount"])) < 0:
-            codes.append("negative_amount")
-        if fields["amount"] is not None and not fields["currency"]:
-            codes.append("missing_currency")
-        # Anchor to receipt time so replays cannot change a time-based outcome.
-        if fields["due_date"] and fields["due_date"] < document.created_at.date().isoformat():
-            codes.append("overdue_at_receipt")
-        if data["link_entities"]["unresolved"]:
-            codes.append("unresolved_entity")
-        for code in codes:
-            session.add(
-                Risk(
-                    tenant_id=document.tenant_id,
-                    project_id=document.project_id,
-                    document_id=document.id,
-                    title=code.replace("_", " ").capitalize(),
-                    category="document_processing",
-                    severity="medium",
-                    status="open",
-                )
-            )
-        return codes
+        from app.domain.services.risk_engine import run_risk_checks
+
+        return await run_risk_checks(document, session)
     if stage == "create_review_task":
         # The public Numeric(5,4) summary may round a just-below-threshold value up.
         confidence = min(
