@@ -280,8 +280,11 @@ async def test_editor_cannot_write_financial_fields(test_session, world):
     await test_session.flush()
     bind_scope(test_session, world["user"])
     order = await test_session.scalar(select(ChangeOrder))
-    order.title = "valid edit"
-    await test_session.flush()
+    # Change orders now require the checked, audited workflow for all edits.
+    with pytest.raises(AuthorizationError):
+        async with test_session.begin_nested():
+            order.title = "unaudited edit"
+            await test_session.flush()
     with pytest.raises(AuthorizationError):
         async with test_session.begin_nested():
             order.amount = Decimal("999")
