@@ -1,0 +1,14 @@
+From: engineer@riverside.example
+To: manager@contractor.example
+Subject: East wing works - instruction and programme concern
+Date: Wed, 4 Nov 2026 09:15:00 +0000
+
+Dear Project Manager,
+The architect instructed the contractor to add a lintel above opening E-12.
+The scope was revised to include the new access ramp.
+Work is suspended at the east wing pending the revised structural detail.
+Please obtain clarification on the unexpected service obstruction near grid E-12.
+The material shortage reported yesterday was resolved.
+If the revised detail arrives tomorrow, the remaining works may proceed as planned.
+Regards,
+Resident Engineer

@@ -260,6 +260,17 @@ class ProjectEvent(ProjectRecord, Base):
     document_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
     event_type: Mapped[str] = mapped_column(String(64), index=True)
     title: Mapped[str] = mapped_column(String(255))
+    detection_key: Mapped[str | None] = mapped_column(String(64), unique=True)
+    detected_date: Mapped[date | None] = mapped_column(Date)
+    confidence: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
+    suggested_owner: Mapped[str | None] = mapped_column(String(255))
+    suggested_cost_impact: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 2), deferred=True, deferred_raiseload=True
+    )
+    suggested_currency: Mapped[str | None] = mapped_column(
+        String(3), deferred=True, deferred_raiseload=True
+    )
+    suggested_schedule_impact: Mapped[int | None] = mapped_column(Integer)
     description: Mapped[str | None] = mapped_column(Text)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     status: Mapped[str] = mapped_column(String(32), server_default="recorded", index=True)

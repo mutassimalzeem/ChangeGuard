@@ -17,6 +17,7 @@ from app.policy.permissions import TENANT_WIDE_ROLES, Action, Role, has_permissi
 
 SCOPE_KEY = "access_principal"
 FINANCIAL_FIELDS = {
+    "project_events": frozenset({"suggested_cost_impact", "suggested_currency"}),
     "projects": frozenset({"currency"}),
     "contracts": frozenset({"value", "currency"}),
     "boq_items": frozenset({"unit_rate", "currency"}),
