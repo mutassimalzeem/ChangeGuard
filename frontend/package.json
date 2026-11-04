@@ -2,12 +2,17 @@
   "name": "changeguard-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "imports": {
+    "@/*": "./src/*"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/test/*.test.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "5.105.3",

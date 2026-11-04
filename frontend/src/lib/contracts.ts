@@ -399,3 +399,143 @@ export const investigationResultSchema = z
 
 export type InvestigationResult = z.infer<typeof investigationResultSchema>;
 
+/* ------------------------------------------------------------- review queue */
+
+export const REVIEW_CATEGORIES = [
+  "low_confidence_extraction",
+  "missing_required_field",
+  "potential_duplicate",
+  "conflicting_evidence",
+  "high_value_change",
+  "high_severity_risk",
+  "approval_request",
+] as const;
+
+export type ReviewCategory = (typeof REVIEW_CATEGORIES)[number];
+
+export const reviewCategorySchema = z.enum(REVIEW_CATEGORIES);
+
+export const reviewAuditRecordSchema = z.object({
+  id: z.string(),
+  timestamp: isoDateTimeSchema,
+  actor_name: z.string(),
+  actor_role: z.string(),
+  action: z.string(),
+  reason: z.string().nullable().default(null),
+  details: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type ReviewAuditRecord = z.infer<typeof reviewAuditRecordSchema>;
+
+export const reviewEvidenceLinkSchema = z.object({
+  id: z.string(),
+  source_type: z.string(),
+  source_id: z.string(),
+  document_name: z.string(),
+  page_number: z.number().int().nullable().optional(),
+  excerpt: z.string(),
+  confidence: z.number().min(0).max(1).optional(),
+});
+
+export type ReviewEvidenceLink = z.infer<typeof reviewEvidenceLinkSchema>;
+
+export const reviewItemSchema = z.object({
+  id: z.string(),
+  category: reviewCategorySchema,
+  title: z.string().min(1),
+  project_id: z.string(),
+  project_code: z.string(),
+  project_name: z.string(),
+  severity: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+  system_found: z.string(),
+  why_review_needed: z.string(),
+  evidence_links: z.array(reviewEvidenceLinkSchema).default([]),
+  recommended_correction: z.string(),
+  financial_exposure: z.string().nullable().default(null),
+  currency: z.string().default("USD"),
+  schedule_impact_days: z.number().int().nullable().default(null),
+  status: z.enum(["pending", "approved", "rejected", "overridden"]).default("pending"),
+  entity_type: z.enum(["change_order", "risk", "document", "potential_change", "extraction"]),
+  entity_id: z.string(),
+  required_permission: z.string().default("approvals.decide"),
+  audit_history: z.array(reviewAuditRecordSchema).default([]),
+  created_at: isoDateTimeSchema,
+  updated_at: isoDateTimeSchema.optional(),
+});
+
+export type ReviewItem = z.infer<typeof reviewItemSchema>;
+
+export const reviewDecisionSchema = z.object({
+  action: z.enum(["approve", "reject", "override"]),
+  reason: z.string().trim().min(1, "A justification reason is required for audited compliance"),
+  override_severity: z.enum(["low", "medium", "high", "critical"]).optional(),
+  override_schedule_impact_days: z.number().int().min(0).optional(),
+  override_financial_exposure: z.string().optional(),
+});
+
+export type ReviewDecisionInput = z.infer<typeof reviewDecisionSchema>;
+
+export const reviewEditSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").optional(),
+  recommended_correction: z.string().trim().min(1, "Correction details are required").optional(),
+  financial_exposure: z.string().nullable().optional(),
+  schedule_impact_days: z.number().int().min(0).nullable().optional(),
+  reason: z.string().trim().min(1, "An audited change note is required"),
+});
+
+export type ReviewEditInput = z.infer<typeof reviewEditSchema>;
+
+export const REVIEW_CATEGORY_META: Record<
+  ReviewCategory,
+  {
+    label: string;
+    description: string;
+    defaultPermission: string;
+    tone: "neutral" | "brand" | "success" | "warning" | "danger";
+  }
+> = {
+  low_confidence_extraction: {
+    label: "Low-confidence extraction",
+    description: "Automated OCR or model extraction fell below confidence threshold and requires manual verification.",
+    defaultPermission: "documents.write",
+    tone: "warning",
+  },
+  missing_required_field: {
+    label: "Missing required field",
+    description: "Subcontractor or supplier notice lacks mandatory statutory, temporal, or clause particulars.",
+    defaultPermission: "change_orders.write",
+    tone: "warning",
+  },
+  potential_duplicate: {
+    label: "Potential duplicate",
+    description: "Identical scope variance or notice has already been captured under an active instruction.",
+    defaultPermission: "change_orders.write",
+    tone: "neutral",
+  },
+  conflicting_evidence: {
+    label: "Conflicting evidence",
+    description: "Contemporaneous site records or weather logs contradict submitted claims.",
+    defaultPermission: "approvals.decide",
+    tone: "danger",
+  },
+  high_value_change: {
+    label: "High-value change",
+    description: "Financial exposure exceeds single-signoff delegated commercial authority.",
+    defaultPermission: "approvals.decide",
+    tone: "danger",
+  },
+  high_severity_risk: {
+    label: "High-severity risk",
+    description: "Critical risk exceeds schedule or cost tolerance and mandates commercial decision.",
+    defaultPermission: "risks.accept",
+    tone: "danger",
+  },
+  approval_request: {
+    label: "Approval request",
+    description: "Formal change order submitted for commercial approval workflow sign-off.",
+    defaultPermission: "approvals.decide",
+    tone: "brand",
+  },
+};
+
+

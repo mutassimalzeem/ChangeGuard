@@ -21,8 +21,8 @@ import axios, {
 } from "axios";
 import { z } from "zod";
 
-import { config } from "@/lib/config";
-import { ApiError, type FieldIssue } from "./errors";
+import { config } from "../config.ts";
+import { ApiError, type FieldIssue } from "./errors.ts";
 
 interface RetriableConfig extends InternalAxiosRequestConfig {
   /** Set once a request has been replayed, so it is never replayed again. */
