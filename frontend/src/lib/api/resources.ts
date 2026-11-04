@@ -19,11 +19,15 @@ import {
   projectUpdateSchema,
   riskDecisionSchema,
   riskSchema,
+  evidenceResultSchema,
+  investigationResultSchema,
   tokenPairSchema,
   type ChangeOrderCreateInput,
   type ChangeOrderItem,
   type ChangeOrderPatchInput,
   type DocumentItem,
+  type EvidenceResult,
+  type InvestigationResult,
   type PotentialChangeItem,
   type Project,
   type ProjectCreate,
@@ -258,6 +262,31 @@ export const changeOrdersApi = {
       { responseType: "blob" },
     );
     return response.data as Blob;
+  },
+};
+
+/* ------------------------------------------------------------------ evidence */
+
+export const evidenceApi = {
+  async view(projectId: string, subjectType: string, subjectId: string): Promise<EvidenceResult> {
+    const response = await client.get(`/projects/${projectId}/evidence/${subjectType}/${subjectId}`);
+    return parse(evidenceResultSchema, response.data);
+  },
+};
+
+/* ------------------------------------------------------------ investigations */
+
+export const investigationsApi = {
+  async ask(
+    projectId: string,
+    payload: { document_id: string; question: string; max_seconds?: number; max_tool_depth?: number }
+  ): Promise<InvestigationResult> {
+    const response = await client.post(`/projects/${projectId}/investigations`, {
+      max_seconds: payload.max_seconds ?? 20,
+      max_tool_depth: payload.max_tool_depth ?? 6,
+      ...payload,
+    });
+    return parse(investigationResultSchema, response.data);
   },
 };
 
