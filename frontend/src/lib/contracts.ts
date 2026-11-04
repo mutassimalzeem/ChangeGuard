@@ -312,3 +312,90 @@ export const changeOrderPatchSchema = z.object({
 });
 
 export type ChangeOrderPatchInput = z.infer<typeof changeOrderPatchSchema>;
+
+/* ----------------------------------------------------------------- timeline */
+
+export const timelineEventSchema = z
+  .object({
+    id: z.string(),
+    project_id: z.string().optional(),
+    title: z.string(),
+    description: z.string().default(""),
+    occurred_at: z.string(),
+    event_type: z.string().default("event"),
+    evidence_links: z.array(z.string()).default([]),
+    source_type: z.string().nullable().optional(),
+    source_id: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export type TimelineEvent = z.infer<typeof timelineEventSchema>;
+
+/* ----------------------------------------------------------------- evidence */
+
+export const evidenceItemSchema = z
+  .object({
+    id: z.string().optional(),
+    project_id: z.string().optional(),
+    subject_type: z.string().optional(),
+    subject_id: z.string().optional(),
+    source_type: z.string(),
+    source_id: z.string(),
+    page_number: z.number().int().nullable().optional(),
+    excerpt: z.string(),
+    created_at: z.string().optional(),
+  })
+  .passthrough();
+
+export type EvidenceItem = z.infer<typeof evidenceItemSchema>;
+
+export const evidenceResultSchema = z
+  .object({
+    subject_type: z.string(),
+    subject_id: z.string(),
+    items: z.array(evidenceItemSchema).default([]),
+    total: z.number().int().default(0),
+  })
+  .passthrough();
+
+export type EvidenceResult = z.infer<typeof evidenceResultSchema>;
+
+/* ----------------------------------------------------------- investigations */
+
+export const citationSchema = z
+  .object({
+    evidence_id: z.string(),
+    quote: z.string(),
+    source_type: z.string().optional(),
+    source_id: z.string().optional(),
+  })
+  .passthrough();
+
+export type Citation = z.infer<typeof citationSchema>;
+
+export const conclusionSchema = z
+  .object({
+    kind: z.enum(["supported", "conflict", "insufficient_evidence"]).default("supported"),
+    citations: z.array(citationSchema).default([]),
+    recommended_action: z.enum(["no_action", "request_human_review"]).default("no_action"),
+    confidence: z.number().min(0).max(1).default(0.85),
+    summary: z.string().optional(),
+  })
+  .passthrough();
+
+export type Conclusion = z.infer<typeof conclusionSchema>;
+
+export const investigationResultSchema = z
+  .object({
+    run_id: z.string(),
+    status: z.string(),
+    conclusions: z.array(conclusionSchema).default([]),
+    action: z.unknown().nullable().optional(),
+    tool_calls: z.number().int().default(0),
+    human_review_required: z.boolean().default(false),
+    trace: z.array(z.record(z.string(), z.unknown())).default([]),
+  })
+  .passthrough();
+
+export type InvestigationResult = z.infer<typeof investigationResultSchema>;
+
