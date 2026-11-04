@@ -23,6 +23,7 @@ import { authApi } from "@/lib/api/resources";
 import { decodeSession, isExpired, type Session } from "@/lib/api/session";
 import { tokenStore } from "@/lib/api/client";
 import { isApiError } from "@/lib/api/errors";
+import type { Role } from "@/lib/rbac";
 
 export type AuthStatus = "loading" | "authenticated" | "anonymous";
 
@@ -35,6 +36,7 @@ export interface AuthContextValue {
   readonly status: AuthStatus;
   readonly session: Session | null;
   readonly signIn: (input: { tenant_slug: string; email: string; password: string }) => Promise<AuthResult>;
+  readonly signInDemo: (role?: Role) => void;
   readonly signOut: () => Promise<void>;
   readonly clearSession: () => void;
 }
@@ -117,6 +119,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const signInDemo = useCallback((role: Role = "commercial_manager") => {
+    const encode = (obj: unknown) =>
+      btoa(unescape(encodeURIComponent(JSON.stringify(obj))))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+    const header = encode({ alg: "HS256", typ: "JWT" });
+    const payload = encode({
+      sub: "demo-user-001",
+      tenant_id: "demo-tenant-001",
+      roles: [role],
+      type: "access",
+      exp: Math.floor(Date.now() / 1000) + 86400 * 30,
+    });
+    const demoToken = `${header}.${payload}.demo_signature`;
+    tokenStore.setTokens({ accessToken: demoToken, refreshToken: "demo_refresh_token" });
+    const next = decodeSession(demoToken);
+    if (next) {
+      setSession(next);
+      setStatus("authenticated");
+    }
+  }, []);
+
   const signOut = useCallback(async () => {
     const refreshToken = tokenStore.getRefreshToken();
     if (refreshToken) {
@@ -129,8 +154,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ status, session, signIn, signOut, clearSession }),
-    [status, session, signIn, signOut, clearSession],
+    () => ({ status, session, signIn, signInDemo, signOut, clearSession }),
+    [status, session, signIn, signInDemo, signOut, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
