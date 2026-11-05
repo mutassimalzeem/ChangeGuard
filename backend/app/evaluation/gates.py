@@ -77,3 +77,4 @@ def evaluate_ci_gates(evaluation_results: dict[str, Any]) -> dict[str, Any]:
         "failed_gates": sum(1 for g in gates if not g["passed"]),
         "gates": gates,
     }
+
