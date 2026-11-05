@@ -1,0 +1,59 @@
+{
+  "id": "CONF-002",
+  "title": "Headcount Contradiction: 4 Steel Fixers Logged vs 16 Billed",
+  "category": "conflicting_evidence",
+  "input": {
+    "document_a": {
+      "document_id": "dr-steelfix-log",
+      "filename": "DR-2026-02-16_DailyLog.pdf",
+      "document_type": "daily_report",
+      "source_page": 1,
+      "snippet": "Labour on site: 4 steel fixers, 2 carpenters present in Zone B.",
+      "date": "2026-02-16",
+      "steel_fixer_count": 4
+    },
+    "document_b": {
+      "document_id": "dw-invoice-steelfix",
+      "filename": "DW-2026-014_DayworkBill.pdf",
+      "document_type": "change_order",
+      "source_page": 2,
+      "snippet": "Daywork shift 2026-02-16: 16 certified steel fixers x 8 hours = 128 manhours billed.",
+      "date": "2026-02-16",
+      "steel_fixer_count": 16,
+      "financial_exposure": "4800.00",
+      "currency": "USD"
+    }
+  },
+  "expected_output": {
+    "conflict_detected": true,
+    "risk_type": "conflicting_information",
+    "severity": "high",
+    "contradiction_key": "operative_headcount_2026-02-16",
+    "conflict_summary": "Superintendent daily log records 4 steel fixers on site, while daywork bill DW-2026-014 charges for 16 steel fixers (12 operative variance).",
+    "financial_exposure": {
+      "amount": "4800.00",
+      "currency": "USD"
+    },
+    "sources": [
+      {
+        "document_id": "dr-steelfix-log",
+        "page": 1,
+        "snippet": "Labour on site: 4 steel fixers"
+      },
+      {
+        "document_id": "dw-invoice-steelfix",
+        "page": 2,
+        "snippet": "16 certified steel fixers x 8 hours"
+      }
+    ],
+    "recommended_action": "Audit security turnstile logs to reconcile actual physical headcount."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "conflicting_information",
+    "assertions": {
+      "conflict_detected": true,
+      "exposure_amount": "4800.00"
+    }
+  }
+}

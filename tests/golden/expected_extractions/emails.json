@@ -1,0 +1,872 @@
+[
+  {
+    "id": "DOC-EML-001",
+    "title": "Email: re: urgent mep riser relocation direction",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "re: urgent mep riser relocation direction",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: re: urgent mep riser relocation direction",
+        "missing": false
+      },
+      "sender": {
+        "value": "pm.marcus@apexventures.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: pm.marcus@apexventures.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "director.david@horizon-struct.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: director.david@horizon-struct.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-02-15",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-02-15",
+        "missing": false
+      },
+      "body": {
+        "value": "Proceed with urgent MEP riser relocation per sketch SK-S-201-A immediately to avoid framing delay. We will formalize change order CO-2026-002 upon receipt of priced breakdown.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Proceed with urgent MEP riser relocation per sketch SK-S-201-A immediately to av",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "re: urgent mep riser relocation direction",
+        "sender": "pm.marcus@apexventures.test",
+        "recipient": "director.david@horizon-struct.test",
+        "sent_date": "2026-02-15"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-002",
+    "title": "Email: notice of weather delay claim rejection",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "notice of weather delay claim rejection",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: notice of weather delay claim rejection",
+        "missing": false
+      },
+      "sender": {
+        "value": "contracts@apexventures.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: contracts@apexventures.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "commercial@horizon-struct.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: commercial@horizon-struct.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-02-23",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-02-23",
+        "missing": false
+      },
+      "body": {
+        "value": "Your notice of adverse weather delay dated Feb 20 is rejected. National weather service data confirms rainfall was 14mm, well below the contractual 30mm force majeure threshold in Clause 8.4.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Your notice of adverse weather delay dated Feb 20 is rejected. National weather ",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "notice of weather delay claim rejection",
+        "sender": "contracts@apexventures.test",
+        "recipient": "commercial@horizon-struct.test",
+        "sent_date": "2026-02-23"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-003",
+    "title": "Email: confirmation of revised footing depth for grid c-3",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "confirmation of revised footing depth for grid c-3",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: confirmation of revised footing depth for grid c-3",
+        "missing": false
+      },
+      "sender": {
+        "value": "lead.structural@metroconsult.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: lead.structural@metroconsult.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "site.eng@geofoundation.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: site.eng@geofoundation.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-02-26",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-02-26",
+        "missing": false
+      },
+      "body": {
+        "value": "Based on geotechnical core samples, the founding depth for pile cap PC-03 is revised from -6.50m to -7.80m ECD. Approved for immediate rebar placement.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Based on geotechnical core samples, the founding depth for pile cap PC-03 is rev",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "confirmation of revised footing depth for grid c-3",
+        "sender": "lead.structural@metroconsult.test",
+        "recipient": "site.eng@geofoundation.test",
+        "sent_date": "2026-02-26"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-004",
+    "title": "Email: formal notice of delayed site possession - zone c",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "formal notice of delayed site possession - zone c",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: formal notice of delayed site possession - zone c",
+        "missing": false
+      },
+      "sender": {
+        "value": "commercial@horizon-struct.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: commercial@horizon-struct.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "pm.marcus@apexventures.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: pm.marcus@apexventures.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-01",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-01",
+        "missing": false
+      },
+      "body": {
+        "value": "We hereby serve formal notice under Clause 2.1 that access to Zone C has been obstructed by ongoing municipal utility work. We reserve all rights to time and financial compensation.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "We hereby serve formal notice under Clause 2.1 that access to Zone C has been ob",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "formal notice of delayed site possession - zone c",
+        "sender": "commercial@horizon-struct.test",
+        "recipient": "pm.marcus@apexventures.test",
+        "sent_date": "2026-03-01"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-005",
+    "title": "Email: steel mill material price escalation notification",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "steel mill material price escalation notification",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: steel mill material price escalation notification",
+        "missing": false
+      },
+      "sender": {
+        "value": "sales.mgr@titansteel.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: sales.mgr@titansteel.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "procurement@apexventures.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: procurement@apexventures.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-06",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-06",
+        "missing": false
+      },
+      "body": {
+        "value": "Global raw materials surcharge has increased European heavy flange beams by 12.5%. Attached mill index certificates validate this adjustment. Current quotation prices hold for 14 days.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Global raw materials surcharge has increased European heavy flange beams by 12.5",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "steel mill material price escalation notification",
+        "sender": "sales.mgr@titansteel.test",
+        "recipient": "procurement@apexventures.test",
+        "sent_date": "2026-03-06"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-006",
+    "title": "Email: authorization for emergency dewatering pump deployment",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "authorization for emergency dewatering pump deployment",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: authorization for emergency dewatering pump deployment",
+        "missing": false
+      },
+      "sender": {
+        "value": "resident.eng@apexventures.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: resident.eng@apexventures.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "operations@geofoundation.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: operations@geofoundation.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-10",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-10",
+        "missing": false
+      },
+      "body": {
+        "value": "This email confirms verbal site authorization given today for GeoFoundation to mobilize three additional 6-inch submersible pumps with temporary generators. Log hours separately under CO-2026-005.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "This email confirms verbal site authorization given today for GeoFoundation to m",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "authorization for emergency dewatering pump deployment",
+        "sender": "resident.eng@apexventures.test",
+        "recipient": "operations@geofoundation.test",
+        "sent_date": "2026-03-10"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-007",
+    "title": "Email: architectural instruction - executive suite ceiling finish",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "architectural instruction - executive suite ceiling finish",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: architectural instruction - executive suite ceiling finish",
+        "missing": false
+      },
+      "sender": {
+        "value": "lead.architect@zenithstudio.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: lead.architect@zenithstudio.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "pm.david@apexventures.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: pm.david@apexventures.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-14",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-14",
+        "missing": false
+      },
+      "body": {
+        "value": "Per client preference, replace specified acoustic wood baffles in the Boardroom with seamless monolithic micro-perforated gypsum ceiling system. Requesting cost delta.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Per client preference, replace specified acoustic wood baffles in the Boardroom ",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "architectural instruction - executive suite ceiling finish",
+        "sender": "lead.architect@zenithstudio.test",
+        "recipient": "pm.david@apexventures.test",
+        "sent_date": "2026-03-14"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-008",
+    "title": "Email: dispute notice regarding crane back-charges",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "dispute notice regarding crane back-charges",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: dispute notice regarding crane back-charges",
+        "missing": false
+      },
+      "sender": {
+        "value": "finance@titansteel.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: finance@titansteel.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "commercial@horizon-struct.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: commercial@horizon-struct.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-18",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-18",
+        "missing": false
+      },
+      "body": {
+        "value": "We dispute your back-charge invoice #BC-044 for tower crane shared usage ($14,500). Contract Sub-clause 6.2 states crane hook time is provided by main contractor without surcharge.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "We dispute your back-charge invoice #BC-044 for tower crane shared usage ($14,50",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "dispute notice regarding crane back-charges",
+        "sender": "finance@titansteel.test",
+        "recipient": "commercial@horizon-struct.test",
+        "sent_date": "2026-03-18"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-009",
+    "title": "Email: employer request for schedule acceleration proposal",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "employer request for schedule acceleration proposal",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: employer request for schedule acceleration proposal",
+        "missing": false
+      },
+      "sender": {
+        "value": "director.project@apexventures.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: director.project@apexventures.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "exec.team@horizon-struct.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: exec.team@horizon-struct.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-22",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-22",
+        "missing": false
+      },
+      "body": {
+        "value": "Apex invites Horizon to submit a fast-track acceleration proposal to bring forward Substantial Completion of Podium Retail by 45 calendar days. Include double-shifting cost breakdown.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Apex invites Horizon to submit a fast-track acceleration proposal to bring forwa",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "employer request for schedule acceleration proposal",
+        "sender": "director.project@apexventures.test",
+        "recipient": "exec.team@horizon-struct.test",
+        "sent_date": "2026-03-22"
+      }
+    }
+  },
+  {
+    "id": "DOC-EML-010",
+    "title": "Email: commissioning defect - fire damper smoke seal failure",
+    "document_type": "email",
+    "expected": {
+      "subject": {
+        "value": "commissioning defect - fire damper smoke seal failure",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: commissioning defect - fire damper smoke seal failure",
+        "missing": false
+      },
+      "sender": {
+        "value": "commissioning.agent@safetysystems.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: commissioning.agent@safetysystems.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "mep.lead@pioneerthermal.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: mep.lead@pioneerthermal.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-27",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-27",
+        "missing": false
+      },
+      "body": {
+        "value": "During today's pre-functional pressurization test on Stair Core B, fire damper FD-B-04 failed to close within 15 seconds due to actuator torque deficiency. Replacement required before re-test.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "During today's pre-functional pressurization test on Stair Core B, fire damper F",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-005"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-005",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "email",
+      "required_fields_present": [
+        "subject",
+        "sender",
+        "recipient",
+        "body"
+      ],
+      "value_assertions": {
+        "subject": "commissioning defect - fire damper smoke seal failure",
+        "sender": "commissioning.agent@safetysystems.test",
+        "recipient": "mep.lead@pioneerthermal.test",
+        "sent_date": "2026-03-27"
+      }
+    }
+  }
+]

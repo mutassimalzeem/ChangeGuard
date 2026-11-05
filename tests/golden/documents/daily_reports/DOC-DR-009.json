@@ -1,0 +1,103 @@
+{
+  "id": "DOC-DR-009",
+  "title": "Daily Log - Delayed Hot Work Permit Clearance",
+  "category": "daily_report",
+  "input": {
+    "filename": "DailyReport_2026-03-24.pdf",
+    "document_type_hint": "daily_report",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 2,
+      "author": "Site Superintendent"
+    },
+    "extracted_text": "DAILY SITE REPORT\nTitle: Daily Log - Delayed Hot Work Permit Clearance\nReport Date: 2026-03-24\nWeather: Breezy, 20C\nActivities: Structural steel welding crew delayed 3 hours awaiting client safety gas-free certification in confined shaft area.\nLabour: 140.00 h\nStatus: draft\nContract Reference: CON-2026-STL-003"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "daily_report",
+      "confidence": 0.99,
+      "reasoning": "Daily construction field report documenting weather, site activities, labour hours, and progress.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "report_date": {
+        "value": "2026-03-24",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-24",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Log - Delayed Hot Work Permit Clearance",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Log - Delayed Hot Work Permit Clearance",
+        "missing": false
+      },
+      "weather": {
+        "value": "Breezy, 20C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Breezy, 20C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Structural steel welding crew delayed 3 hours awaiting client safety gas-free certification in confined shaft area.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Structural steel welding crew delayed 3 hours awaiting client safety gas-free certification in confined shaft area.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "140.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 140.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "draft",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: draft",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "daily_report",
+    "required_fields_present": [
+      "report_date",
+      "activities",
+      "weather"
+    ],
+    "value_assertions": {
+      "report_date": "2026-03-24",
+      "status": "draft"
+    }
+  }
+}

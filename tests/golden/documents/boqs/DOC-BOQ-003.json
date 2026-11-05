@@ -1,0 +1,132 @@
+{
+  "id": "DOC-BOQ-003",
+  "title": "Structural Steel & Metal Decking Schedule of Rates",
+  "category": "boq",
+  "input": {
+    "filename": "BOQ-2026-STL-03_Steelwork.xlsx",
+    "document_type_hint": "boq",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "xlsx",
+      "sheet_count": 4,
+      "author": "Highline Commercial"
+    },
+    "extracted_text": "BILL OF QUANTITIES: STRUCTURAL STEEL FRAME\nBOQ Reference: BOQ-2026-STL-03\nContract Reference: CON-2026-STL-003\nCurrency: USD\n\nItem Code | Description | Quantity | Unit | Rate | Total\nST-10 | Grade S355JR structural steel fabrication and erection | 820.00 | t | 2650.00 | 2173000.00\nST-11 | Galvanized corrugated profiled steel decking 1.2mm thk | 7400.00 | m2 | 32.50 | 240500.00\nST-12 | Nelson type welded shear connector studs 19mm dia | 18500.00 | each | 4.80 | 88800.00\nST-13 | Two-hour intumescent thin-film fireproofing coating | 9200.00 | m2 | 45.00 | 414000.00\n\nTotal Structural Steel Package: USD 2916300.00"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "boq",
+      "confidence": 0.99,
+      "reasoning": "Detailed steel fabrication schedule of rates with weight and area metrics.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "title": {
+        "value": "Structural Steel Frame Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: STRUCTURAL STEEL FRAME",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "2916300.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Structural Steel Package: USD 2916300.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "ST-10",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "ST-10 | Grade S355JR structural steel",
+            "missing": false
+          },
+          "description": {
+            "value": "Grade S355JR structural steel fabrication and erection",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Grade S355JR structural steel fabrication and erection",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "820.00",
+              "unit": "t"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "820.00 | t",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "2650.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2650.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "2173000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2173000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-STL-03"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "boq",
+    "item_assertions": [
+      {
+        "code": "ST-10",
+        "unit_rate": "2650.00",
+        "unit": "t"
+      }
+    ]
+  }
+}

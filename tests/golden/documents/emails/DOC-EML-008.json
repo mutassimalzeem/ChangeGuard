@@ -1,0 +1,103 @@
+{
+  "id": "DOC-EML-008",
+  "title": "Email: dispute notice regarding crane back-charges",
+  "category": "email",
+  "input": {
+    "filename": "DOC-EML-008_2026-03-18.eml",
+    "document_type_hint": "email",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "eml",
+      "page_count": 1,
+      "author": "finance@titansteel.test"
+    },
+    "extracted_text": "Subject: dispute notice regarding crane back-charges\nFrom: finance@titansteel.test\nTo: commercial@horizon-struct.test\nDate: 2026-03-18\nStatus: received\nContract Reference: CON-2026-STL-003\n\nWe dispute your back-charge invoice #BC-044 for tower crane shared usage ($14,500). Contract Sub-clause 6.2 states crane hook time is provided by main contractor without surcharge."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "email",
+      "confidence": 0.99,
+      "reasoning": "Project correspondence email thread with valid sender, recipient, timestamp and message body.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "subject": {
+        "value": "dispute notice regarding crane back-charges",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: dispute notice regarding crane back-charges",
+        "missing": false
+      },
+      "sender": {
+        "value": "finance@titansteel.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: finance@titansteel.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "commercial@horizon-struct.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: commercial@horizon-struct.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-18",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-18",
+        "missing": false
+      },
+      "body": {
+        "value": "We dispute your back-charge invoice #BC-044 for tower crane shared usage ($14,500). Contract Sub-clause 6.2 states crane hook time is provided by main contractor without surcharge.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "We dispute your back-charge invoice #BC-044 for tower crane shared usage ($14,50",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "email",
+    "required_fields_present": [
+      "subject",
+      "sender",
+      "recipient",
+      "body"
+    ],
+    "value_assertions": {
+      "subject": "dispute notice regarding crane back-charges",
+      "sender": "finance@titansteel.test",
+      "recipient": "commercial@horizon-struct.test",
+      "sent_date": "2026-03-18"
+    }
+  }
+}

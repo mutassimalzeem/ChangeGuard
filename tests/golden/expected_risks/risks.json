@@ -1,0 +1,957 @@
+{
+  "duplicate_detection": [
+    {
+      "id": "DUP-001",
+      "title": "Exact Duplicate Change Order Claim Resubmission",
+      "category": "duplicate_detection",
+      "input": {
+        "primary_document": {
+          "document_id": "co-orig-001",
+          "filename": "CO-2026-001_Approved.pdf",
+          "document_type": "change_order",
+          "co_number": "CO-2026-001",
+          "contract_id": "CON-2026-CS-001",
+          "rfi_id": "RFI-2026-001",
+          "amount": "142500.00",
+          "currency": "USD",
+          "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+          "status": "approved"
+        },
+        "candidate_document": {
+          "document_id": "co-dup-001",
+          "filename": "CO-2026-001-REV_Resubmitted.pdf",
+          "document_type": "change_order",
+          "co_number": "CO-2026-001-REV",
+          "contract_id": "CON-2026-CS-001",
+          "rfi_id": "RFI-2026-001",
+          "amount": "142500.00",
+          "currency": "USD",
+          "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+          "status": "submitted"
+        }
+      },
+      "expected_output": {
+        "is_duplicate": true,
+        "risk_type": "duplicate_change_order_claim",
+        "severity": "high",
+        "status": "open",
+        "financial_exposure": {
+          "amount": "142500.00",
+          "currency": "USD"
+        },
+        "matched_fields": [
+          "contract_id",
+          "rfi_id",
+          "amount",
+          "currency",
+          "normalized_description"
+        ],
+        "recommended_action": "Reconcile the two claims before certifying payment.",
+        "sources": [
+          {
+            "document_id": "co-orig-001",
+            "page": 1,
+            "snippet": "CO-2026-001: Sub-base stabilization"
+          },
+          {
+            "document_id": "co-dup-001",
+            "page": 1,
+            "snippet": "CO-2026-001-REV: Sub-base stabilization"
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "duplicate_change_order_claim",
+        "assertions": {
+          "duplicate_detected": true,
+          "exposure_amount": "142500.00",
+          "severity": "high",
+          "status": "open"
+        }
+      }
+    },
+    {
+      "id": "DUP-002",
+      "title": "Double-Billed Scaffolding Preliminaries and Variation",
+      "category": "duplicate_detection",
+      "input": {
+        "primary_document": {
+          "document_id": "inv-march-prelim",
+          "filename": "IPC-04_Preliminaries_Schedule.pdf",
+          "document_type": "boq",
+          "contract_id": "CON-2026-FAC-005",
+          "item_code": "PRE-08",
+          "amount": "28000.00",
+          "currency": "USD",
+          "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+          "status": "approved"
+        },
+        "candidate_document": {
+          "document_id": "co-facade-scaffold",
+          "filename": "CO-2026-FAC-002_ScaffoldClaim.pdf",
+          "document_type": "change_order",
+          "contract_id": "CON-2026-FAC-005",
+          "item_code": "PRE-08",
+          "amount": "28000.00",
+          "currency": "USD",
+          "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+          "status": "submitted"
+        }
+      },
+      "expected_output": {
+        "is_duplicate": true,
+        "risk_type": "duplicate_change_order_claim",
+        "severity": "high",
+        "status": "open",
+        "financial_exposure": {
+          "amount": "28000.00",
+          "currency": "USD"
+        },
+        "matched_fields": [
+          "contract_id",
+          "amount",
+          "currency",
+          "normalized_description"
+        ],
+        "recommended_action": "Reconcile duplicate scaffolding rental between preliminaries and variation claim.",
+        "sources": [
+          {
+            "document_id": "inv-march-prelim",
+            "page": 1,
+            "snippet": "PRE-08: Perimeter modular access scaffolding rental"
+          },
+          {
+            "document_id": "co-facade-scaffold",
+            "page": 1,
+            "snippet": "Scaffolding rental for East Elevation"
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "duplicate_change_order_claim",
+        "assertions": {
+          "duplicate_detected": true,
+          "exposure_amount": "28000.00"
+        }
+      }
+    },
+    {
+      "id": "DUP-003",
+      "title": "Duplicate Tower Crane Downtime Claims Across Weather & Breakdown",
+      "category": "duplicate_detection",
+      "input": {
+        "primary_document": {
+          "document_id": "dr-crane-log",
+          "filename": "DR-2026-02-16_CraneBreakdown.pdf",
+          "document_type": "daily_report",
+          "contract_id": "CON-2026-CS-001",
+          "date": "2026-02-16",
+          "amount": "14500.00",
+          "currency": "USD",
+          "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+          "status": "approved"
+        },
+        "candidate_document": {
+          "document_id": "clm-weather-delay",
+          "filename": "CLM-2026-004_WeatherInterruption.pdf",
+          "document_type": "change_order",
+          "contract_id": "CON-2026-CS-001",
+          "date": "2026-02-16",
+          "amount": "14500.00",
+          "currency": "USD",
+          "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+          "status": "submitted"
+        }
+      },
+      "expected_output": {
+        "is_duplicate": true,
+        "risk_type": "duplicate_change_order_claim",
+        "severity": "high",
+        "status": "open",
+        "financial_exposure": {
+          "amount": "14500.00",
+          "currency": "USD"
+        },
+        "matched_fields": [
+          "contract_id",
+          "amount",
+          "normalized_description"
+        ],
+        "recommended_action": "Reconcile duplicate downtime claim logged under both weather and breakdown.",
+        "sources": [
+          {
+            "document_id": "dr-crane-log",
+            "page": 1,
+            "snippet": "Tower crane 2 hydraulic breakdown downtime"
+          },
+          {
+            "document_id": "clm-weather-delay",
+            "page": 1,
+            "snippet": "Tower crane 2 hydraulic breakdown downtime"
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "duplicate_change_order_claim",
+        "assertions": {
+          "duplicate_detected": true,
+          "exposure_amount": "14500.00"
+        }
+      }
+    },
+    {
+      "id": "DUP-004",
+      "title": "Re-submitted Rejected Rock Excavation Claim under New ID",
+      "category": "duplicate_detection",
+      "input": {
+        "primary_document": {
+          "document_id": "co-rej-085",
+          "filename": "CO-REJ-01_RockExcavation.pdf",
+          "document_type": "change_order",
+          "co_number": "CO-REJ-01",
+          "contract_id": "CON-2026-CS-001",
+          "rfi_id": "RFI-2026-002",
+          "amount": "85000.00",
+          "currency": "USD",
+          "description": "Additional pneumatic rock breaker excavation for Basement B3 elevator core pit",
+          "status": "rejected"
+        },
+        "candidate_document": {
+          "document_id": "co-new-085",
+          "filename": "CO-2026-011_RockClaim.pdf",
+          "document_type": "change_order",
+          "co_number": "CO-2026-011",
+          "contract_id": "CON-2026-CS-001",
+          "rfi_id": "RFI-2026-002",
+          "amount": "85000.00",
+          "currency": "USD",
+          "description": "Additional pneumatic rock breaker excavation for Basement B3 elevator core pit",
+          "status": "submitted"
+        }
+      },
+      "expected_output": {
+        "is_duplicate": true,
+        "risk_type": "duplicate_change_order_claim",
+        "severity": "high",
+        "status": "open",
+        "financial_exposure": {
+          "amount": "85000.00",
+          "currency": "USD"
+        },
+        "matched_fields": [
+          "contract_id",
+          "rfi_id",
+          "amount",
+          "normalized_description"
+        ],
+        "recommended_action": "Verify if new substantiating geotechnical evidence resolves prior rejection basis.",
+        "sources": [
+          {
+            "document_id": "co-rej-085",
+            "page": 1,
+            "snippet": "Additional pneumatic rock breaker excavation"
+          },
+          {
+            "document_id": "co-new-085",
+            "page": 1,
+            "snippet": "Additional pneumatic rock breaker excavation"
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "duplicate_change_order_claim",
+        "assertions": {
+          "duplicate_detected": true,
+          "exposure_amount": "85000.00",
+          "status": "open"
+        }
+      }
+    },
+    {
+      "id": "DUP-005",
+      "title": "Double Billing of Subcontractor Labor Timesheets in Daywork",
+      "category": "duplicate_detection",
+      "input": {
+        "primary_document": {
+          "document_id": "ts-week-09",
+          "filename": "Timesheet_Week09_BaseContract.pdf",
+          "document_type": "daily_report",
+          "contract_id": "CON-2026-MEP-002",
+          "amount": "12800.00",
+          "currency": "USD",
+          "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+          "status": "approved"
+        },
+        "candidate_document": {
+          "document_id": "co-daywork-02",
+          "filename": "CO-2026-002_Daywork_Billing.pdf",
+          "document_type": "change_order",
+          "contract_id": "CON-2026-MEP-002",
+          "amount": "12800.00",
+          "currency": "USD",
+          "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+          "status": "submitted"
+        }
+      },
+      "expected_output": {
+        "is_duplicate": true,
+        "risk_type": "duplicate_change_order_claim",
+        "severity": "high",
+        "status": "open",
+        "financial_exposure": {
+          "amount": "12800.00",
+          "currency": "USD"
+        },
+        "matched_fields": [
+          "contract_id",
+          "amount",
+          "normalized_description"
+        ],
+        "recommended_action": "Verify operative clock-in logs to eliminate dual billing across base work and variation.",
+        "sources": [
+          {
+            "document_id": "ts-week-09",
+            "page": 1,
+            "snippet": "160 hours journeyman electrician labor"
+          },
+          {
+            "document_id": "co-daywork-02",
+            "page": 1,
+            "snippet": "160 hours journeyman electrician labor"
+          }
+        ]
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "duplicate_change_order_claim",
+        "assertions": {
+          "duplicate_detected": true,
+          "exposure_amount": "12800.00"
+        }
+      }
+    }
+  ],
+  "missing_evidence": [
+    {
+      "id": "MISS-001",
+      "title": "Rock Excavation Change Order Lacking Borehole Logs & Cross Sections",
+      "category": "missing_evidence",
+      "input": {
+        "document_id": "co-rock-unsubstantiated",
+        "filename": "CO-2026-ROCK-01_Claim.pdf",
+        "document_type": "change_order",
+        "extracted_fields": {
+          "co_number": {
+            "value": "CO-2026-ROCK-01",
+            "missing": false
+          },
+          "title": {
+            "value": "Extra Hard Rock Excavation at Core B",
+            "missing": false
+          },
+          "description": {
+            "value": "Claim for 1,200m3 unexpected igneous basalt requiring continuous hydraulic breakers.",
+            "missing": false
+          },
+          "amount": {
+            "value": {
+              "amount": "85000.00",
+              "currency": "USD"
+            },
+            "missing": false
+          },
+          "status": {
+            "value": "submitted",
+            "missing": false
+          },
+          "document_references": []
+        },
+        "required_supporting_documents": [
+          "Geotechnical Borehole Log GT-BOR",
+          "Licensed Surveyor Pre/Post Volume Cross-Sections",
+          "Inspector Daily Sign-Off Verification"
+        ]
+      },
+      "expected_output": {
+        "risk_detected": true,
+        "risk_type": "missing_required_evidence",
+        "severity": "high",
+        "status": "insufficient_evidence",
+        "missing_facts": [
+          "document_references",
+          "geotechnical_baseline",
+          "survey_cross_sections"
+        ],
+        "refusal_behavior": {
+          "refuse_approval": true,
+          "refusal_reason": "Change order claim exceeds $50,000 threshold and lacks required geotechnical survey cross-sections."
+        },
+        "recommended_action": "Supply the missing facts and their source evidence."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "missing_required_evidence",
+        "assertions": {
+          "refuse_approval": true,
+          "status": "insufficient_evidence",
+          "missing_evidence_flag": true
+        }
+      }
+    },
+    {
+      "id": "MISS-002",
+      "title": "Weekend Overtime Acceleration Claim Lacking Signed Timesheets",
+      "category": "missing_evidence",
+      "input": {
+        "document_id": "co-accel-overtime",
+        "filename": "CO-2026-ACCEL-02_Overtime.pdf",
+        "document_type": "change_order",
+        "extracted_fields": {
+          "co_number": {
+            "value": "CO-2026-ACCEL-02",
+            "missing": false
+          },
+          "title": {
+            "value": "Weekend Overtime Shift Acceleration for Slab Handover",
+            "missing": false
+          },
+          "description": {
+            "value": "240 journeyman carpenter hours performed over two weekends to achieve milestone.",
+            "missing": false
+          },
+          "amount": {
+            "value": {
+              "amount": "28800.00",
+              "currency": "USD"
+            },
+            "missing": false
+          },
+          "status": {
+            "value": "submitted",
+            "missing": false
+          },
+          "document_references": []
+        },
+        "required_supporting_documents": [
+          "Resident Engineer Overtime Pre-Approval Form",
+          "Security Turnstile Biometric Gate In/Out Logs",
+          "Signed Daily Foreman Timesheets"
+        ]
+      },
+      "expected_output": {
+        "risk_detected": true,
+        "risk_type": "missing_required_evidence",
+        "severity": "medium",
+        "status": "insufficient_evidence",
+        "missing_facts": [
+          "supervisor_signed_timesheets",
+          "turnstile_gate_logs"
+        ],
+        "refusal_behavior": {
+          "refuse_approval": true,
+          "refusal_reason": "Claim cannot be audited: daily signed timesheets and biometric gate logs are missing."
+        },
+        "recommended_action": "Upload signed timesheets matching claimed operative names and dates."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "missing_required_evidence",
+        "assertions": {
+          "refuse_approval": true,
+          "status": "insufficient_evidence"
+        }
+      }
+    },
+    {
+      "id": "MISS-003",
+      "title": "Drawing Revision Delay Claim Lacking Formal RFI Submission Receipt",
+      "category": "missing_evidence",
+      "input": {
+        "document_id": "clm-drawing-delay",
+        "filename": "CLM-2026-009_DesignDelay.pdf",
+        "document_type": "change_order",
+        "extracted_fields": {
+          "co_number": {
+            "value": "CLM-2026-009",
+            "missing": false
+          },
+          "title": {
+            "value": "Time Extension Claim for Late Architectural Detailing",
+            "missing": false
+          },
+          "description": {
+            "value": "Claiming 14 calendar days critical path delay due to late issuance of revised lobby layout.",
+            "missing": false
+          },
+          "amount": {
+            "value": {
+              "amount": "42000.00",
+              "currency": "USD"
+            },
+            "missing": false
+          },
+          "status": {
+            "value": "submitted",
+            "missing": false
+          },
+          "document_references": []
+        },
+        "required_supporting_documents": [
+          "Formally Transmitted RFI Document",
+          "Document Transmittal Submittal Log",
+          "Primavera P6 Critical Path Delay Fragnet"
+        ]
+      },
+      "expected_output": {
+        "risk_detected": true,
+        "risk_type": "missing_required_evidence",
+        "severity": "high",
+        "status": "insufficient_evidence",
+        "missing_facts": [
+          "rfi_reference",
+          "schedule_fragnet"
+        ],
+        "refusal_behavior": {
+          "refuse_approval": true,
+          "refusal_reason": "Time extension claim rejected: no logged RFI or contemporaneous schedule fragnet cited."
+        },
+        "recommended_action": "Supply the missing facts and their source evidence."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "missing_required_evidence",
+        "assertions": {
+          "refuse_approval": true,
+          "status": "insufficient_evidence"
+        }
+      }
+    },
+    {
+      "id": "MISS-004",
+      "title": "Expedited Air Freight Surcharge Lacking Waybill and Customs Proof",
+      "category": "missing_evidence",
+      "input": {
+        "document_id": "co-freight-claim",
+        "filename": "CO-2026-FRT-01_ExpeditedChiller.pdf",
+        "document_type": "change_order",
+        "extracted_fields": {
+          "co_number": {
+            "value": "CO-2026-FRT-01",
+            "missing": false
+          },
+          "title": {
+            "value": "Emergency Air Freight for Chiller Replacement Rotor",
+            "missing": false
+          },
+          "description": {
+            "value": "Air freight from Munich factory to prevent commissioning delay.",
+            "missing": false
+          },
+          "amount": {
+            "value": {
+              "amount": "38500.00",
+              "currency": "USD"
+            },
+            "missing": false
+          },
+          "status": {
+            "value": "submitted",
+            "missing": false
+          },
+          "document_references": []
+        },
+        "required_supporting_documents": [
+          "Air Waybill (AWB) Bill of Lading",
+          "Airport Customs Duty & Clearance Receipt",
+          "Client Prior Written Expedited Delivery Authorization"
+        ]
+      },
+      "expected_output": {
+        "risk_detected": true,
+        "risk_type": "missing_required_evidence",
+        "severity": "medium",
+        "status": "insufficient_evidence",
+        "missing_facts": [
+          "air_waybill_number",
+          "commercial_invoice"
+        ],
+        "refusal_behavior": {
+          "refuse_approval": true,
+          "refusal_reason": "Freight premium claim requires original airway bill and airline carrier payment receipt."
+        },
+        "recommended_action": "Upload certified freight carrier waybill and port clearance voucher."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "missing_required_evidence",
+        "assertions": {
+          "refuse_approval": true,
+          "status": "insufficient_evidence"
+        }
+      }
+    },
+    {
+      "id": "MISS-005",
+      "title": "Thermal Cracking Repair Claim Lacking Batch Tickets & Curing Logs",
+      "category": "missing_evidence",
+      "input": {
+        "document_id": "co-crack-repair",
+        "filename": "CO-2026-CRK-01_EpoxyInjection.pdf",
+        "document_type": "change_order",
+        "extracted_fields": {
+          "co_number": {
+            "value": "CO-2026-CRK-01",
+            "missing": false
+          },
+          "title": {
+            "value": "Epoxy Resin Injection for Thermal Cracking in Raft Pour 3",
+            "missing": false
+          },
+          "description": {
+            "value": "Pressure injection of low-viscosity structural epoxy along 45m of surface cracks.",
+            "missing": false
+          },
+          "amount": {
+            "value": {
+              "amount": "19400.00",
+              "currency": "USD"
+            },
+            "missing": false
+          },
+          "status": {
+            "value": "submitted",
+            "missing": false
+          },
+          "document_references": []
+        },
+        "required_supporting_documents": [
+          "Concrete Batch Plant Delivery Tickets",
+          "7-Day Thermocouple Core Temperature Differential Logs",
+          "Post-Crack Core Compressive Strength Test Results"
+        ]
+      },
+      "expected_output": {
+        "risk_detected": true,
+        "risk_type": "missing_required_evidence",
+        "severity": "medium",
+        "status": "insufficient_evidence",
+        "missing_facts": [
+          "batch_tickets",
+          "thermocouple_temperature_logs"
+        ],
+        "refusal_behavior": {
+          "refuse_approval": true,
+          "refusal_reason": "Thermal cracking defect liability cannot be determined without contemporaneous temperature differential records."
+        },
+        "recommended_action": "Provide 7-day temperature curing logs and supplier batch certificates."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "missing_required_evidence",
+        "assertions": {
+          "refuse_approval": true,
+          "status": "insufficient_evidence"
+        }
+      }
+    }
+  ],
+  "conflicting_evidence": [
+    {
+      "id": "CONF-001",
+      "title": "Weather Contradiction: Clear Site Log vs Torrential Rain Claim",
+      "category": "conflicting_evidence",
+      "input": {
+        "document_a": {
+          "document_id": "dr-2026-03-14",
+          "filename": "DR-2026-03-14_DailyReport.pdf",
+          "document_type": "daily_report",
+          "source_page": 1,
+          "snippet": "Weather: Clear and sunny, 24C, wind 8 km/h. Placed 220 m3 concrete.",
+          "date": "2026-03-14",
+          "weather": "clear_and_sunny",
+          "recorded_rainfall_mm": 0.0
+        },
+        "document_b": {
+          "document_id": "clm-rain-0314",
+          "filename": "CLM-2026-008_RainfallDelay.pdf",
+          "document_type": "change_order",
+          "source_page": 1,
+          "snippet": "Severe torrential rainfall of 65mm flooded Zone B, causing full site shutdown on 2026-03-14.",
+          "date": "2026-03-14",
+          "claimed_condition": "torrential_rainfall",
+          "claimed_rainfall_mm": 65.0,
+          "claimed_impact_days": 3
+        }
+      },
+      "expected_output": {
+        "conflict_detected": true,
+        "risk_type": "conflicting_information",
+        "severity": "high",
+        "contradiction_key": "weather_conditions_on_2026-03-14",
+        "conflict_summary": "Daily report DR-2026-03-14 records 0mm rainfall and active concrete pour, whereas Claim CLM-2026-008 asserts 65mm torrential rain and site shutdown.",
+        "sources": [
+          {
+            "document_id": "dr-2026-03-14",
+            "page": 1,
+            "snippet": "Clear and sunny, 24C. Placed 220 m3 concrete."
+          },
+          {
+            "document_id": "clm-rain-0314",
+            "page": 1,
+            "snippet": "Severe torrential rainfall of 65mm flooded Zone B"
+          }
+        ],
+        "recommended_action": "Resolve the conflicting values with the document issuer."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "conflicting_information",
+        "assertions": {
+          "conflict_detected": true,
+          "both_sources_cited": true
+        }
+      }
+    },
+    {
+      "id": "CONF-002",
+      "title": "Headcount Contradiction: 4 Steel Fixers Logged vs 16 Billed",
+      "category": "conflicting_evidence",
+      "input": {
+        "document_a": {
+          "document_id": "dr-steelfix-log",
+          "filename": "DR-2026-02-16_DailyLog.pdf",
+          "document_type": "daily_report",
+          "source_page": 1,
+          "snippet": "Labour on site: 4 steel fixers, 2 carpenters present in Zone B.",
+          "date": "2026-02-16",
+          "steel_fixer_count": 4
+        },
+        "document_b": {
+          "document_id": "dw-invoice-steelfix",
+          "filename": "DW-2026-014_DayworkBill.pdf",
+          "document_type": "change_order",
+          "source_page": 2,
+          "snippet": "Daywork shift 2026-02-16: 16 certified steel fixers x 8 hours = 128 manhours billed.",
+          "date": "2026-02-16",
+          "steel_fixer_count": 16,
+          "financial_exposure": "4800.00",
+          "currency": "USD"
+        }
+      },
+      "expected_output": {
+        "conflict_detected": true,
+        "risk_type": "conflicting_information",
+        "severity": "high",
+        "contradiction_key": "operative_headcount_2026-02-16",
+        "conflict_summary": "Superintendent daily log records 4 steel fixers on site, while daywork bill DW-2026-014 charges for 16 steel fixers (12 operative variance).",
+        "financial_exposure": {
+          "amount": "4800.00",
+          "currency": "USD"
+        },
+        "sources": [
+          {
+            "document_id": "dr-steelfix-log",
+            "page": 1,
+            "snippet": "Labour on site: 4 steel fixers"
+          },
+          {
+            "document_id": "dw-invoice-steelfix",
+            "page": 2,
+            "snippet": "16 certified steel fixers x 8 hours"
+          }
+        ],
+        "recommended_action": "Audit security turnstile logs to reconcile actual physical headcount."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "conflicting_information",
+        "assertions": {
+          "conflict_detected": true,
+          "exposure_amount": "4800.00"
+        }
+      }
+    },
+    {
+      "id": "CONF-003",
+      "title": "Pipe Specification Contradiction: 500mm Installed vs 750mm Billed",
+      "category": "conflicting_evidence",
+      "input": {
+        "document_a": {
+          "document_id": "drg-asbuilt-drain",
+          "filename": "DR-C-701_AsBuilt_Drainage.pdf",
+          "document_type": "drawing",
+          "source_page": 1,
+          "snippet": "Stormwater Line SW-02: Installed 500mm ID Class 4 RCP pipe at 0.5% slope.",
+          "drawing_number": "DR-C-701",
+          "pipe_diameter_mm": 500
+        },
+        "document_b": {
+          "document_id": "co-drain-upsize",
+          "filename": "CO-2026-CV-003_PipeUpsize.pdf",
+          "document_type": "change_order",
+          "source_page": 1,
+          "snippet": "Supply and installation of 750mm ID heavy-duty reinforced stormwater line SW-02.",
+          "co_number": "CO-2026-CV-003",
+          "pipe_diameter_mm": 750,
+          "financial_delta": "34500.00",
+          "currency": "USD"
+        }
+      },
+      "expected_output": {
+        "conflict_detected": true,
+        "risk_type": "conflicting_information",
+        "severity": "high",
+        "contradiction_key": "pipe_diameter_specification",
+        "conflict_summary": "As-built drawing DR-C-701 documents installation of 500mm diameter pipe, but change order CO-2026-CV-003 bills for 750mm diameter pipe.",
+        "financial_exposure": {
+          "amount": "34500.00",
+          "currency": "USD"
+        },
+        "sources": [
+          {
+            "document_id": "drg-asbuilt-drain",
+            "page": 1,
+            "snippet": "Installed 500mm ID Class 4 RCP pipe"
+          },
+          {
+            "document_id": "co-drain-upsize",
+            "page": 1,
+            "snippet": "Supply and installation of 750mm ID heavy-duty"
+          }
+        ],
+        "recommended_action": "Conduct CCTV pipe inspection to confirm physical installed bore diameter."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "conflicting_information",
+        "assertions": {
+          "conflict_detected": true,
+          "exposure_amount": "34500.00"
+        }
+      }
+    },
+    {
+      "id": "CONF-004",
+      "title": "Unit Rate Contradiction: Quotation $45/m2 vs Change Order $95/m2",
+      "category": "conflicting_evidence",
+      "input": {
+        "document_a": {
+          "document_id": "quo-tactile-paver",
+          "filename": "Q-2026-PAV-01_Quotation.pdf",
+          "document_type": "quotation",
+          "source_page": 1,
+          "snippet": "Tactile warning hazard paver tiles supply rate: USD 45.00 per m2.",
+          "item_code": "PAV-04",
+          "unit_rate": "45.00",
+          "currency": "USD"
+        },
+        "document_b": {
+          "document_id": "co-paver-claim",
+          "filename": "CO-2026-006_PaverVariation.pdf",
+          "document_type": "change_order",
+          "source_page": 1,
+          "snippet": "Tactile warning hazard paver tiles 800m2 at unit rate USD 95.00 per m2 = USD 76,000.00.",
+          "item_code": "PAV-04",
+          "unit_rate": "95.00",
+          "quantity": "800.00",
+          "currency": "USD"
+        }
+      },
+      "expected_output": {
+        "conflict_detected": true,
+        "risk_type": "cost_outlier",
+        "severity": "high",
+        "contradiction_key": "item_unit_rate_PAV-04",
+        "conflict_summary": "Change order unit rate ($95/m2) exceeds agreed supplier quotation rate ($45/m2) by 111% (threshold >20%).",
+        "financial_exposure": {
+          "amount": "40000.00",
+          "currency": "USD"
+        },
+        "sources": [
+          {
+            "document_id": "quo-tactile-paver",
+            "page": 1,
+            "snippet": "Tactile warning hazard paver tiles supply rate: USD 45.00"
+          },
+          {
+            "document_id": "co-paver-claim",
+            "page": 1,
+            "snippet": "unit rate USD 95.00 per m2"
+          }
+        ],
+        "recommended_action": "Reconcile the item rate with the comparable source record."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "cost_outlier",
+        "assertions": {
+          "conflict_detected": true,
+          "exposure_amount": "40000.00"
+        }
+      }
+    },
+    {
+      "id": "CONF-005",
+      "title": "Status Contradiction: Contractor Claim 'Approved' vs Disapproval Log",
+      "category": "conflicting_evidence",
+      "input": {
+        "document_a": {
+          "document_id": "reg-supervising-eng",
+          "filename": "SER-2026-03_Register.pdf",
+          "document_type": "other",
+          "source_page": 3,
+          "snippet": "CO-2026-007 Status: Disapproved by Supervising Engineer on 2026-03-29 citing failure to comply with acoustic warranty.",
+          "co_number": "CO-2026-007",
+          "official_status": "disapproved"
+        },
+        "document_b": {
+          "document_id": "co-sub-claim-007",
+          "filename": "CO-2026-007_Submission.pdf",
+          "document_type": "change_order",
+          "source_page": 1,
+          "snippet": "Change Order Number: CO-2026-007. Status: approved by Engineer.",
+          "co_number": "CO-2026-007",
+          "asserted_status": "approved",
+          "amount": "134800.00",
+          "currency": "USD"
+        }
+      },
+      "expected_output": {
+        "conflict_detected": true,
+        "risk_type": "conflicting_information",
+        "severity": "high",
+        "contradiction_key": "change_order_status_CO-2026-007",
+        "conflict_summary": "Contractor submission claims change order is approved, but official Supervising Engineer Register SER-2026-03 records status as Disapproved.",
+        "financial_exposure": {
+          "amount": "134800.00",
+          "currency": "USD"
+        },
+        "sources": [
+          {
+            "document_id": "reg-supervising-eng",
+            "page": 3,
+            "snippet": "CO-2026-007 Status: Disapproved by Supervising Engineer"
+          },
+          {
+            "document_id": "co-sub-claim-007",
+            "page": 1,
+            "snippet": "Change Order Number: CO-2026-007. Status: approved"
+          }
+        ],
+        "recommended_action": "Freeze approval workflow and obtain definitive determination from Project Director."
+      },
+      "evaluation_criteria": {
+        "metric": "deterministic_rule_match",
+        "rule_name": "conflicting_information",
+        "assertions": {
+          "conflict_detected": true,
+          "exposure_amount": "134800.00"
+        }
+      }
+    }
+  ]
+}

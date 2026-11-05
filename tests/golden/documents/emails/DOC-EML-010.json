@@ -1,0 +1,113 @@
+{
+  "id": "DOC-EML-010",
+  "title": "Email: commissioning defect - fire damper smoke seal failure",
+  "category": "email",
+  "input": {
+    "filename": "DOC-EML-010_2026-03-27.eml",
+    "document_type_hint": "email",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "eml",
+      "page_count": 1,
+      "author": "commissioning.agent@safetysystems.test"
+    },
+    "extracted_text": "Subject: commissioning defect - fire damper smoke seal failure\nFrom: commissioning.agent@safetysystems.test\nTo: mep.lead@pioneerthermal.test\nDate: 2026-03-27\nStatus: received\nContract Reference: CON-2026-MEP-002\nReferenced RFI: RFI-2026-005\n\nDuring today's pre-functional pressurization test on Stair Core B, fire damper FD-B-04 failed to close within 15 seconds due to actuator torque deficiency. Replacement required before re-test."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "email",
+      "confidence": 0.99,
+      "reasoning": "Project correspondence email thread with valid sender, recipient, timestamp and message body.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "subject": {
+        "value": "commissioning defect - fire damper smoke seal failure",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: commissioning defect - fire damper smoke seal failure",
+        "missing": false
+      },
+      "sender": {
+        "value": "commissioning.agent@safetysystems.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: commissioning.agent@safetysystems.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "mep.lead@pioneerthermal.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: mep.lead@pioneerthermal.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-27",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-27",
+        "missing": false
+      },
+      "body": {
+        "value": "During today's pre-functional pressurization test on Stair Core B, fire damper FD-B-04 failed to close within 15 seconds due to actuator torque deficiency. Replacement required before re-test.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "During today's pre-functional pressurization test on Stair Core B, fire damper F",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-005"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-005",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "email",
+    "required_fields_present": [
+      "subject",
+      "sender",
+      "recipient",
+      "body"
+    ],
+    "value_assertions": {
+      "subject": "commissioning defect - fire damper smoke seal failure",
+      "sender": "commissioning.agent@safetysystems.test",
+      "recipient": "mep.lead@pioneerthermal.test",
+      "sent_date": "2026-03-27"
+    }
+  }
+}

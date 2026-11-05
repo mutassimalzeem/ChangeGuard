@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "dataset_name": "ChangeGuard Golden Evaluation Dataset",
+  "total_cases": 95,
+  "categories": {
+    "contracts": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "boqs": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "rfis": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "change_orders": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "daily_reports": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "emails": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "site_photos": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "duplicate_detection": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "missing_evidence": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "conflicting_evidence": {
+      "count": 5,
+      "target_minimum": 5
+    },
+    "permission_isolation": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "prompt_injection": {
+      "count": 10,
+      "target_minimum": 10
+    },
+    "end_to_end_workflows": {
+      "count": 5,
+      "target_minimum": 5
+    }
+  },
+  "directories": [
+    "documents/",
+    "expected_classifications/",
+    "expected_extractions/",
+    "expected_entities/",
+    "expected_risks/",
+    "expected_retrieval/",
+    "expected_change_orders/",
+    "prompt_injection/"
+  ]
+}

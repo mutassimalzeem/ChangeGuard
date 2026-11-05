@@ -1,0 +1,740 @@
+[
+  {
+    "id": "DOC-BOQ-001",
+    "title": "Substructure & Bulk Earthworks Bill of Quantities",
+    "document_type": "boq",
+    "expected": {
+      "title": {
+        "value": "Substructure and Bulk Earthworks Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: SUBSTRUCTURE AND BULK EARTHWORKS",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "1948050.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Bill of Quantities Amount: USD 1948050.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "EX-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "EX-01 | Bulk site excavation in general soil",
+            "missing": false
+          },
+          "description": {
+            "value": "Bulk site excavation in general soil down to formation level",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Bulk site excavation in general soil down to formation level",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "14500.00",
+              "unit": "m3"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "14500.00 | m3",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "18.50",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "18.50",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "268250.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "268250.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        },
+        {
+          "code": {
+            "value": "EX-02",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "EX-02 | Excavation in hard rock",
+            "missing": false
+          },
+          "description": {
+            "value": "Excavation in hard rock requiring pneumatic breakers",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Excavation in hard rock requiring pneumatic breakers",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "2200.00",
+              "unit": "m3"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2200.00 | m3",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "85.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "85.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "187000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "187000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        },
+        {
+          "code": {
+            "value": "ST-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "ST-01 | Cast-in-place C40/50 foundation raft",
+            "missing": false
+          },
+          "description": {
+            "value": "Cast-in-place C40/50 sulfate-resisting foundation raft concrete",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Cast-in-place C40/50 sulfate-resisting foundation raft concrete",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "3800.00",
+              "unit": "m3"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "3800.00 | m3",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "210.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "210.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "798000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "798000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-CS-01"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "boq",
+      "required_fields_present": [
+        "title",
+        "stated_total",
+        "items"
+      ],
+      "item_count_minimum": 3,
+      "item_assertions": [
+        {
+          "code": "EX-01",
+          "unit_rate": "18.50",
+          "unit": "m3"
+        },
+        {
+          "code": "ST-01",
+          "unit_rate": "210.00",
+          "unit": "m3"
+        }
+      ],
+      "evidence_grounding": {
+        "require_source_snippets": true
+      }
+    }
+  },
+  {
+    "id": "DOC-BOQ-002",
+    "title": "HVAC Chilled Water System & Primary Plant BOQ",
+    "document_type": "boq",
+    "expected": {
+      "title": {
+        "value": "Mechanical Chilled Water Plant Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: MECHANICAL CHILLED WATER PLANT",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "965750.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Mechanical Package: USD 965750.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "ME-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "ME-01 | 800 TR Water-Cooled Centrifugal Chiller",
+            "missing": false
+          },
+          "description": {
+            "value": "800 TR Water-Cooled Centrifugal Chiller with VFD",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "800 TR Water-Cooled Centrifugal Chiller with VFD",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "2.00",
+              "unit": "each"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2.00 | each",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "285000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "285000.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "570000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "570000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        },
+        {
+          "code": {
+            "value": "ME-03",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "ME-03 | Schedule 40 seamless carbon steel chilled water pipe",
+            "missing": false
+          },
+          "description": {
+            "value": "Schedule 40 seamless carbon steel chilled water pipe DN300",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Schedule 40 seamless carbon steel chilled water pipe DN300",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "650.00",
+              "unit": "m"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "650.00 | m",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "175.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "175.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "113750.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "113750.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-MEP-02"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "boq",
+      "required_fields_present": [
+        "title",
+        "stated_total",
+        "items"
+      ],
+      "item_assertions": [
+        {
+          "code": "ME-01",
+          "unit_rate": "285000.00",
+          "unit": "each"
+        }
+      ]
+    }
+  },
+  {
+    "id": "DOC-BOQ-003",
+    "title": "Structural Steel & Metal Decking Schedule of Rates",
+    "document_type": "boq",
+    "expected": {
+      "title": {
+        "value": "Structural Steel Frame Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: STRUCTURAL STEEL FRAME",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "2916300.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Structural Steel Package: USD 2916300.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "ST-10",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "ST-10 | Grade S355JR structural steel",
+            "missing": false
+          },
+          "description": {
+            "value": "Grade S355JR structural steel fabrication and erection",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Grade S355JR structural steel fabrication and erection",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "820.00",
+              "unit": "t"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "820.00 | t",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "2650.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2650.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "2173000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2173000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-STL-03"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "boq",
+      "item_assertions": [
+        {
+          "code": "ST-10",
+          "unit_rate": "2650.00",
+          "unit": "t"
+        }
+      ]
+    }
+  },
+  {
+    "id": "DOC-BOQ-004",
+    "title": "Deep Foundation Bored Piling & Shoring Schedule",
+    "document_type": "boq",
+    "expected": {
+      "title": {
+        "value": "Deep Foundations and Piling Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: DEEP FOUNDATIONS AND PILING",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "1451000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Piling Package: USD 1451000.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "PIL-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "PIL-01 | Bored cast-in-place concrete piles 900mm",
+            "missing": false
+          },
+          "description": {
+            "value": "Bored cast-in-place concrete piles 900mm dia depth to 24m",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Bored cast-in-place concrete piles 900mm dia depth to 24m",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "240.00",
+              "unit": "each"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "240.00 | each",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "3400.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "3400.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "816000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "816000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-GEO-04"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "boq",
+      "item_assertions": [
+        {
+          "code": "PIL-01",
+          "unit_rate": "3400.00",
+          "unit": "each"
+        }
+      ]
+    }
+  },
+  {
+    "id": "DOC-BOQ-005",
+    "title": "Architectural Facade & Glazing Schedule of Quantities",
+    "document_type": "boq",
+    "expected": {
+      "title": {
+        "value": "Architectural Facade System Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: ARCHITECTURAL FACADE SYSTEM",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "3838000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Facade Package: USD 3838000.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-FAC-005"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-FAC-005",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "GL-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "GL-01 | Unitized double-glazed low-e curtain wall",
+            "missing": false
+          },
+          "description": {
+            "value": "Unitized double-glazed low-e curtain wall panels 1500x3800mm",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Unitized double-glazed low-e curtain wall panels 1500x3800mm",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "6200.00",
+              "unit": "m2"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "6200.00 | m2",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "480.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "480.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "2976000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2976000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-FAC-05"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-FAC-005"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "boq",
+      "item_assertions": [
+        {
+          "code": "GL-01",
+          "unit_rate": "480.00",
+          "unit": "m2"
+        }
+      ]
+    }
+  }
+]

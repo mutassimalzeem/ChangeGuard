@@ -1,0 +1,128 @@
+{
+  "id": "DOC-CON-004",
+  "title": "Subcontract for Deep Foundations, Shoring & Dewatering",
+  "category": "contract",
+  "input": {
+    "filename": "CON-2026-GEO-004_Signed.pdf",
+    "document_type_hint": "contract",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 16,
+      "author": "Waterfront Development PM"
+    },
+    "extracted_text": "FOUNDATION WORKS SUBCONTRACT\nContract Reference: CON-2026-GEO-004\nTitle: Specialized Subcontract for Secant Piling, Foundation Bored Piles and Dewatering\nEmployer: Waterfront Logistics Park LLC\nContractor: GeoFoundation Engineering Ltd\nEffective Date: 2026-01-10\nExpiry Date: 2026-08-30\nContract Value: USD 1875000.00\nStatus: active\n\nWorks include installation of bored cast-in-place piles per geotechnical specification GT-BOR-01 and Bill of Quantities BOQ-2026-GEO-04."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "contract",
+      "confidence": 0.98,
+      "reasoning": "Subcontract agreement for geotechnical and deep foundation works with clear active status.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "reference": {
+        "value": "CON-2026-GEO-004",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+        "missing": false
+      },
+      "title": {
+        "value": "Specialized Subcontract for Secant Piling, Foundation Bored Piles and Dewatering",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Specialized Subcontract for Secant Piling, Foundation Bored Piles and Dewatering",
+        "missing": false
+      },
+      "employer": {
+        "value": "Waterfront Logistics Park LLC",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Waterfront Logistics Park LLC",
+        "missing": false
+      },
+      "contractor": {
+        "value": "GeoFoundation Engineering Ltd",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: GeoFoundation Engineering Ltd",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-01-10",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-01-10",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2026-08-30",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2026-08-30",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "1875000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 1875000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "active",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: active",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-GEO-04"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Bill of Quantities BOQ-2026-GEO-04",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-GEO-04"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "contract",
+    "required_fields_present": [
+      "reference",
+      "title",
+      "employer",
+      "contractor",
+      "contract_value"
+    ],
+    "value_assertions": {
+      "reference": "CON-2026-GEO-004",
+      "contract_value.amount": "1875000.00",
+      "status": "active"
+    },
+    "evidence_grounding": {
+      "require_source_snippets": true,
+      "require_source_page": true
+    }
+  }
+}

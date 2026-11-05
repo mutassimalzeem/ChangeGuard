@@ -1,0 +1,113 @@
+{
+  "id": "DOC-EML-006",
+  "title": "Email: authorization for emergency dewatering pump deployment",
+  "category": "email",
+  "input": {
+    "filename": "DOC-EML-006_2026-03-10.eml",
+    "document_type_hint": "email",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "eml",
+      "page_count": 1,
+      "author": "resident.eng@apexventures.test"
+    },
+    "extracted_text": "Subject: authorization for emergency dewatering pump deployment\nFrom: resident.eng@apexventures.test\nTo: operations@geofoundation.test\nDate: 2026-03-10\nStatus: sent\nContract Reference: CON-2026-GEO-004\nReferenced RFI: RFI-2026-002\n\nThis email confirms verbal site authorization given today for GeoFoundation to mobilize three additional 6-inch submersible pumps with temporary generators. Log hours separately under CO-2026-005."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "email",
+      "confidence": 0.99,
+      "reasoning": "Project correspondence email thread with valid sender, recipient, timestamp and message body.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "subject": {
+        "value": "authorization for emergency dewatering pump deployment",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: authorization for emergency dewatering pump deployment",
+        "missing": false
+      },
+      "sender": {
+        "value": "resident.eng@apexventures.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: resident.eng@apexventures.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "operations@geofoundation.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: operations@geofoundation.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-10",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-10",
+        "missing": false
+      },
+      "body": {
+        "value": "This email confirms verbal site authorization given today for GeoFoundation to mobilize three additional 6-inch submersible pumps with temporary generators. Log hours separately under CO-2026-005.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "This email confirms verbal site authorization given today for GeoFoundation to m",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "email",
+    "required_fields_present": [
+      "subject",
+      "sender",
+      "recipient",
+      "body"
+    ],
+    "value_assertions": {
+      "subject": "authorization for emergency dewatering pump deployment",
+      "sender": "resident.eng@apexventures.test",
+      "recipient": "operations@geofoundation.test",
+      "sent_date": "2026-03-10"
+    }
+  }
+}

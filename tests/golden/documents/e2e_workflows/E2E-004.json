@@ -1,0 +1,48 @@
+{
+  "id": "E2E-004",
+  "title": "Conflicting Weather Evidence Audit and Partial Claim Adjustment",
+  "category": "end_to_end_workflow",
+  "input": {
+    "scenario": "Contractor files weather delay claim contradicted by project's own daily site log.",
+    "stages": [
+      {
+        "stage_number": 1,
+        "action": "contemporaneous_log_entry",
+        "document": "DOC-DR-001",
+        "details": "Daily report records clear sunny weather and ongoing concrete works."
+      },
+      {
+        "stage_number": 2,
+        "action": "contractor_delay_claim_submission",
+        "document": "CONF-001",
+        "details": "Contractor submits claim for 3 days weather disruption on same date."
+      },
+      {
+        "stage_number": 3,
+        "action": "risk_engine_contradiction_detection",
+        "details": "Engine flags 'conflicting_information' with dual source citations."
+      },
+      {
+        "stage_number": 4,
+        "action": "dispute_resolution_and_claim_adjustment",
+        "details": "Commercial team presents daily report logs; contractor withdraws weather delay claim."
+      }
+    ]
+  },
+  "expected_output": {
+    "conflict_identified": true,
+    "audit_trail_recorded": true,
+    "unsubstantiated_claim_disallowed": true,
+    "disallowed_amount": {
+      "amount": "45000.00",
+      "currency": "USD"
+    }
+  },
+  "evaluation_criteria": {
+    "metric": "e2e_workflow_completion",
+    "assertions": {
+      "conflict_detected": true,
+      "audit_trail_recorded": true
+    }
+  }
+}

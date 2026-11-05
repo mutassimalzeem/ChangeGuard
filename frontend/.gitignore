@@ -34,6 +34,7 @@ yarn-error.log*
 
 # Vercel
 .vercel
+AGENTS.md
 
 # Ensure frontend/src/lib is tracked even if root .gitignore ignores Python lib/
 !src/lib/

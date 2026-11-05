@@ -1,0 +1,50 @@
+{
+  "id": "E2E-003",
+  "title": "Insufficient Evidence Refusal, Evidence Upload & Final Resolution",
+  "category": "end_to_end_workflow",
+  "input": {
+    "scenario": "Rock excavation claim initially lacks borehole and surveyor evidence; system refuses approval until uploaded.",
+    "stages": [
+      {
+        "stage_number": 1,
+        "action": "initial_claim_submission",
+        "document": "MISS-001",
+        "details": "Claim submitted for $85,000 rock excavation without supporting survey logs."
+      },
+      {
+        "stage_number": 2,
+        "action": "automated_refusal_gate",
+        "details": "System blocks approval with status 'insufficient_evidence', citing missing survey cross sections."
+      },
+      {
+        "stage_number": 3,
+        "action": "substantiating_evidence_upload",
+        "document": "DOC-BOQ-001",
+        "details": "Contractor uploads certified surveyor volume cross-section survey and geotechnical core log."
+      },
+      {
+        "stage_number": 4,
+        "action": "evidence_linking_and_re-evaluation",
+        "details": "Evidence links established to Document ID. Status transitions from insufficient_evidence to open."
+      },
+      {
+        "stage_number": 5,
+        "action": "commercial_manager_certification",
+        "details": "Commercial manager confirms survey volume 1,000m3 and certifies payment."
+      }
+    ]
+  },
+  "expected_output": {
+    "gate_blocked_initially": true,
+    "refusal_reason_logged": "missing_required_evidence",
+    "unblocked_on_evidence_upload": true,
+    "final_workflow_status": "approved"
+  },
+  "evaluation_criteria": {
+    "metric": "e2e_workflow_completion",
+    "assertions": {
+      "refusal_gate_enforced": true,
+      "resubmission_successful": true
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "DUP-001",
+  "title": "Exact Duplicate Change Order Claim Resubmission",
+  "category": "duplicate_detection",
+  "input": {
+    "primary_document": {
+      "document_id": "co-orig-001",
+      "filename": "CO-2026-001_Approved.pdf",
+      "document_type": "change_order",
+      "co_number": "CO-2026-001",
+      "contract_id": "CON-2026-CS-001",
+      "rfi_id": "RFI-2026-001",
+      "amount": "142500.00",
+      "currency": "USD",
+      "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+      "status": "approved"
+    },
+    "candidate_document": {
+      "document_id": "co-dup-001",
+      "filename": "CO-2026-001-REV_Resubmitted.pdf",
+      "document_type": "change_order",
+      "co_number": "CO-2026-001-REV",
+      "contract_id": "CON-2026-CS-001",
+      "rfi_id": "RFI-2026-001",
+      "amount": "142500.00",
+      "currency": "USD",
+      "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+      "status": "submitted"
+    }
+  },
+  "expected_output": {
+    "is_duplicate": true,
+    "risk_type": "duplicate_change_order_claim",
+    "severity": "high",
+    "status": "open",
+    "financial_exposure": {
+      "amount": "142500.00",
+      "currency": "USD"
+    },
+    "matched_fields": [
+      "contract_id",
+      "rfi_id",
+      "amount",
+      "currency",
+      "normalized_description"
+    ],
+    "recommended_action": "Reconcile the two claims before certifying payment.",
+    "sources": [
+      {
+        "document_id": "co-orig-001",
+        "page": 1,
+        "snippet": "CO-2026-001: Sub-base stabilization"
+      },
+      {
+        "document_id": "co-dup-001",
+        "page": 1,
+        "snippet": "CO-2026-001-REV: Sub-base stabilization"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "duplicate_change_order_claim",
+    "assertions": {
+      "duplicate_detected": true,
+      "exposure_amount": "142500.00",
+      "severity": "high",
+      "status": "open"
+    }
+  }
+}

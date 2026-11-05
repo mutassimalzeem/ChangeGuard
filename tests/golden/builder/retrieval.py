@@ -1,0 +1,140 @@
+"""Retrieval golden test cases definition."""
+
+def get_retrieval_cases():
+    return [
+        {
+            "id": "RET-001",
+            "title": "Exact Identifier Search for RFI-2026-001",
+            "category": "retrieval",
+            "input": {
+                "query": "RFI-2026-001 chilled water transfer girder clash",
+                "filters": {
+                    "tenant_id": "11111111-1111-1111-1111-111111111111",
+                    "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                    "document_type": "rfi",
+                },
+                "limit": 5,
+                "semantic": True,
+                "rerank": False,
+            },
+            "expected_output": {
+                "status": "matched",
+                "exact_identifier_match": True,
+                "top_hit_document": "DOC-RFI-001",
+                "top_hit_snippet_contains": "Clash between 600mm Chilled Water Riser and Transfer Girder TG-04",
+                "minimum_fusion_score": 0.85,
+            },
+            "evaluation_criteria": {
+                "metric": "retrieval_precision",
+                "assertions": {
+                    "status": "matched",
+                    "top_document_id": "DOC-RFI-001",
+                    "exact_identifier_match": True,
+                },
+            },
+        },
+        {
+            "id": "RET-002",
+            "title": "Semantic Query for Basement Water Seepage and Dewatering",
+            "category": "retrieval",
+            "input": {
+                "query": "unforeseen ground water ingress continuous wellpoint dewatering",
+                "filters": {
+                    "tenant_id": "11111111-1111-1111-1111-111111111111",
+                    "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                },
+                "limit": 5,
+                "semantic": True,
+                "rerank": True,
+            },
+            "expected_output": {
+                "status": "matched",
+                "relevant_documents": ["DOC-CO-005", "DOC-RFI-002", "DOC-PHO-001", "DOC-PHO-005"],
+                "minimum_results_count": 2,
+            },
+            "evaluation_criteria": {
+                "metric": "retrieval_recall",
+                "assertions": {
+                    "status": "matched",
+                    "includes_document": "DOC-CO-005",
+                },
+            },
+        },
+        {
+            "id": "RET-003",
+            "title": "Filtered Search by Document Type: contract",
+            "category": "retrieval",
+            "input": {
+                "query": "FIDIC subcontract agreement core shell lump sum",
+                "filters": {
+                    "tenant_id": "11111111-1111-1111-1111-111111111111",
+                    "document_type": "contract",
+                },
+                "limit": 5,
+                "semantic": True,
+            },
+            "expected_output": {
+                "status": "matched",
+                "top_hit_document": "DOC-CON-001",
+                "all_results_document_type": "contract",
+            },
+            "evaluation_criteria": {
+                "metric": "filter_accuracy",
+                "assertions": {
+                    "document_type_pure": True,
+                    "top_document_id": "DOC-CON-001",
+                },
+            },
+        },
+        {
+            "id": "RET-004",
+            "title": "Date Range Filtered Query for Daily Reports",
+            "category": "retrieval",
+            "input": {
+                "query": "concrete pour inspection slump test",
+                "filters": {
+                    "tenant_id": "11111111-1111-1111-1111-111111111111",
+                    "date_from": "2026-02-10",
+                    "date_to": "2026-02-28",
+                    "document_type": "daily_report",
+                },
+                "limit": 10,
+            },
+            "expected_output": {
+                "status": "matched",
+                "relevant_documents": ["DOC-DR-001", "DOC-DR-002", "DOC-DR-003", "DOC-DR-004"],
+            },
+            "evaluation_criteria": {
+                "metric": "temporal_filtering",
+                "assertions": {
+                    "all_dates_within_range": True,
+                },
+            },
+        },
+        {
+            "id": "RET-005",
+            "title": "Insufficient Evidence Refusal on Fabricated Query",
+            "category": "retrieval",
+            "input": {
+                "query": "nuclear reactor cooling water discharge permit compliance",
+                "filters": {
+                    "tenant_id": "11111111-1111-1111-1111-111111111111",
+                    "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                },
+                "limit": 5,
+            },
+            "expected_output": {
+                "status": "insufficient_evidence",
+                "results_count": 0,
+                "hallucination_avoidance": True,
+            },
+            "evaluation_criteria": {
+                "metric": "insufficient_evidence_refusal",
+                "assertions": {
+                    "status": "insufficient_evidence",
+                    "results_empty": True,
+                },
+            },
+        },
+    ]
+

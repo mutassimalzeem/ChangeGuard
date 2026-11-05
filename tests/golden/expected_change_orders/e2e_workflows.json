@@ -1,0 +1,276 @@
+[
+  {
+    "id": "E2E-001",
+    "title": "Unforeseen Utility Clash to Approved Change Order Workflow",
+    "category": "end_to_end_workflow",
+    "input": {
+      "scenario": "Excavator discovers uncharted utility duct bank interfering with 33kV high voltage route.",
+      "stages": [
+        {
+          "stage_number": 1,
+          "action": "document_ingestion",
+          "document": "DOC-PHO-002",
+          "details": "Site engineer uploads photo of uncovered brick conduit with GPS tags."
+        },
+        {
+          "stage_number": 2,
+          "action": "rfi_generation_and_response",
+          "document": "DOC-RFI-001",
+          "details": "Contractor raises RFI-2026-001; engineer issues SK-S-201-A directing 1200mm bypass route."
+        },
+        {
+          "stage_number": 3,
+          "action": "email_direction",
+          "document": "DOC-EML-001",
+          "details": "Employer PM sends email directing immediate relocation prior to formal pricing."
+        },
+        {
+          "stage_number": 4,
+          "action": "change_order_submission",
+          "document": "DOC-CO-002",
+          "details": "Contractor drafts and submits CO-2026-002 for $88,750 USD with 4 days time impact."
+        },
+        {
+          "stage_number": 5,
+          "action": "risk_and_policy_evaluation",
+          "details": "Risk engine verifies no duplicate claims and confirms linked RFI evidence."
+        },
+        {
+          "stage_number": 6,
+          "action": "approval_and_audit",
+          "actor_role": "commercial_manager",
+          "details": "Commercial manager reviews grounded evidence and approves change order."
+        }
+      ]
+    },
+    "expected_output": {
+      "final_workflow_status": "approved",
+      "evidence_graph_nodes": [
+        "DOC-PHO-002",
+        "DOC-RFI-001",
+        "DOC-EML-001",
+        "DOC-CO-002"
+      ],
+      "total_approved_amount": {
+        "amount": "88750.00",
+        "currency": "USD"
+      },
+      "schedule_impact_days": 4,
+      "unresolved_risks_count": 0,
+      "audit_trail_complete": true
+    },
+    "evaluation_criteria": {
+      "metric": "e2e_workflow_completion",
+      "assertions": {
+        "workflow_completed": true,
+        "evidence_chain_complete": true,
+        "zero_unresolved_risks": true
+      }
+    }
+  },
+  {
+    "id": "E2E-002",
+    "title": "Cost Outlier Detection, Rejection & Revised Approval Workflow",
+    "category": "end_to_end_workflow",
+    "input": {
+      "scenario": "Contractor submits variation with concrete unit rate >20% above BOQ baseline.",
+      "stages": [
+        {
+          "stage_number": 1,
+          "action": "baseline_ingestion",
+          "document": "DOC-BOQ-001",
+          "details": "Baseline BOQ item ST-01 established at USD 210.00/m3."
+        },
+        {
+          "stage_number": 2,
+          "action": "inflated_claim_submission",
+          "details": "Contractor submits variation claiming USD 380.00/m3 for identical concrete."
+        },
+        {
+          "stage_number": 3,
+          "action": "automated_risk_engine_flag",
+          "details": "Risk engine triggers 'cost_outlier' (>20% over baseline rate $210/m3), exposure $34,000 USD."
+        },
+        {
+          "stage_number": 4,
+          "action": "commercial_rejection_and_renegotiation",
+          "details": "Commercial manager rejects submission citing BOQ-2026-CS-01 item ST-01."
+        },
+        {
+          "stage_number": 5,
+          "action": "resubmission_and_approval",
+          "details": "Contractor resubmits at agreed rate USD 225.00/m3 (within allowable adjustment). Approved."
+        }
+      ]
+    },
+    "expected_output": {
+      "initial_finding": "cost_outlier",
+      "initial_action": "rejected_with_citation",
+      "final_workflow_status": "approved",
+      "reconciled_rate": {
+        "amount": "225.00",
+        "currency": "USD"
+      },
+      "cost_savings_secured": {
+        "amount": "31000.00",
+        "currency": "USD"
+      }
+    },
+    "evaluation_criteria": {
+      "metric": "e2e_workflow_completion",
+      "assertions": {
+        "cost_outlier_flagged": true,
+        "renegotiation_succeeded": true
+      }
+    }
+  },
+  {
+    "id": "E2E-003",
+    "title": "Insufficient Evidence Refusal, Evidence Upload & Final Resolution",
+    "category": "end_to_end_workflow",
+    "input": {
+      "scenario": "Rock excavation claim initially lacks borehole and surveyor evidence; system refuses approval until uploaded.",
+      "stages": [
+        {
+          "stage_number": 1,
+          "action": "initial_claim_submission",
+          "document": "MISS-001",
+          "details": "Claim submitted for $85,000 rock excavation without supporting survey logs."
+        },
+        {
+          "stage_number": 2,
+          "action": "automated_refusal_gate",
+          "details": "System blocks approval with status 'insufficient_evidence', citing missing survey cross sections."
+        },
+        {
+          "stage_number": 3,
+          "action": "substantiating_evidence_upload",
+          "document": "DOC-BOQ-001",
+          "details": "Contractor uploads certified surveyor volume cross-section survey and geotechnical core log."
+        },
+        {
+          "stage_number": 4,
+          "action": "evidence_linking_and_re-evaluation",
+          "details": "Evidence links established to Document ID. Status transitions from insufficient_evidence to open."
+        },
+        {
+          "stage_number": 5,
+          "action": "commercial_manager_certification",
+          "details": "Commercial manager confirms survey volume 1,000m3 and certifies payment."
+        }
+      ]
+    },
+    "expected_output": {
+      "gate_blocked_initially": true,
+      "refusal_reason_logged": "missing_required_evidence",
+      "unblocked_on_evidence_upload": true,
+      "final_workflow_status": "approved"
+    },
+    "evaluation_criteria": {
+      "metric": "e2e_workflow_completion",
+      "assertions": {
+        "refusal_gate_enforced": true,
+        "resubmission_successful": true
+      }
+    }
+  },
+  {
+    "id": "E2E-004",
+    "title": "Conflicting Weather Evidence Audit and Partial Claim Adjustment",
+    "category": "end_to_end_workflow",
+    "input": {
+      "scenario": "Contractor files weather delay claim contradicted by project's own daily site log.",
+      "stages": [
+        {
+          "stage_number": 1,
+          "action": "contemporaneous_log_entry",
+          "document": "DOC-DR-001",
+          "details": "Daily report records clear sunny weather and ongoing concrete works."
+        },
+        {
+          "stage_number": 2,
+          "action": "contractor_delay_claim_submission",
+          "document": "CONF-001",
+          "details": "Contractor submits claim for 3 days weather disruption on same date."
+        },
+        {
+          "stage_number": 3,
+          "action": "risk_engine_contradiction_detection",
+          "details": "Engine flags 'conflicting_information' with dual source citations."
+        },
+        {
+          "stage_number": 4,
+          "action": "dispute_resolution_and_claim_adjustment",
+          "details": "Commercial team presents daily report logs; contractor withdraws weather delay claim."
+        }
+      ]
+    },
+    "expected_output": {
+      "conflict_identified": true,
+      "audit_trail_recorded": true,
+      "unsubstantiated_claim_disallowed": true,
+      "disallowed_amount": {
+        "amount": "45000.00",
+        "currency": "USD"
+      }
+    },
+    "evaluation_criteria": {
+      "metric": "e2e_workflow_completion",
+      "assertions": {
+        "conflict_detected": true,
+        "audit_trail_recorded": true
+      }
+    }
+  },
+  {
+    "id": "E2E-005",
+    "title": "Grounded Multi-Turn Investigation Agent Workflow with Citation Verification",
+    "category": "end_to_end_workflow",
+    "input": {
+      "scenario": "Commercial Director queries investigation agent for foundation variation exposure.",
+      "stages": [
+        {
+          "stage_number": 1,
+          "action": "user_query",
+          "query": "What is the total approved financial exposure for foundation and dewatering variations on Project Apex Horizon?"
+        },
+        {
+          "stage_number": 2,
+          "action": "agent_hybrid_retrieval",
+          "details": "Investigation agent executes scoped hybrid search across tenant and project boundaries."
+        },
+        {
+          "stage_number": 3,
+          "action": "fact_extraction_and_citation",
+          "details": "Agent retrieves CO-2026-001 ($142,500) and CO-2026-005 ($118,900) with source document IDs and page numbers."
+        },
+        {
+          "stage_number": 4,
+          "action": "bounded_synthesis",
+          "details": "Agent computes sum of $261,400.00 USD, explicitly citing Page 1 of CO-2026-001 and Page 1 of CO-2026-005, refusing to extrapolate ungrounded estimates."
+        }
+      ]
+    },
+    "expected_output": {
+      "agent_response_grounded": true,
+      "cited_change_orders": [
+        "CO-2026-001",
+        "CO-2026-005"
+      ],
+      "total_exposure_amount": {
+        "amount": "261400.00",
+        "currency": "USD"
+      },
+      "hallucinations_detected": false,
+      "citations_include_page_numbers": true
+    },
+    "evaluation_criteria": {
+      "metric": "investigation_agent_grounding",
+      "assertions": {
+        "exposure_exact": "261400.00",
+        "zero_hallucinations": true,
+        "exact_citations_present": true
+      }
+    }
+  }
+]

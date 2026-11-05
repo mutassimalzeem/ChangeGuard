@@ -1,0 +1,88 @@
+{
+  "id": "DOC-PHO-003",
+  "title": "Site Photo: Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+  "category": "site_photo",
+  "input": {
+    "filename": "PHO-2026-003_Structural_Dimensional_Non-Conformance.jpg",
+    "document_type_hint": "site_photo",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "jpeg",
+      "dimensions": "4032x3024",
+      "camera_model": "Trimble SiteVision Rugged / iPhone 15 Pro Max",
+      "gps_latitude": 25.1972,
+      "gps_longitude": 55.2744,
+      "timestamp": "2026-02-24T11:00:00Z",
+      "author": "Site QA/QC Field Engineer"
+    },
+    "extracted_text": "CONSTRUCTION SITE INSPECTION PHOTOGRAPH\nPhoto ID: PHO-2026-003\nTitle: Misaligned Baseplate Anchor Bolts on Gridline D-8 Column\nTimestamp: 2026-02-24T11:00:00Z\nLocation: Podium Level 01, Structural Grid D-8, Column Base C-14\nObserved Scene: Cast-in Grade 8.8 anchor bolt cluster displaced 45mm south of theoretical centerline. Structural steel baseplate cannot be seated without oblong slot enlargement or anchor re-engineering.\nClassification: site_photo\nDefect Category: Structural Dimensional Non-Conformance\nContract Reference: CON-2026-CS-001\nReferenced RFI: RFI-2026-004"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "site_photo",
+      "confidence": 0.98,
+      "reasoning": "Site inspection photograph capturing field visual evidence of Structural Dimensional Non-Conformance.",
+      "model_or_rule_used": "vision_rules_with_llm"
+    },
+    "extraction": {
+      "title": {
+        "value": "Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+        "missing": false
+      },
+      "description": {
+        "value": "Cast-in Grade 8.8 anchor bolt cluster displaced 45mm south of theoretical centerline. Structural steel baseplate cannot be seated without oblong slot enlargement or anchor re-engineering.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Cast-in Grade 8.8 anchor bolt cluster displaced 45mm south of theoretical center",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-004",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-004"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "site_photo",
+    "required_fields_present": [
+      "title",
+      "description"
+    ],
+    "value_assertions": {
+      "title": "Misaligned Baseplate Anchor Bolts on Gridline D-8 Column"
+    }
+  }
+}

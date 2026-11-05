@@ -1,0 +1,106 @@
+{
+  "id": "DOC-RFI-003",
+  "title": "Curtain Wall Seismic Joint Displacement Clearance",
+  "category": "rfi",
+  "input": {
+    "filename": "RFI-2026-003_CurtainWall_Seismic.pdf",
+    "document_type_hint": "rfi",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 2,
+      "author": "Alumitech Technical Office"
+    },
+    "extracted_text": "TECHNICAL REQUEST FOR INFORMATION\nRFI Number: RFI-2026-003\nSubject: Curtain Wall Seismic Joint Displacement Clearance at Tower Expansion Joint\nContract Reference: CON-2026-FAC-005\nRaised Date: 2026-03-05\nDue Date: 2026-03-12\nStatus: answered\n\nQUESTION:\nArchitectural detail 4/A-501 specifies a 50mm expansion joint between the Podium and Main Tower. However, Structural General Notes S-001 indicate maximum inter-story drift under Seismic Design Category D of 75mm. Please confirm whether the facade expansion joint width must be enlarged to 85mm to prevent glass shattering.\n\nRESPONSE:\nResponse Date: 2026-03-09\nApproved: Increase expansion joint width to 90mm at all tower interface lines. Contractor to submit revised silicone bellows extrusion profile."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "rfi",
+      "confidence": 0.99,
+      "reasoning": "RFI resolving discrepancy between architectural joint detail and structural seismic drift criteria.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "rfi_number": {
+        "value": "RFI-2026-003",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "RFI Number: RFI-2026-003",
+        "missing": false
+      },
+      "subject": {
+        "value": "Curtain Wall Seismic Joint Displacement Clearance at Tower Expansion Joint",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Subject: Curtain Wall Seismic Joint Displacement Clearance at Tower Expansion Joint",
+        "missing": false
+      },
+      "question": {
+        "value": "Architectural detail 4/A-501 specifies a 50mm expansion joint between the Podium and Main Tower. However, Structural General Notes S-001 indicate maximum inter-story drift under Seismic Design Category D of 75mm. Please confirm whether the facade expansion joint width must be enlarged to 85mm to prevent glass shattering.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Architectural detail 4/A-501 specifies a 50mm expansion joint between the Podium and Main Tower",
+        "missing": false
+      },
+      "response": {
+        "value": "Approved: Increase expansion joint width to 90mm at all tower interface lines. Contractor to submit revised silicone bellows extrusion profile.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Approved: Increase expansion joint width to 90mm at all tower interface lines.",
+        "missing": false
+      },
+      "raised_date": {
+        "value": "2026-03-05",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Raised Date: 2026-03-05",
+        "missing": false
+      },
+      "due_date": {
+        "value": "2026-03-12",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Due Date: 2026-03-12",
+        "missing": false
+      },
+      "status": {
+        "value": "answered",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: answered",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-FAC-005"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-FAC-005",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-003"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-FAC-005"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "rfi",
+    "value_assertions": {
+      "rfi_number": "RFI-2026-003",
+      "status": "answered"
+    }
+  }
+}
