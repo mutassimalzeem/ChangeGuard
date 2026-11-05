@@ -261,6 +261,8 @@ class AuthenticationService:
             select(User).where(User.id == row.user_id).with_for_update()
         )
         await self.revoke_family(row.family_id)
+        if user:
+            user.token_version += 1
         tenant = await self.session.get(Tenant, row.tenant_id)
         await self.audit("auth.logout", tenant, user)
 
