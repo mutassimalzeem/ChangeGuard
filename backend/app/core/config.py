@@ -211,6 +211,17 @@ class Settings(BaseSettings):
         return self.base_path / "uploads"
 
     # Validators
+    @field_validator("debug", mode="before")
+    @classmethod
+    def validate_debug(cls, v: object) -> bool:
+        if isinstance(v, str):
+            val = v.strip().lower()
+            if val in ("release", "prod", "production", "false", "0", "no", "off"):
+                return False
+            if val in ("debug", "dev", "development", "true", "1", "yes", "on"):
+                return True
+        return bool(v)
+
     @field_validator("jwt_secret")
     @classmethod
     def validate_jwt_secret(cls, v: str) -> str:
