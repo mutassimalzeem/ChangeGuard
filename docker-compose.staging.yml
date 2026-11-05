@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_secure_db_pass_2026}
       POSTGRES_DB: ${POSTGRES_DB:-changeguard}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - staging_postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -52,7 +52,7 @@ services:
       --maxmemory 512mb
       --maxmemory-policy allkeys-lru
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - staging_redis_data:/data
     healthcheck:
@@ -81,8 +81,8 @@ services:
       MINIO_ROOT_USER: ${OBJECT_STORAGE_ACCESS_KEY:-changeguard_staging_minio}
       MINIO_ROOT_PASSWORD: ${OBJECT_STORAGE_SECRET_KEY:-staging_minio_pass_2026}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - staging_minio_data:/data
     healthcheck:

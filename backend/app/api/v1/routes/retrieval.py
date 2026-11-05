@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import require_authenticated_user
+from app.api.dependencies import require_authenticated_user, require_rate_limit
 from app.core.config import get_settings
 from app.core.database import get_session
 from app.domain.models import User
@@ -39,7 +39,11 @@ def get_retrieval(
     )
 
 
-@router.post("/search", response_model=SearchResponse)
+@router.post(
+    "/search",
+    response_model=SearchResponse,
+    dependencies=[Depends(require_rate_limit(requests=60, window_seconds=60, endpoint_tag="retrieval"))],
+)
 async def search_chunks(
     payload: SearchRequest, retrieval: Annotated[HybridRetrieval, Depends(get_retrieval)]
 ):

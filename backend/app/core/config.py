@@ -278,6 +278,15 @@ class Settings(BaseSettings):
             if self.smtp_host and (not self.smtp_starttls or not self.frontend_url.startswith("https://")):
                 errors.append("Password reset delivery in production requires STARTTLS and an HTTPS FRONTEND_URL")
 
+            import os
+            if os.getenv("DEBUG", "").lower() in ("true", "1", "yes"):
+                errors.append("DEBUG mode must be disabled in production")
+
+            if os.getenv("CORS_ORIGINS"):
+                for origin in self.cors_origins:
+                    if "localhost" in origin or "127.0.0.1" in origin:
+                        errors.append(f"CORS origins must not contain localhost in production: {origin}")
+
             if errors:
                 raise ValueError(
                     "Production configuration validation failed:\n" + "\n".join(f"  - {e}" for e in errors)

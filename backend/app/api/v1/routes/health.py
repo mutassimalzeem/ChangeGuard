@@ -69,7 +69,7 @@ async def _run_health_check_db(session: AsyncSession) -> dict[str, Any]:
         return {
             "status": "unhealthy",
             "database": "disconnected",
-            "error": str(exc),
+            "error": "database_unavailable",
             "latency_ms": latency_ms,
         }
 
@@ -103,7 +103,7 @@ async def _run_health_check_redis() -> dict[str, Any]:
         return {
             "status": "unhealthy",
             "redis": "disconnected",
-            "error": str(exc),
+            "error": "redis_unavailable",
             "latency_ms": latency_ms,
         }
     finally:
@@ -152,7 +152,7 @@ async def _run_health_check_storage() -> dict[str, Any]:
             "status": "unhealthy",
             "storage": "disconnected",
             "bucket": settings.object_storage_bucket,
-            "error": str(exc),
+            "error": "storage_unavailable",
             "latency_ms": latency_ms,
         }
 
@@ -193,7 +193,7 @@ async def _run_health_check_worker() -> dict[str, Any]:
         return {
             "status": "unhealthy",
             "worker": "disconnected",
-            "error": str(exc),
+            "error": "worker_unavailable",
             "latency_ms": latency_ms,
         }
 
@@ -220,7 +220,8 @@ async def _run_readiness_check(
         checks["database"] = "ok"
         details["database_latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
     except Exception as exc:
-        checks["database"] = f"error: {exc}"
+        logger.error("Readiness database check failed", error=str(exc))
+        checks["database"] = "error"
 
     # 2. Redis check
     client = None
@@ -235,9 +236,10 @@ async def _run_readiness_check(
             checks["redis"] = "ok"
             details["redis_latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
         else:
-            checks["redis"] = "error: ping returned false"
+            checks["redis"] = "error"
     except Exception as exc:
-        checks["redis"] = f"error: {exc}"
+        logger.error("Readiness Redis check failed", error=str(exc))
+        checks["redis"] = "error"
     finally:
         if client is not None:
             with contextlib.suppress(Exception):
@@ -265,7 +267,8 @@ async def _run_readiness_check(
         checks["object_storage"] = "ok"
         details["storage_latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
     except Exception as exc:
-        checks["object_storage"] = f"error: {exc}"
+        logger.error("Readiness object storage check failed", error=str(exc))
+        checks["object_storage"] = "error"
 
     # 4. Celery Worker / Broker check
     try:
@@ -276,7 +279,8 @@ async def _run_readiness_check(
         checks["worker"] = "ok"
         details["worker_broker_latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
     except Exception as exc:
-        checks["worker"] = f"error: {exc}"
+        logger.error("Readiness Celery worker check failed", error=str(exc))
+        checks["worker"] = "error"
 
     all_ok = all(v == "ok" for v in checks.values())
 

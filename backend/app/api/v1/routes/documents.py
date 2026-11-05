@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import require_authenticated_user
+from app.api.dependencies import require_authenticated_user, require_rate_limit
 from app.core.database import get_session
 from app.domain.models import User
 from app.domain.schemas.document import DocumentRead
@@ -28,6 +28,7 @@ def get_document_service(
     "/projects/{project_id}/documents",
     response_model=DocumentRead,
     status_code=201,
+    dependencies=[Depends(require_rate_limit(requests=30, window_seconds=60, endpoint_tag="document_upload"))],
     responses={
         409: {"description": "Duplicate document"},
         413: {"model": DocumentRead},

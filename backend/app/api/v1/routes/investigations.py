@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.investigation.agent import InvestigationAgent, Trace
 from app.ai.investigation.planner import GatewayPlanner
 from app.ai.investigation.schemas import InvestigationRequest, tool_schemas
-from app.api.dependencies import require_authenticated_user, require_permission
+from app.api.dependencies import require_authenticated_user, require_permission, require_rate_limit
 from app.core.config import get_settings
 from app.core.database import get_session
 from app.domain.models import User
@@ -43,6 +43,7 @@ async def investigate(
     project_id: UUID,
     payload: InvestigationRequest,
     request: Request,
+    _rate_limit: User = Depends(require_rate_limit(requests=10, window_seconds=60, endpoint_tag="investigations")),
     user: User = Depends(require_authenticated_user),
     session: AsyncSession = Depends(get_session),
 ):

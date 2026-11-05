@@ -120,6 +120,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signInDemo = useCallback((role: Role = "commercial_manager") => {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN !== "true"
+    ) {
+      console.warn("Demo login is disabled in production.");
+      return;
+    }
     const encode = (obj: unknown) =>
       btoa(unescape(encodeURIComponent(JSON.stringify(obj))))
         .replace(/\+/g, "-")
