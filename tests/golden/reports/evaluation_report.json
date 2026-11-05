@@ -1,0 +1,518 @@
+{
+  "timestamp": "2026-11-05T06:15:25.270092+00:00",
+  "ci_status": "PASSED",
+  "gates": {
+    "passed": true,
+    "total_gates": 4,
+    "passed_gates": 4,
+    "failed_gates": 0,
+    "gates": [
+      {
+        "name": "classification_accuracy",
+        "threshold": ">= 90%",
+        "actual": "100.00%",
+        "passed": true,
+        "description": "Document classification accuracy across all golden cases"
+      },
+      {
+        "name": "critical_field_extraction_accuracy",
+        "threshold": ">= 85%",
+        "actual": "100.00%",
+        "passed": true,
+        "description": "Accuracy on critical legal, financial, and identifying fields"
+      },
+      {
+        "name": "citation_coverage",
+        "threshold": ">= 95%",
+        "actual": "100.00%",
+        "passed": true,
+        "description": "Percentage of extracted facts with valid page and source snippet citation"
+      },
+      {
+        "name": "zero_unsupported_factual_claims",
+        "threshold": "== 0",
+        "actual": "0 claims",
+        "passed": true,
+        "description": "Prohibits any hallucinated or unevidenced factual claims"
+      }
+    ]
+  },
+  "suites": {
+    "classification": {
+      "total": 55,
+      "correct": 55,
+      "accuracy": 1.0,
+      "per_class": {
+        "boq": {
+          "support": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "change_order": {
+          "support": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "contract": {
+          "support": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "daily_report": {
+          "support": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "email": {
+          "support": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "rfi": {
+          "support": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "site_photo": {
+          "support": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "confusion_matrix": {
+        "boq": {
+          "boq": 5
+        },
+        "change_order": {
+          "change_order": 10
+        },
+        "contract": {
+          "contract": 5
+        },
+        "daily_report": {
+          "daily_report": 10
+        },
+        "email": {
+          "email": 10
+        },
+        "rfi": {
+          "rfi": 5
+        },
+        "site_photo": {
+          "site_photo": 10
+        }
+      },
+      "failures": []
+    },
+    "extraction": {
+      "total_expected_facts": 285,
+      "total_predicted_facts": 285,
+      "correct_facts": 285,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "critical_facts_total": 180,
+      "critical_facts_correct": 180,
+      "critical_field_accuracy": 1.0,
+      "by_field": {
+        "title": {
+          "expected": 40,
+          "correct": 40,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "stated_total": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "co_number": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "description": {
+          "expected": 20,
+          "correct": 20,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "issue_date": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "amount": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "status": {
+          "expected": 40,
+          "correct": 40,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "reference": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "employer": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "contractor": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "effective_date": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "expiry_date": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "contract_value": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "report_date": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "weather": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "activities": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "labour_quantity": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "subject": {
+          "expected": 15,
+          "correct": 15,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "sender": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "recipient": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "sent_date": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "body": {
+          "expected": 10,
+          "correct": 10,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "rfi_number": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "question": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "response": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "raised_date": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "due_date": {
+          "expected": 5,
+          "correct": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      }
+    },
+    "entity_linking": {
+      "total_expected_links": 95,
+      "total_predicted_links": 95,
+      "correct_links": 90,
+      "precision": 0.9474,
+      "recall": 0.9474,
+      "f1": 0.9474,
+      "accuracy": 0.9474
+    },
+    "retrieval": {
+      "precision@1": 1.0,
+      "precision@3": 0.6667,
+      "precision@5": 0.5,
+      "recall@1": 0.625,
+      "recall@3": 0.875,
+      "recall@5": 1.0,
+      "mrr": 1.0,
+      "exact_identifier_matches": 1,
+      "exact_identifier_queries": 1,
+      "refusal_correctness": 1,
+      "refusal_queries": 1,
+      "exact_identifier_match_rate": 1.0,
+      "refusal_accuracy": 1.0
+    },
+    "citations": {
+      "total_facts": 284,
+      "facts_with_citation": 284,
+      "citation_coverage": 1.0,
+      "facts_grounded_in_text": 284,
+      "groundedness_rate": 1.0,
+      "unsupported_factual_claims": 0
+    },
+    "refusal": {
+      "total": 5,
+      "correct_refusals": 5,
+      "refusal_accuracy": 1.0
+    },
+    "duplicates": {
+      "total_cases": 5,
+      "true_positives": 5,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "risks": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "by_risk_type": {
+        "duplicate_change_order_claim": {
+          "expected": 5,
+          "true_positives": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "missing_required_evidence": {
+          "expected": 5,
+          "true_positives": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "conflicting_information": {
+          "expected": 4,
+          "true_positives": 4,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "cost_outlier": {
+          "expected": 1,
+          "true_positives": 1,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "prompt_versions": {
+      "variants": {
+        "prompt_v1_baseline": {
+          "description": "Zero-shot direct JSON schema prompt without explicit quoting constraints",
+          "classification_accuracy": 0.8909,
+          "critical_field_accuracy": 0.8145,
+          "citation_coverage": 0.882,
+          "groundedness_rate": 0.841,
+          "unsupported_claims": 6,
+          "latency_p50_ms": 1150
+        },
+        "prompt_v2_cot": {
+          "description": "Chain-of-Thought scratchpad reasoning with mandatory source snippet extraction",
+          "classification_accuracy": 0.9818,
+          "critical_field_accuracy": 0.942,
+          "citation_coverage": 0.978,
+          "groundedness_rate": 0.982,
+          "unsupported_claims": 0,
+          "latency_p50_ms": 1820
+        },
+        "prompt_v2_structured_json": {
+          "description": "Schema-constrained output with Pydantic grammar enforcement and strict quoting",
+          "classification_accuracy": 1.0,
+          "critical_field_accuracy": 0.985,
+          "citation_coverage": 0.995,
+          "groundedness_rate": 0.998,
+          "unsupported_claims": 0,
+          "latency_p50_ms": 1420
+        }
+      },
+      "best_variant": "prompt_v2_structured_json",
+      "delta_summary": {
+        "accuracy_improvement": "+10.91%",
+        "critical_field_improvement": "+17.05%",
+        "unsupported_claims_reduction": "-6 claims (zero hallucinations)"
+      }
+    },
+    "models": {
+      "models": {
+        "primary_gpt4o": {
+          "provider": "openai",
+          "classification_accuracy": 1.0,
+          "critical_field_accuracy": 0.985,
+          "citation_coverage": 0.995,
+          "groundedness_rate": 0.998,
+          "unsupported_claims": 0,
+          "avg_latency_ms": 1380,
+          "estimated_cost_per_1k_docs_usd": 12.5
+        },
+        "fast_haiku": {
+          "provider": "anthropic",
+          "classification_accuracy": 0.9455,
+          "critical_field_accuracy": 0.912,
+          "citation_coverage": 0.962,
+          "groundedness_rate": 0.954,
+          "unsupported_claims": 0,
+          "avg_latency_ms": 620,
+          "estimated_cost_per_1k_docs_usd": 2.1
+        },
+        "deterministic_baseline": {
+          "provider": "rule_engine",
+          "classification_accuracy": 1.0,
+          "critical_field_accuracy": 0.95,
+          "citation_coverage": 1.0,
+          "groundedness_rate": 1.0,
+          "unsupported_claims": 0,
+          "avg_latency_ms": 15,
+          "estimated_cost_per_1k_docs_usd": 0.0
+        }
+      },
+      "recommendation": "Use deterministic_baseline first; fall back to primary_gpt4o for ambiguous inputs."
+    },
+    "retrieval_settings": {
+      "settings": {
+        "bm25_only": {
+          "description": "PostgreSQL full-text search with ts_rank",
+          "precision@1": 0.75,
+          "precision@5": 0.55,
+          "recall@5": 0.6875,
+          "mrr": 0.7708,
+          "exact_id_match_rate": 1.0,
+          "latency_ms": 22
+        },
+        "dense_only": {
+          "description": "pgvector 1536-dim cosine similarity (min_similarity=0.65)",
+          "precision@1": 0.75,
+          "precision@5": 0.6,
+          "recall@5": 0.75,
+          "mrr": 0.8125,
+          "exact_id_match_rate": 0.5,
+          "latency_ms": 48
+        },
+        "hybrid_rrf": {
+          "description": "Reciprocal Rank Fusion (k=60) combining BM25 and dense vectors",
+          "precision@1": 1.0,
+          "precision@5": 0.75,
+          "recall@5": 0.9375,
+          "mrr": 1.0,
+          "exact_id_match_rate": 1.0,
+          "latency_ms": 65
+        },
+        "hybrid_rrf_reranked": {
+          "description": "Hybrid RRF with cross-encoder semantic reranker top-20",
+          "precision@1": 1.0,
+          "precision@5": 0.85,
+          "recall@5": 1.0,
+          "mrr": 1.0,
+          "exact_id_match_rate": 1.0,
+          "latency_ms": 135
+        }
+      },
+      "recommended_setting": "hybrid_rrf_reranked",
+      "delta_summary": "RRF + Reranker boosts Recall@5 from 68.8% to 100.0% while keeping exact identifier match at 100%."
+    },
+    "chunking_strategies": {
+      "strategies": {
+        "fixed_token_512": {
+          "description": "Fixed 512-token window with 64-token overlap",
+          "retrieval_recall@5": 0.8125,
+          "boundary_clause_truncation_rate": 0.285,
+          "mean_chunk_size_chars": 2048,
+          "citation_precision": 0.89
+        },
+        "page_boundary": {
+          "description": "Physical page segmentation without cross-page splitting",
+          "retrieval_recall@5": 0.875,
+          "boundary_clause_truncation_rate": 0.142,
+          "mean_chunk_size_chars": 3120,
+          "citation_precision": 0.965
+        },
+        "section_semantic": {
+          "description": "Heading, article, and table row semantic boundary chunking",
+          "retrieval_recall@5": 0.9688,
+          "boundary_clause_truncation_rate": 0.015,
+          "mean_chunk_size_chars": 1640,
+          "citation_precision": 0.992
+        }
+      },
+      "recommended_strategy": "section_semantic",
+      "delta_summary": "Semantic section boundaries virtually eliminate clause truncation (1.5% vs 28.5%) and maximize citation precision."
+    }
+  }
+}
