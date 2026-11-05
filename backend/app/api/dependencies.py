@@ -1,13 +1,18 @@
 """Reusable authentication dependency; authorization uses the current database user."""
 
+import collections
+import contextlib
+import time
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.database import get_session
 from app.core.security import decode_token
 from app.domain.models import Project, Tenant, User
@@ -127,3 +132,70 @@ def require_policy_action(action: Action):
         return project
 
     return dependency
+
+
+_IN_MEMORY_RATE_LIMITS: dict[str, list[float]] = collections.defaultdict(list)
+
+
+def require_rate_limit(requests: int = 60, window_seconds: int = 60, endpoint_tag: str = "api"):
+    """Sliding-window rate limiter for authenticated endpoints.
+
+    Uses Redis when available, falls back to thread-safe in-memory sliding window.
+    Keyed by (endpoint_tag, tenant_id, user_id).
+    """
+
+    async def dependency(user: User = Depends(require_authenticated_user)) -> User:
+        settings = get_settings()
+        key = f"rate_limit:{endpoint_tag}:{user.tenant_id}:{user.id}"
+        now = time.time()
+
+        # Attempt Redis sliding window
+        redis_client = None
+        try:
+            redis_client = Redis.from_url(
+                settings.redis_url,
+                socket_timeout=0.5,
+                socket_connect_timeout=0.5,
+            )
+            pipe = redis_client.pipeline()
+            pipe.zremrangebyscore(key, 0, now - window_seconds)
+            pipe.zcard(key)
+            pipe.zadd(key, {str(now): now})
+            pipe.expire(key, window_seconds + 5)
+            results = await pipe.execute()
+            count = results[1]
+
+            if count > requests:
+                raise HTTPException(
+                    status_code=429,
+                    detail=f"Rate limit exceeded: maximum {requests} requests per {window_seconds}s for {endpoint_tag}.",
+                    headers={"Retry-After": str(window_seconds)},
+                )
+            return user
+        except HTTPException:
+            raise
+        except Exception:
+            # Fall back to in-memory sliding window if Redis is not reachable
+            pass
+        finally:
+            if redis_client is not None:
+                with contextlib.suppress(Exception):
+                    await redis_client.aclose()
+
+        # In-memory fallback
+        timestamps = _IN_MEMORY_RATE_LIMITS[key]
+        cutoff = now - window_seconds
+        valid_timestamps = [t for t in timestamps if t > cutoff]
+        if len(valid_timestamps) >= requests:
+            _IN_MEMORY_RATE_LIMITS[key] = valid_timestamps
+            raise HTTPException(
+                status_code=429,
+                detail=f"Rate limit exceeded: maximum {requests} requests per {window_seconds}s for {endpoint_tag}.",
+                headers={"Retry-After": str(window_seconds)},
+            )
+        valid_timestamps.append(now)
+        _IN_MEMORY_RATE_LIMITS[key] = valid_timestamps
+        return user
+
+    return dependency
+

@@ -15,8 +15,18 @@ import { loginSchema } from "@/lib/contracts";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTarget = searchParams.get("redirect") || "/projects";
+  const rawRedirect = searchParams.get("redirect");
+  const redirectTarget =
+    rawRedirect &&
+    rawRedirect.startsWith("/") &&
+    !rawRedirect.startsWith("//") &&
+    !rawRedirect.includes("\\")
+      ? rawRedirect
+      : "/projects";
   const { signIn, signInDemo, status } = useAuth();
+  const isDemoEnabled =
+    process.env.NODE_ENV !== "production" ||
+    process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
 
   const [tenantSlug, setTenantSlug] = useState("");
   const [email, setEmail] = useState("");
@@ -146,41 +156,43 @@ function LoginForm() {
           Sign In
         </Button>
 
-        <div className="pt-3 border-t border-border flex flex-col gap-2 w-full">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted text-center">
-            Instant Demo Sign-In
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => signInDemo("commercial_manager")}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
-            >
-              <span>Commercial Manager</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => signInDemo("project_manager")}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
-            >
-              <span>Project Manager</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => signInDemo("site_engineer")}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
-            >
-              <span>Site Engineer</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => signInDemo("auditor")}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
-            >
-              <span>Auditor</span>
-            </button>
+        {isDemoEnabled ? (
+          <div className="pt-3 border-t border-border flex flex-col gap-2 w-full">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted text-center">
+              Instant Demo Sign-In
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => signInDemo("commercial_manager")}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
+              >
+                <span>Commercial Manager</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => signInDemo("project_manager")}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
+              >
+                <span>Project Manager</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => signInDemo("site_engineer")}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
+              >
+                <span>Site Engineer</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => signInDemo("auditor")}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-subtle/80 px-2.5 py-2 text-xs font-semibold text-ink hover:border-brand hover:bg-surface transition cursor-pointer"
+              >
+                <span>Auditor</span>
+              </button>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <p className="text-center text-xs text-ink-muted">
           Don&apos;t have an organization workspace?{" "}

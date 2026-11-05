@@ -87,6 +87,16 @@ export const authApi = {
   async logout(refreshToken: string): Promise<void> {
     await client.post("/auth/logout", { refresh_token: refreshToken });
   },
+
+  async requestPasswordReset(payload: { tenant_slug: string; email: string }): Promise<{ message: string }> {
+    const response = await client.post("/auth/password-reset/request", payload);
+    return parse(messageSchema, response.data);
+  },
+
+  async confirmPasswordReset(payload: { token: string; password: string }): Promise<{ message: string }> {
+    const response = await client.post("/auth/password-reset/confirm", payload);
+    return parse(messageSchema, response.data);
+  },
 };
 
 /* ------------------------------------------------------------------ projects */
