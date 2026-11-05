@@ -1,0 +1,56 @@
+{
+  "id": "E2E-002",
+  "title": "Cost Outlier Detection, Rejection & Revised Approval Workflow",
+  "category": "end_to_end_workflow",
+  "input": {
+    "scenario": "Contractor submits variation with concrete unit rate >20% above BOQ baseline.",
+    "stages": [
+      {
+        "stage_number": 1,
+        "action": "baseline_ingestion",
+        "document": "DOC-BOQ-001",
+        "details": "Baseline BOQ item ST-01 established at USD 210.00/m3."
+      },
+      {
+        "stage_number": 2,
+        "action": "inflated_claim_submission",
+        "details": "Contractor submits variation claiming USD 380.00/m3 for identical concrete."
+      },
+      {
+        "stage_number": 3,
+        "action": "automated_risk_engine_flag",
+        "details": "Risk engine triggers 'cost_outlier' (>20% over baseline rate $210/m3), exposure $34,000 USD."
+      },
+      {
+        "stage_number": 4,
+        "action": "commercial_rejection_and_renegotiation",
+        "details": "Commercial manager rejects submission citing BOQ-2026-CS-01 item ST-01."
+      },
+      {
+        "stage_number": 5,
+        "action": "resubmission_and_approval",
+        "details": "Contractor resubmits at agreed rate USD 225.00/m3 (within allowable adjustment). Approved."
+      }
+    ]
+  },
+  "expected_output": {
+    "initial_finding": "cost_outlier",
+    "initial_action": "rejected_with_citation",
+    "final_workflow_status": "approved",
+    "reconciled_rate": {
+      "amount": "225.00",
+      "currency": "USD"
+    },
+    "cost_savings_secured": {
+      "amount": "31000.00",
+      "currency": "USD"
+    }
+  },
+  "evaluation_criteria": {
+    "metric": "e2e_workflow_completion",
+    "assertions": {
+      "cost_outlier_flagged": true,
+      "renegotiation_succeeded": true
+    }
+  }
+}

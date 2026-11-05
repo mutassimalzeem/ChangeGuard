@@ -1,0 +1,132 @@
+{
+  "id": "DOC-BOQ-004",
+  "title": "Deep Foundation Bored Piling & Shoring Schedule",
+  "category": "boq",
+  "input": {
+    "filename": "BOQ-2026-GEO-04_Piling.xlsx",
+    "document_type_hint": "boq",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "xlsx",
+      "sheet_count": 2,
+      "author": "Waterfront QS"
+    },
+    "extracted_text": "BILL OF QUANTITIES: DEEP FOUNDATIONS AND PILING\nBOQ Reference: BOQ-2026-GEO-04\nContract Reference: CON-2026-GEO-004\nCurrency: USD\n\nItem Code | Description | Quantity | Unit | Rate | Total\nPIL-01 | Bored cast-in-place concrete piles 900mm dia depth to 24m | 240.00 | each | 3400.00 | 816000.00\nPIL-02 | Bored cast-in-place concrete piles 1200mm dia depth to 28m | 110.00 | each | 5200.00 | 572000.00\nPIL-03 | Sonic logging integrity testing across pile cross-sections | 350.00 | each | 180.00 | 63000.00\n\nTotal Piling Package: USD 1451000.00"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "boq",
+      "confidence": 0.99,
+      "reasoning": "Geotechnical piling bill of quantities with pile diameters, depths and testing items.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "title": {
+        "value": "Deep Foundations and Piling Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: DEEP FOUNDATIONS AND PILING",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "1451000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Piling Package: USD 1451000.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "PIL-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "PIL-01 | Bored cast-in-place concrete piles 900mm",
+            "missing": false
+          },
+          "description": {
+            "value": "Bored cast-in-place concrete piles 900mm dia depth to 24m",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Bored cast-in-place concrete piles 900mm dia depth to 24m",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "240.00",
+              "unit": "each"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "240.00 | each",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "3400.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "3400.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "816000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "816000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-GEO-04"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "boq",
+    "item_assertions": [
+      {
+        "code": "PIL-01",
+        "unit_rate": "3400.00",
+        "unit": "each"
+      }
+    ]
+  }
+}

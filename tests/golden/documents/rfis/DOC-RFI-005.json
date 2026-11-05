@@ -1,0 +1,106 @@
+{
+  "id": "DOC-RFI-005",
+  "title": "Discontinued UL-Listed Fire Damper Model Substitution",
+  "category": "rfi",
+  "input": {
+    "filename": "RFI-2026-005_Fire_Damper_Model.pdf",
+    "document_type_hint": "rfi",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 2,
+      "author": "Pioneer Thermal Field Staff"
+    },
+    "extracted_text": "REQUEST FOR INFORMATION\nRFI Number: RFI-2026-005\nSubject: Proposed Substitution for Discontinued Ruskin FSD-60 Fire/Smoke Dampers\nContract Reference: CON-2026-MEP-002\nRaised Date: 2026-03-20\nDue Date: 2026-03-27\nStatus: closed\n\nQUESTION:\nThe specified motorized combination fire/smoke damper model Ruskin FSD-60 is discontinued by manufacturer. We propose substituting Greenheck Model FSD-211 which meets identical 1-1/2 hour UL 555 and UL 555S Class II leakage ratings. Please confirm acceptability.\n\nRESPONSE:\nResponse Date: 2026-03-24\nAccepted as equal. Submit formal material submittal SUB-MEP-088 for resident engineer stamp."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "rfi",
+      "confidence": 0.99,
+      "reasoning": "RFI detailing equipment product substitution with closed resolution.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "rfi_number": {
+        "value": "RFI-2026-005",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "RFI Number: RFI-2026-005",
+        "missing": false
+      },
+      "subject": {
+        "value": "Proposed Substitution for Discontinued Ruskin FSD-60 Fire/Smoke Dampers",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Subject: Proposed Substitution for Discontinued Ruskin FSD-60 Fire/Smoke Dampers",
+        "missing": false
+      },
+      "question": {
+        "value": "The specified motorized combination fire/smoke damper model Ruskin FSD-60 is discontinued by manufacturer. We propose substituting Greenheck Model FSD-211 which meets identical 1-1/2 hour UL 555 and UL 555S Class II leakage ratings. Please confirm acceptability.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "The specified motorized combination fire/smoke damper model Ruskin FSD-60 is discontinued by manufacturer",
+        "missing": false
+      },
+      "response": {
+        "value": "Accepted as equal. Submit formal material submittal SUB-MEP-088 for resident engineer stamp.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Accepted as equal. Submit formal material submittal SUB-MEP-088 for resident engineer stamp.",
+        "missing": false
+      },
+      "raised_date": {
+        "value": "2026-03-20",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Raised Date: 2026-03-20",
+        "missing": false
+      },
+      "due_date": {
+        "value": "2026-03-27",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Due Date: 2026-03-27",
+        "missing": false
+      },
+      "status": {
+        "value": "closed",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: closed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-005"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "rfi",
+    "value_assertions": {
+      "rfi_number": "RFI-2026-005",
+      "status": "closed"
+    }
+  }
+}

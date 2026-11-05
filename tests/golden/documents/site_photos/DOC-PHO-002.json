@@ -1,0 +1,88 @@
+{
+  "id": "DOC-PHO-002",
+  "title": "Site Photo: Uncharted Historical Masonry Duct Discovered in Trench",
+  "category": "site_photo",
+  "input": {
+    "filename": "PHO-2026-002_Unforeseen_Site_Obstruction.jpg",
+    "document_type_hint": "site_photo",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "jpeg",
+      "dimensions": "4032x3024",
+      "camera_model": "Trimble SiteVision Rugged / iPhone 15 Pro Max",
+      "gps_latitude": 25.1972,
+      "gps_longitude": 55.2744,
+      "timestamp": "2026-02-19T14:30:00Z",
+      "author": "Site QA/QC Field Engineer"
+    },
+    "extracted_text": "CONSTRUCTION SITE INSPECTION PHOTOGRAPH\nPhoto ID: PHO-2026-002\nTitle: Uncharted Historical Masonry Duct Discovered in Trench\nTimestamp: 2026-02-19T14:30:00Z\nLocation: External Utilities Corridor, Chainage 0+085, depth 1.8m\nObserved Scene: Excavator teeth exposed arched brickwork conduit dating to early 20th century municipal stormwater network. Structural integrity undisturbed but blocking planned 33kV high voltage electrical duct bank route.\nClassification: site_photo\nDefect Category: Unforeseen Site Obstruction\nContract Reference: CON-2026-MEP-002\nReferenced RFI: RFI-2026-002"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "site_photo",
+      "confidence": 0.98,
+      "reasoning": "Site inspection photograph capturing field visual evidence of Unforeseen Site Obstruction.",
+      "model_or_rule_used": "vision_rules_with_llm"
+    },
+    "extraction": {
+      "title": {
+        "value": "Uncharted Historical Masonry Duct Discovered in Trench",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Uncharted Historical Masonry Duct Discovered in Trench",
+        "missing": false
+      },
+      "description": {
+        "value": "Excavator teeth exposed arched brickwork conduit dating to early 20th century municipal stormwater network. Structural integrity undisturbed but blocking planned 33kV high voltage electrical duct bank route.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Excavator teeth exposed arched brickwork conduit dating to early 20th century mu",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "site_photo",
+    "required_fields_present": [
+      "title",
+      "description"
+    ],
+    "value_assertions": {
+      "title": "Uncharted Historical Masonry Duct Discovered in Trench"
+    }
+  }
+}

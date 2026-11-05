@@ -1,0 +1,132 @@
+{
+  "id": "DOC-BOQ-005",
+  "title": "Architectural Facade & Glazing Schedule of Quantities",
+  "category": "boq",
+  "input": {
+    "filename": "BOQ-2026-FAC-05_Facade.xlsx",
+    "document_type_hint": "boq",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "xlsx",
+      "sheet_count": 3,
+      "author": "Zenith Commercial QS"
+    },
+    "extracted_text": "BILL OF QUANTITIES: ARCHITECTURAL FACADE SYSTEM\nBOQ Reference: BOQ-2026-FAC-05\nContract Reference: CON-2026-FAC-005\nCurrency: USD\n\nItem Code | Description | Quantity | Unit | Rate | Total\nGL-01 | Unitized double-glazed low-e curtain wall panels 1500x3800mm | 6200.00 | m2 | 480.00 | 2976000.00\nGL-02 | Solid anodized aluminum composite spandrel panels | 2400.00 | m2 | 260.00 | 624000.00\nGL-03 | Structural silicone sealant and continuous EPDM air/vapor barrier | 8500.00 | m | 28.00 | 238000.00\n\nTotal Facade Package: USD 3838000.00"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "boq",
+      "confidence": 0.99,
+      "reasoning": "Facade schedule of quantities with unitized curtain wall glazing line items.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "title": {
+        "value": "Architectural Facade System Bill of Quantities",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "BILL OF QUANTITIES: ARCHITECTURAL FACADE SYSTEM",
+        "missing": false
+      },
+      "stated_total": {
+        "value": {
+          "amount": "3838000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Total Facade Package: USD 3838000.00",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-FAC-005"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-FAC-005",
+          "missing": false
+        }
+      ],
+      "items": [
+        {
+          "code": {
+            "value": "GL-01",
+            "confidence": 0.97,
+            "source_page": 1,
+            "source_text_snippet": "GL-01 | Unitized double-glazed low-e curtain wall",
+            "missing": false
+          },
+          "description": {
+            "value": "Unitized double-glazed low-e curtain wall panels 1500x3800mm",
+            "confidence": 0.96,
+            "source_page": 1,
+            "source_text_snippet": "Unitized double-glazed low-e curtain wall panels 1500x3800mm",
+            "missing": false
+          },
+          "quantity": {
+            "value": {
+              "amount": "6200.00",
+              "unit": "m2"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "6200.00 | m2",
+            "missing": false
+          },
+          "unit_rate": {
+            "value": {
+              "amount": "480.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "480.00",
+            "missing": false
+          },
+          "stated_total": {
+            "value": {
+              "amount": "2976000.00",
+              "currency": "USD"
+            },
+            "confidence": 0.98,
+            "source_page": 1,
+            "source_text_snippet": "2976000.00",
+            "missing": false
+          },
+          "status": {
+            "value": "planned",
+            "confidence": 0.95,
+            "source_page": 1,
+            "source_text_snippet": "planned",
+            "missing": false
+          }
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-FAC-05"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-FAC-005"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "boq",
+    "item_assertions": [
+      {
+        "code": "GL-01",
+        "unit_rate": "480.00",
+        "unit": "m2"
+      }
+    ]
+  }
+}

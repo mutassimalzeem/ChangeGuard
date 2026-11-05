@@ -1,0 +1,110 @@
+{
+  "id": "DOC-CO-010",
+  "title": "Change Order CO-2026-010 - Scope Reduction Credit for Omission of Perimeter Security Fencing",
+  "category": "change_order",
+  "input": {
+    "filename": "CO-2026-010_approved.pdf",
+    "document_type_hint": "change_order",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 3,
+      "author": "Change Control Board"
+    },
+    "extracted_text": "CHANGE ORDER\nChange Order Number: CO-2026-010\nTitle: Scope Reduction Credit for Omission of Perimeter Security Fencing\nDescription: Deductive change order for deleting 320 lin.m of galvanized steel security fencing from contractor scope.\nIssue Date: 2026-04-08\nAmount: USD -48000.00\nStatus: approved\nSchedule Impact: 0 calendar days\nContract Reference: CON-2026-CS-001"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "change_order",
+      "confidence": 0.99,
+      "reasoning": "Formal change order with agreed financial consideration of USD -48000.00 and schedule adjustments.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "co_number": {
+        "value": "CO-2026-010",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Change Order Number: CO-2026-010",
+        "missing": false
+      },
+      "title": {
+        "value": "Scope Reduction Credit for Omission of Perimeter Security Fencing",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Scope Reduction Credit for Omission of Perimeter Security Fencing",
+        "missing": false
+      },
+      "description": {
+        "value": "Deductive change order for deleting 320 lin.m of galvanized steel security fencing from contractor scope.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Description: Deductive change order for deleting 320 lin.m of galvanized steel security fencing from contractor scope.",
+        "missing": false
+      },
+      "issue_date": {
+        "value": "2026-04-08",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Issue Date: 2026-04-08",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "-48000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Amount: USD -48000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "change_order",
+        "reference": "CO-2026-010"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "change_order",
+    "required_fields_present": [
+      "co_number",
+      "title",
+      "description",
+      "amount",
+      "status"
+    ],
+    "value_assertions": {
+      "co_number": "CO-2026-010",
+      "amount.amount": "-48000.00",
+      "status": "approved"
+    }
+  }
+}

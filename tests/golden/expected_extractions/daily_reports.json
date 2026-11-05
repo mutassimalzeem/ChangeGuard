@@ -1,0 +1,832 @@
+[
+  {
+    "id": "DOC-DR-001",
+    "title": "Daily Construction Log - Basement B2 Shear Wall Pour",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-02-12",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-02-12",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Construction Log - Basement B2 Shear Wall Pour",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Construction Log - Basement B2 Shear Wall Pour",
+        "missing": false
+      },
+      "weather": {
+        "value": "Clear and sunny, 24C, wind 8 km/h",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Clear and sunny, 24C, wind 8 km/h",
+        "missing": false
+      },
+      "activities": {
+        "value": "Placed 220 m3 of C40 concrete in shear walls SW-01 through SW-04. Slump testing passed at 160mm. Curing compound applied.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Placed 220 m3 of C40 concrete in shear walls SW-01 through SW-04. Slump testing passed at 160mm. Curing compound applied.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "280.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 280.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-02-12",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-002",
+    "title": "Daily Progress Report - Tower Crane #2 Hydraulic Breakdown",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-02-16",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-02-16",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Progress Report - Tower Crane #2 Hydraulic Breakdown",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Progress Report - Tower Crane #2 Hydraulic Breakdown",
+        "missing": false
+      },
+      "weather": {
+        "value": "Overcast with light breeze, 19C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Overcast with light breeze, 19C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Tower crane #2 hydraulic slew motor failed at 09:30. Steel fixers in Zone B idle for 4.5 hours awaiting mobile crane backup.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Tower crane #2 hydraulic slew motor failed at 09:30. Steel fixers in Zone B idle for 4.5 hours awaiting mobile crane backup.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "195.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 195.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-02-16",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-003",
+    "title": "Site Safety Log - Discovery of Asbestos Conduit in Trench T-4",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-02-21",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-02-21",
+        "missing": false
+      },
+      "title": {
+        "value": "Site Safety Log - Discovery of Asbestos Conduit in Trench T-4",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Site Safety Log - Discovery of Asbestos Conduit in Trench T-4",
+        "missing": false
+      },
+      "weather": {
+        "value": "Sunny, 26C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Sunny, 26C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Encountered non-documented legacy asbestos-cement conduit at chainage 0+140. Work immediately halted. HSE perimeter erected.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Encountered non-documented legacy asbestos-cement conduit at chainage 0+140. Work immediately halted. HSE perimeter erected.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "120.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 120.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: submitted",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-02-21",
+        "status": "submitted"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-004",
+    "title": "Daily Quality Log - Basement Waterproofing Membrane NCR",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-02-27",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-02-27",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Quality Log - Basement Waterproofing Membrane NCR",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Quality Log - Basement Waterproofing Membrane NCR",
+        "missing": false
+      },
+      "weather": {
+        "value": "Cloudy, 21C, humidity 65%",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Cloudy, 21C, humidity 65%",
+        "missing": false
+      },
+      "activities": {
+        "value": "Inspection of SBS torch-applied membrane on east retaining wall revealed pinholes and unbonded laps. Issued NCR-012 for remedial priming.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Inspection of SBS torch-applied membrane on east retaining wall revealed pinholes and unbonded laps. Issued NCR-012 for remedial priming.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "160.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 160.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-02-27",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-005",
+    "title": "Daily Report - Night Shift Precast Beam Placement",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-03",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-03",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Report - Night Shift Precast Beam Placement",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Report - Night Shift Precast Beam Placement",
+        "missing": false
+      },
+      "weather": {
+        "value": "Clear night, 16C, road closure in effect",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Clear night, 16C, road closure in effect",
+        "missing": false
+      },
+      "activities": {
+        "value": "Erected 4 precast prestressed bridge beams over arterial access road between 01:00 and 05:00 using 350t all-terrain crane.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Erected 4 precast prestressed bridge beams over arterial access road between 01:00 and 05:00 using 350t all-terrain crane.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "96.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 96.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-03",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-006",
+    "title": "Daily Log - Extreme Heat Index Mandatory Work Stoppage",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-08",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-08",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Log - Extreme Heat Index Mandatory Work Stoppage",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Log - Extreme Heat Index Mandatory Work Stoppage",
+        "missing": false
+      },
+      "weather": {
+        "value": "Extreme heat, 39C ambient, WBGT 34.2C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Extreme heat, 39C ambient, WBGT 34.2C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Mandatory midday heat stress stoppage enforced from 12:30 to 15:30. Operatives moved to air-conditioned rest shelters.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Mandatory midday heat stress stoppage enforced from 12:30 to 15:30. Operatives moved to air-conditioned rest shelters.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "180.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 180.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-08",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-007",
+    "title": "Daily Material Log - Ready-Mix Concrete Batch Rejection",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-14",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-14",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Material Log - Ready-Mix Concrete Batch Rejection",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Material Log - Ready-Mix Concrete Batch Rejection",
+        "missing": false
+      },
+      "weather": {
+        "value": "Partly cloudy, 23C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Partly cloudy, 23C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Rejected 3 transit mixer trucks (batch tickets #4901-#4903) due to slump test reading 65mm against required 150mm tolerance.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Rejected 3 transit mixer trucks (batch tickets #4901-#4903) due to slump test reading 65mm against required 150mm tolerance.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "210.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 210.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: submitted",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-14",
+        "status": "submitted"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-008",
+    "title": "Daily Engineering Log - Level 06 Pre-Pour MEP Penetration Clash",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-19",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-19",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Engineering Log - Level 06 Pre-Pour MEP Penetration Clash",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Engineering Log - Level 06 Pre-Pour MEP Penetration Clash",
+        "missing": false
+      },
+      "weather": {
+        "value": "Sunny and dry, 25C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Sunny and dry, 25C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Pre-pour survey revealed 150mm drain pipe clashed with structural PT anchor zone. Core drilling team mobilized to reposition sleeve.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Pre-pour survey revealed 150mm drain pipe clashed with structural PT anchor zone. Core drilling team mobilized to reposition sleeve.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "225.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 225.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-19",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-009",
+    "title": "Daily Log - Delayed Hot Work Permit Clearance",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-24",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-24",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Log - Delayed Hot Work Permit Clearance",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Log - Delayed Hot Work Permit Clearance",
+        "missing": false
+      },
+      "weather": {
+        "value": "Breezy, 20C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Breezy, 20C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Structural steel welding crew delayed 3 hours awaiting client safety gas-free certification in confined shaft area.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Structural steel welding crew delayed 3 hours awaiting client safety gas-free certification in confined shaft area.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "140.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 140.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "draft",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: draft",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-24",
+        "status": "draft"
+      }
+    }
+  },
+  {
+    "id": "DOC-DR-010",
+    "title": "Daily Progress Report - Weekend Overtime Slab Burnishing",
+    "document_type": "daily_report",
+    "expected": {
+      "report_date": {
+        "value": "2026-03-29",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Report Date: 2026-03-29",
+        "missing": false
+      },
+      "title": {
+        "value": "Daily Progress Report - Weekend Overtime Slab Burnishing",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Daily Progress Report - Weekend Overtime Slab Burnishing",
+        "missing": false
+      },
+      "weather": {
+        "value": "Approaching evening thunderstorm, 22C",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Weather: Approaching evening thunderstorm, 22C",
+        "missing": false
+      },
+      "activities": {
+        "value": "Authorized weekend overtime shift completed ride-on power trowel surface burnishing on 1,400m2 slab prior to heavy evening rain.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Activities: Authorized weekend overtime shift completed ride-on power trowel surface burnishing on 1,400m2 slab prior to heavy evening rain.",
+        "missing": false
+      },
+      "labour_quantity": {
+        "value": {
+          "amount": "310.00",
+          "unit": "h"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Labour: 310.00 h",
+        "missing": false
+      },
+      "status": {
+        "value": "approved",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: approved",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "daily_report",
+      "required_fields_present": [
+        "report_date",
+        "activities",
+        "weather"
+      ],
+      "value_assertions": {
+        "report_date": "2026-03-29",
+        "status": "approved"
+      }
+    }
+  }
+]

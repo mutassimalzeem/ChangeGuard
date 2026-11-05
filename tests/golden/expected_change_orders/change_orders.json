@@ -1,0 +1,452 @@
+[
+  {
+    "id": "DOC-CO-001",
+    "co_number": "CO-2026-001",
+    "title": "Sub-base Stabilization over Unsuitable Clay Formation",
+    "amount": {
+      "amount": "142500.00",
+      "currency": "USD"
+    },
+    "status": "approved",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-001"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-001",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-001",
+        "amount.amount": "142500.00",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-002",
+    "co_number": "CO-2026-002",
+    "title": "33kV Feeder Cable Diversion around Uncharted Heritage Duct",
+    "amount": {
+      "amount": "88750.00",
+      "currency": "USD"
+    },
+    "status": "submitted",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-MEP-002"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-002"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-002",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-002",
+        "amount.amount": "88750.00",
+        "status": "submitted"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-003",
+    "co_number": "CO-2026-003",
+    "title": "Level 04 Structural Slab Post-Tensioning Upgrade for MRI Suite",
+    "amount": {
+      "amount": "215000.00",
+      "currency": "USD"
+    },
+    "status": "approved",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-004"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-004",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-003",
+        "amount.amount": "215000.00",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-004",
+    "co_number": "CO-2026-004",
+    "title": "Fire-Rated Acoustic Door Package Upgrade in Stair Cores",
+    "amount": {
+      "amount": "64200.00",
+      "currency": "USD"
+    },
+    "status": "draft",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-005"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-005",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-004",
+        "amount.amount": "64200.00",
+        "status": "draft"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-005",
+    "co_number": "CO-2026-005",
+    "title": "Emergency Wellpoint Dewatering and Sheet Piling Stabilization",
+    "amount": {
+      "amount": "118900.00",
+      "currency": "USD"
+    },
+    "status": "executed",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-GEO-004"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-002"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-002",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-005",
+        "amount.amount": "118900.00",
+        "status": "executed"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-006",
+    "co_number": "CO-2026-006",
+    "title": "Large-Format Calacatta Porcelain Tile Concourse Finish",
+    "amount": {
+      "amount": "95400.00",
+      "currency": "USD"
+    },
+    "status": "submitted",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-006",
+        "amount.amount": "95400.00",
+        "status": "submitted"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-007",
+    "co_number": "CO-2026-007",
+    "title": "Rooftop Cooling Tower Low-Profile Acoustic Reconfiguration",
+    "amount": {
+      "amount": "134800.00",
+      "currency": "USD"
+    },
+    "status": "approved",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-MEP-002"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-007",
+        "amount.amount": "134800.00",
+        "status": "approved"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-008",
+    "co_number": "CO-2026-008",
+    "title": "Two-Hour Fire Wrap Insulation on Emergency Smoke Exhaust Ducts",
+    "amount": {
+      "amount": "76500.00",
+      "currency": "USD"
+    },
+    "status": "submitted",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-MEP-002"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-005"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-005",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-008",
+        "amount.amount": "76500.00",
+        "status": "submitted"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-009",
+    "co_number": "CO-2026-009",
+    "title": "Carbon Fiber (CFRP) Strengthening at Level 02 Transfer Girders",
+    "amount": {
+      "amount": "52300.00",
+      "currency": "USD"
+    },
+    "status": "draft",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      },
+      {
+        "value": {
+          "kind": "rfi",
+          "reference": "RFI-2026-001"
+        },
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Referenced RFI: RFI-2026-001",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-009",
+        "amount.amount": "52300.00",
+        "status": "draft"
+      }
+    }
+  },
+  {
+    "id": "DOC-CO-010",
+    "co_number": "CO-2026-010",
+    "title": "Scope Reduction Credit for Omission of Perimeter Security Fencing",
+    "amount": {
+      "amount": "-48000.00",
+      "currency": "USD"
+    },
+    "status": "approved",
+    "document_references": [
+      {
+        "value": {
+          "kind": "contract",
+          "reference": "CON-2026-CS-001"
+        },
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "change_order",
+      "required_fields_present": [
+        "co_number",
+        "title",
+        "description",
+        "amount",
+        "status"
+      ],
+      "value_assertions": {
+        "co_number": "CO-2026-010",
+        "amount.amount": "-48000.00",
+        "status": "approved"
+      }
+    }
+  }
+]

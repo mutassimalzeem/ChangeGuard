@@ -1,0 +1,65 @@
+{
+  "id": "DUP-003",
+  "title": "Duplicate Tower Crane Downtime Claims Across Weather & Breakdown",
+  "category": "duplicate_detection",
+  "input": {
+    "primary_document": {
+      "document_id": "dr-crane-log",
+      "filename": "DR-2026-02-16_CraneBreakdown.pdf",
+      "document_type": "daily_report",
+      "contract_id": "CON-2026-CS-001",
+      "date": "2026-02-16",
+      "amount": "14500.00",
+      "currency": "USD",
+      "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+      "status": "approved"
+    },
+    "candidate_document": {
+      "document_id": "clm-weather-delay",
+      "filename": "CLM-2026-004_WeatherInterruption.pdf",
+      "document_type": "change_order",
+      "contract_id": "CON-2026-CS-001",
+      "date": "2026-02-16",
+      "amount": "14500.00",
+      "currency": "USD",
+      "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+      "status": "submitted"
+    }
+  },
+  "expected_output": {
+    "is_duplicate": true,
+    "risk_type": "duplicate_change_order_claim",
+    "severity": "high",
+    "status": "open",
+    "financial_exposure": {
+      "amount": "14500.00",
+      "currency": "USD"
+    },
+    "matched_fields": [
+      "contract_id",
+      "amount",
+      "normalized_description"
+    ],
+    "recommended_action": "Reconcile duplicate downtime claim logged under both weather and breakdown.",
+    "sources": [
+      {
+        "document_id": "dr-crane-log",
+        "page": 1,
+        "snippet": "Tower crane 2 hydraulic breakdown downtime"
+      },
+      {
+        "document_id": "clm-weather-delay",
+        "page": 1,
+        "snippet": "Tower crane 2 hydraulic breakdown downtime"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "duplicate_change_order_claim",
+    "assertions": {
+      "duplicate_detected": true,
+      "exposure_amount": "14500.00"
+    }
+  }
+}

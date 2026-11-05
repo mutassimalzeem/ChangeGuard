@@ -1,0 +1,88 @@
+{
+  "id": "DOC-PHO-009",
+  "title": "Site Photo: Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+  "category": "site_photo",
+  "input": {
+    "filename": "PHO-2026-009_Equipment_Transit_Delivery_Damage.jpg",
+    "document_type_hint": "site_photo",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "jpeg",
+      "dimensions": "4032x3024",
+      "camera_model": "Trimble SiteVision Rugged / iPhone 15 Pro Max",
+      "gps_latitude": 25.1972,
+      "gps_longitude": 55.2744,
+      "timestamp": "2026-03-26T12:00:00Z",
+      "author": "Site QA/QC Field Engineer"
+    },
+    "extracted_text": "CONSTRUCTION SITE INSPECTION PHOTOGRAPH\nPhoto ID: PHO-2026-009\nTitle: Delivered 800TR Chiller with Crushed Heat Exchanger Fins\nTimestamp: 2026-03-26T12:00:00Z\nLocation: Site Laydown Yard 2, Offloading Crane Bay\nObserved Scene: Forklift impact during transit cracked protective crating and crushed approximately 300x500mm area of aluminum heat transfer condenser coils on Chiller Unit CH-02.\nClassification: site_photo\nDefect Category: Equipment Transit Delivery Damage\nContract Reference: CON-2026-MEP-002\nReferenced RFI: RFI-2026-005"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "site_photo",
+      "confidence": 0.98,
+      "reasoning": "Site inspection photograph capturing field visual evidence of Equipment Transit Delivery Damage.",
+      "model_or_rule_used": "vision_rules_with_llm"
+    },
+    "extraction": {
+      "title": {
+        "value": "Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+        "missing": false
+      },
+      "description": {
+        "value": "Forklift impact during transit cracked protective crating and crushed approximately 300x500mm area of aluminum heat transfer condenser coils on Chiller Unit CH-02.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Forklift impact during transit cracked protective crating and crushed approximat",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-005"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-005",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-005"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "site_photo",
+    "required_fields_present": [
+      "title",
+      "description"
+    ],
+    "value_assertions": {
+      "title": "Delivered 800TR Chiller with Crushed Heat Exchanger Fins"
+    }
+  }
+}

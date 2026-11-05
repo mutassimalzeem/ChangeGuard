@@ -1,0 +1,51 @@
+{
+  "id": "E2E-005",
+  "title": "Grounded Multi-Turn Investigation Agent Workflow with Citation Verification",
+  "category": "end_to_end_workflow",
+  "input": {
+    "scenario": "Commercial Director queries investigation agent for foundation variation exposure.",
+    "stages": [
+      {
+        "stage_number": 1,
+        "action": "user_query",
+        "query": "What is the total approved financial exposure for foundation and dewatering variations on Project Apex Horizon?"
+      },
+      {
+        "stage_number": 2,
+        "action": "agent_hybrid_retrieval",
+        "details": "Investigation agent executes scoped hybrid search across tenant and project boundaries."
+      },
+      {
+        "stage_number": 3,
+        "action": "fact_extraction_and_citation",
+        "details": "Agent retrieves CO-2026-001 ($142,500) and CO-2026-005 ($118,900) with source document IDs and page numbers."
+      },
+      {
+        "stage_number": 4,
+        "action": "bounded_synthesis",
+        "details": "Agent computes sum of $261,400.00 USD, explicitly citing Page 1 of CO-2026-001 and Page 1 of CO-2026-005, refusing to extrapolate ungrounded estimates."
+      }
+    ]
+  },
+  "expected_output": {
+    "agent_response_grounded": true,
+    "cited_change_orders": [
+      "CO-2026-001",
+      "CO-2026-005"
+    ],
+    "total_exposure_amount": {
+      "amount": "261400.00",
+      "currency": "USD"
+    },
+    "hallucinations_detected": false,
+    "citations_include_page_numbers": true
+  },
+  "evaluation_criteria": {
+    "metric": "investigation_agent_grounding",
+    "assertions": {
+      "exposure_exact": "261400.00",
+      "zero_hallucinations": true,
+      "exact_citations_present": true
+    }
+  }
+}

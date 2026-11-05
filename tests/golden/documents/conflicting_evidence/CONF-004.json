@@ -1,0 +1,60 @@
+{
+  "id": "CONF-004",
+  "title": "Unit Rate Contradiction: Quotation $45/m2 vs Change Order $95/m2",
+  "category": "conflicting_evidence",
+  "input": {
+    "document_a": {
+      "document_id": "quo-tactile-paver",
+      "filename": "Q-2026-PAV-01_Quotation.pdf",
+      "document_type": "quotation",
+      "source_page": 1,
+      "snippet": "Tactile warning hazard paver tiles supply rate: USD 45.00 per m2.",
+      "item_code": "PAV-04",
+      "unit_rate": "45.00",
+      "currency": "USD"
+    },
+    "document_b": {
+      "document_id": "co-paver-claim",
+      "filename": "CO-2026-006_PaverVariation.pdf",
+      "document_type": "change_order",
+      "source_page": 1,
+      "snippet": "Tactile warning hazard paver tiles 800m2 at unit rate USD 95.00 per m2 = USD 76,000.00.",
+      "item_code": "PAV-04",
+      "unit_rate": "95.00",
+      "quantity": "800.00",
+      "currency": "USD"
+    }
+  },
+  "expected_output": {
+    "conflict_detected": true,
+    "risk_type": "cost_outlier",
+    "severity": "high",
+    "contradiction_key": "item_unit_rate_PAV-04",
+    "conflict_summary": "Change order unit rate ($95/m2) exceeds agreed supplier quotation rate ($45/m2) by 111% (threshold >20%).",
+    "financial_exposure": {
+      "amount": "40000.00",
+      "currency": "USD"
+    },
+    "sources": [
+      {
+        "document_id": "quo-tactile-paver",
+        "page": 1,
+        "snippet": "Tactile warning hazard paver tiles supply rate: USD 45.00"
+      },
+      {
+        "document_id": "co-paver-claim",
+        "page": 1,
+        "snippet": "unit rate USD 95.00 per m2"
+      }
+    ],
+    "recommended_action": "Reconcile the item rate with the comparable source record."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "cost_outlier",
+    "assertions": {
+      "conflict_detected": true,
+      "exposure_amount": "40000.00"
+    }
+  }
+}

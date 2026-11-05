@@ -1,0 +1,47 @@
+{
+  "id": "PERM-010",
+  "title": "Chunk-Level Redaction in Hybrid Search Results",
+  "category": "permission_isolation",
+  "input": {
+    "actor": {
+      "user_id": "user-site-eng-01",
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "site_engineer",
+      "has_restricted_access": false
+    },
+    "search_query": "contract payment retainage terms",
+    "candidate_chunks": [
+      {
+        "chunk_id": "chk-public-01",
+        "access_level": "project",
+        "text": "Interim valuations shall be submitted monthly. Retainage of 5% applies."
+      },
+      {
+        "chunk_id": "chk-restricted-01",
+        "access_level": "restricted",
+        "text": "Confidential settlement: Contractor agrees to maximum liquidated damages cap of $500,000."
+      }
+    ]
+  },
+  "expected_output": {
+    "allowed": true,
+    "filtered_results": [
+      {
+        "chunk_id": "chk-public-01",
+        "redacted": false
+      }
+    ],
+    "omitted_chunk_ids": [
+      "chk-restricted-01"
+    ],
+    "data_leaked": false
+  },
+  "evaluation_criteria": {
+    "metric": "security_isolation",
+    "assertions": {
+      "restricted_chunks_omitted": true,
+      "allowed_chunks_returned": true
+    }
+  }
+}

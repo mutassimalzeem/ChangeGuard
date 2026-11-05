@@ -1,0 +1,31 @@
+{
+  "id": "PERM-005",
+  "title": "Restricted Access Document Inaccessible to Project Viewer",
+  "category": "permission_isolation",
+  "input": {
+    "actor": {
+      "user_id": "user-viewer-01",
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "viewer"
+    },
+    "target_resource": {
+      "resource_type": "document",
+      "document_id": "doc-commercial-settlement",
+      "access_level": "restricted",
+      "classification": "contract"
+    },
+    "action": "documents.read"
+  },
+  "expected_output": {
+    "allowed": false,
+    "http_status": 403,
+    "error_code": "RESTRICTED_ACCESS_REQUIRED"
+  },
+  "evaluation_criteria": {
+    "metric": "security_isolation",
+    "assertions": {
+      "access_allowed": false
+    }
+  }
+}

@@ -1,0 +1,336 @@
+[
+  {
+    "id": "DUP-001",
+    "title": "Exact Duplicate Change Order Claim Resubmission",
+    "category": "duplicate_detection",
+    "input": {
+      "primary_document": {
+        "document_id": "co-orig-001",
+        "filename": "CO-2026-001_Approved.pdf",
+        "document_type": "change_order",
+        "co_number": "CO-2026-001",
+        "contract_id": "CON-2026-CS-001",
+        "rfi_id": "RFI-2026-001",
+        "amount": "142500.00",
+        "currency": "USD",
+        "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+        "status": "approved"
+      },
+      "candidate_document": {
+        "document_id": "co-dup-001",
+        "filename": "CO-2026-001-REV_Resubmitted.pdf",
+        "document_type": "change_order",
+        "co_number": "CO-2026-001-REV",
+        "contract_id": "CON-2026-CS-001",
+        "rfi_id": "RFI-2026-001",
+        "amount": "142500.00",
+        "currency": "USD",
+        "description": "Sub-base stabilization and lean concrete blinding over unsuitable marine clay",
+        "status": "submitted"
+      }
+    },
+    "expected_output": {
+      "is_duplicate": true,
+      "risk_type": "duplicate_change_order_claim",
+      "severity": "high",
+      "status": "open",
+      "financial_exposure": {
+        "amount": "142500.00",
+        "currency": "USD"
+      },
+      "matched_fields": [
+        "contract_id",
+        "rfi_id",
+        "amount",
+        "currency",
+        "normalized_description"
+      ],
+      "recommended_action": "Reconcile the two claims before certifying payment.",
+      "sources": [
+        {
+          "document_id": "co-orig-001",
+          "page": 1,
+          "snippet": "CO-2026-001: Sub-base stabilization"
+        },
+        {
+          "document_id": "co-dup-001",
+          "page": 1,
+          "snippet": "CO-2026-001-REV: Sub-base stabilization"
+        }
+      ]
+    },
+    "evaluation_criteria": {
+      "metric": "deterministic_rule_match",
+      "rule_name": "duplicate_change_order_claim",
+      "assertions": {
+        "duplicate_detected": true,
+        "exposure_amount": "142500.00",
+        "severity": "high",
+        "status": "open"
+      }
+    }
+  },
+  {
+    "id": "DUP-002",
+    "title": "Double-Billed Scaffolding Preliminaries and Variation",
+    "category": "duplicate_detection",
+    "input": {
+      "primary_document": {
+        "document_id": "inv-march-prelim",
+        "filename": "IPC-04_Preliminaries_Schedule.pdf",
+        "document_type": "boq",
+        "contract_id": "CON-2026-FAC-005",
+        "item_code": "PRE-08",
+        "amount": "28000.00",
+        "currency": "USD",
+        "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+        "status": "approved"
+      },
+      "candidate_document": {
+        "document_id": "co-facade-scaffold",
+        "filename": "CO-2026-FAC-002_ScaffoldClaim.pdf",
+        "document_type": "change_order",
+        "contract_id": "CON-2026-FAC-005",
+        "item_code": "PRE-08",
+        "amount": "28000.00",
+        "currency": "USD",
+        "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+        "status": "submitted"
+      }
+    },
+    "expected_output": {
+      "is_duplicate": true,
+      "risk_type": "duplicate_change_order_claim",
+      "severity": "high",
+      "status": "open",
+      "financial_exposure": {
+        "amount": "28000.00",
+        "currency": "USD"
+      },
+      "matched_fields": [
+        "contract_id",
+        "amount",
+        "currency",
+        "normalized_description"
+      ],
+      "recommended_action": "Reconcile duplicate scaffolding rental between preliminaries and variation claim.",
+      "sources": [
+        {
+          "document_id": "inv-march-prelim",
+          "page": 1,
+          "snippet": "PRE-08: Perimeter modular access scaffolding rental"
+        },
+        {
+          "document_id": "co-facade-scaffold",
+          "page": 1,
+          "snippet": "Scaffolding rental for East Elevation"
+        }
+      ]
+    },
+    "evaluation_criteria": {
+      "metric": "deterministic_rule_match",
+      "rule_name": "duplicate_change_order_claim",
+      "assertions": {
+        "duplicate_detected": true,
+        "exposure_amount": "28000.00"
+      }
+    }
+  },
+  {
+    "id": "DUP-003",
+    "title": "Duplicate Tower Crane Downtime Claims Across Weather & Breakdown",
+    "category": "duplicate_detection",
+    "input": {
+      "primary_document": {
+        "document_id": "dr-crane-log",
+        "filename": "DR-2026-02-16_CraneBreakdown.pdf",
+        "document_type": "daily_report",
+        "contract_id": "CON-2026-CS-001",
+        "date": "2026-02-16",
+        "amount": "14500.00",
+        "currency": "USD",
+        "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+        "status": "approved"
+      },
+      "candidate_document": {
+        "document_id": "clm-weather-delay",
+        "filename": "CLM-2026-004_WeatherInterruption.pdf",
+        "document_type": "change_order",
+        "contract_id": "CON-2026-CS-001",
+        "date": "2026-02-16",
+        "amount": "14500.00",
+        "currency": "USD",
+        "description": "Tower crane 2 hydraulic breakdown downtime 5 hours credited under equipment maintenance",
+        "status": "submitted"
+      }
+    },
+    "expected_output": {
+      "is_duplicate": true,
+      "risk_type": "duplicate_change_order_claim",
+      "severity": "high",
+      "status": "open",
+      "financial_exposure": {
+        "amount": "14500.00",
+        "currency": "USD"
+      },
+      "matched_fields": [
+        "contract_id",
+        "amount",
+        "normalized_description"
+      ],
+      "recommended_action": "Reconcile duplicate downtime claim logged under both weather and breakdown.",
+      "sources": [
+        {
+          "document_id": "dr-crane-log",
+          "page": 1,
+          "snippet": "Tower crane 2 hydraulic breakdown downtime"
+        },
+        {
+          "document_id": "clm-weather-delay",
+          "page": 1,
+          "snippet": "Tower crane 2 hydraulic breakdown downtime"
+        }
+      ]
+    },
+    "evaluation_criteria": {
+      "metric": "deterministic_rule_match",
+      "rule_name": "duplicate_change_order_claim",
+      "assertions": {
+        "duplicate_detected": true,
+        "exposure_amount": "14500.00"
+      }
+    }
+  },
+  {
+    "id": "DUP-004",
+    "title": "Re-submitted Rejected Rock Excavation Claim under New ID",
+    "category": "duplicate_detection",
+    "input": {
+      "primary_document": {
+        "document_id": "co-rej-085",
+        "filename": "CO-REJ-01_RockExcavation.pdf",
+        "document_type": "change_order",
+        "co_number": "CO-REJ-01",
+        "contract_id": "CON-2026-CS-001",
+        "rfi_id": "RFI-2026-002",
+        "amount": "85000.00",
+        "currency": "USD",
+        "description": "Additional pneumatic rock breaker excavation for Basement B3 elevator core pit",
+        "status": "rejected"
+      },
+      "candidate_document": {
+        "document_id": "co-new-085",
+        "filename": "CO-2026-011_RockClaim.pdf",
+        "document_type": "change_order",
+        "co_number": "CO-2026-011",
+        "contract_id": "CON-2026-CS-001",
+        "rfi_id": "RFI-2026-002",
+        "amount": "85000.00",
+        "currency": "USD",
+        "description": "Additional pneumatic rock breaker excavation for Basement B3 elevator core pit",
+        "status": "submitted"
+      }
+    },
+    "expected_output": {
+      "is_duplicate": true,
+      "risk_type": "duplicate_change_order_claim",
+      "severity": "high",
+      "status": "open",
+      "financial_exposure": {
+        "amount": "85000.00",
+        "currency": "USD"
+      },
+      "matched_fields": [
+        "contract_id",
+        "rfi_id",
+        "amount",
+        "normalized_description"
+      ],
+      "recommended_action": "Verify if new substantiating geotechnical evidence resolves prior rejection basis.",
+      "sources": [
+        {
+          "document_id": "co-rej-085",
+          "page": 1,
+          "snippet": "Additional pneumatic rock breaker excavation"
+        },
+        {
+          "document_id": "co-new-085",
+          "page": 1,
+          "snippet": "Additional pneumatic rock breaker excavation"
+        }
+      ]
+    },
+    "evaluation_criteria": {
+      "metric": "deterministic_rule_match",
+      "rule_name": "duplicate_change_order_claim",
+      "assertions": {
+        "duplicate_detected": true,
+        "exposure_amount": "85000.00",
+        "status": "open"
+      }
+    }
+  },
+  {
+    "id": "DUP-005",
+    "title": "Double Billing of Subcontractor Labor Timesheets in Daywork",
+    "category": "duplicate_detection",
+    "input": {
+      "primary_document": {
+        "document_id": "ts-week-09",
+        "filename": "Timesheet_Week09_BaseContract.pdf",
+        "document_type": "daily_report",
+        "contract_id": "CON-2026-MEP-002",
+        "amount": "12800.00",
+        "currency": "USD",
+        "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+        "status": "approved"
+      },
+      "candidate_document": {
+        "document_id": "co-daywork-02",
+        "filename": "CO-2026-002_Daywork_Billing.pdf",
+        "document_type": "change_order",
+        "contract_id": "CON-2026-MEP-002",
+        "amount": "12800.00",
+        "currency": "USD",
+        "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+        "status": "submitted"
+      }
+    },
+    "expected_output": {
+      "is_duplicate": true,
+      "risk_type": "duplicate_change_order_claim",
+      "severity": "high",
+      "status": "open",
+      "financial_exposure": {
+        "amount": "12800.00",
+        "currency": "USD"
+      },
+      "matched_fields": [
+        "contract_id",
+        "amount",
+        "normalized_description"
+      ],
+      "recommended_action": "Verify operative clock-in logs to eliminate dual billing across base work and variation.",
+      "sources": [
+        {
+          "document_id": "ts-week-09",
+          "page": 1,
+          "snippet": "160 hours journeyman electrician labor"
+        },
+        {
+          "document_id": "co-daywork-02",
+          "page": 1,
+          "snippet": "160 hours journeyman electrician labor"
+        }
+      ]
+    },
+    "evaluation_criteria": {
+      "metric": "deterministic_rule_match",
+      "rule_name": "duplicate_change_order_claim",
+      "assertions": {
+        "duplicate_detected": true,
+        "exposure_amount": "12800.00"
+      }
+    }
+  }
+]

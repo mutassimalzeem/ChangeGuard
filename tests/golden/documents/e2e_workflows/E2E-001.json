@@ -1,0 +1,69 @@
+{
+  "id": "E2E-001",
+  "title": "Unforeseen Utility Clash to Approved Change Order Workflow",
+  "category": "end_to_end_workflow",
+  "input": {
+    "scenario": "Excavator discovers uncharted utility duct bank interfering with 33kV high voltage route.",
+    "stages": [
+      {
+        "stage_number": 1,
+        "action": "document_ingestion",
+        "document": "DOC-PHO-002",
+        "details": "Site engineer uploads photo of uncovered brick conduit with GPS tags."
+      },
+      {
+        "stage_number": 2,
+        "action": "rfi_generation_and_response",
+        "document": "DOC-RFI-001",
+        "details": "Contractor raises RFI-2026-001; engineer issues SK-S-201-A directing 1200mm bypass route."
+      },
+      {
+        "stage_number": 3,
+        "action": "email_direction",
+        "document": "DOC-EML-001",
+        "details": "Employer PM sends email directing immediate relocation prior to formal pricing."
+      },
+      {
+        "stage_number": 4,
+        "action": "change_order_submission",
+        "document": "DOC-CO-002",
+        "details": "Contractor drafts and submits CO-2026-002 for $88,750 USD with 4 days time impact."
+      },
+      {
+        "stage_number": 5,
+        "action": "risk_and_policy_evaluation",
+        "details": "Risk engine verifies no duplicate claims and confirms linked RFI evidence."
+      },
+      {
+        "stage_number": 6,
+        "action": "approval_and_audit",
+        "actor_role": "commercial_manager",
+        "details": "Commercial manager reviews grounded evidence and approves change order."
+      }
+    ]
+  },
+  "expected_output": {
+    "final_workflow_status": "approved",
+    "evidence_graph_nodes": [
+      "DOC-PHO-002",
+      "DOC-RFI-001",
+      "DOC-EML-001",
+      "DOC-CO-002"
+    ],
+    "total_approved_amount": {
+      "amount": "88750.00",
+      "currency": "USD"
+    },
+    "schedule_impact_days": 4,
+    "unresolved_risks_count": 0,
+    "audit_trail_complete": true
+  },
+  "evaluation_criteria": {
+    "metric": "e2e_workflow_completion",
+    "assertions": {
+      "workflow_completed": true,
+      "evidence_chain_complete": true,
+      "zero_unresolved_risks": true
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "MISS-001",
+  "title": "Rock Excavation Change Order Lacking Borehole Logs & Cross Sections",
+  "category": "missing_evidence",
+  "input": {
+    "document_id": "co-rock-unsubstantiated",
+    "filename": "CO-2026-ROCK-01_Claim.pdf",
+    "document_type": "change_order",
+    "extracted_fields": {
+      "co_number": {
+        "value": "CO-2026-ROCK-01",
+        "missing": false
+      },
+      "title": {
+        "value": "Extra Hard Rock Excavation at Core B",
+        "missing": false
+      },
+      "description": {
+        "value": "Claim for 1,200m3 unexpected igneous basalt requiring continuous hydraulic breakers.",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "85000.00",
+          "currency": "USD"
+        },
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "missing": false
+      },
+      "document_references": []
+    },
+    "required_supporting_documents": [
+      "Geotechnical Borehole Log GT-BOR",
+      "Licensed Surveyor Pre/Post Volume Cross-Sections",
+      "Inspector Daily Sign-Off Verification"
+    ]
+  },
+  "expected_output": {
+    "risk_detected": true,
+    "risk_type": "missing_required_evidence",
+    "severity": "high",
+    "status": "insufficient_evidence",
+    "missing_facts": [
+      "document_references",
+      "geotechnical_baseline",
+      "survey_cross_sections"
+    ],
+    "refusal_behavior": {
+      "refuse_approval": true,
+      "refusal_reason": "Change order claim exceeds $50,000 threshold and lacks required geotechnical survey cross-sections."
+    },
+    "recommended_action": "Supply the missing facts and their source evidence."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "missing_required_evidence",
+    "assertions": {
+      "refuse_approval": true,
+      "status": "insufficient_evidence",
+      "missing_evidence_flag": true
+    }
+  }
+}

@@ -1,0 +1,600 @@
+[
+  {
+    "id": "DOC-PHO-001",
+    "title": "Site Photo: Basement Retaining Wall Water Ingress & Efflorescence",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Basement Retaining Wall Water Ingress & Efflorescence",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Basement Retaining Wall Water Ingress & Efflorescence",
+        "missing": false
+      },
+      "description": {
+        "value": "Severe water seepage observed emerging through vertical construction cold joint. White crystalline efflorescence staining visible across 3.5m length. Damp patch spreading toward elevator sump.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Severe water seepage observed emerging through vertical construction cold joint.",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Basement Retaining Wall Water Ingress & Efflorescence"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-002",
+    "title": "Site Photo: Uncharted Historical Masonry Duct Discovered in Trench",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Uncharted Historical Masonry Duct Discovered in Trench",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Uncharted Historical Masonry Duct Discovered in Trench",
+        "missing": false
+      },
+      "description": {
+        "value": "Excavator teeth exposed arched brickwork conduit dating to early 20th century municipal stormwater network. Structural integrity undisturbed but blocking planned 33kV high voltage electrical duct bank route.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Excavator teeth exposed arched brickwork conduit dating to early 20th century mu",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Uncharted Historical Masonry Duct Discovered in Trench"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-003",
+    "title": "Site Photo: Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Misaligned Baseplate Anchor Bolts on Gridline D-8 Column",
+        "missing": false
+      },
+      "description": {
+        "value": "Cast-in Grade 8.8 anchor bolt cluster displaced 45mm south of theoretical centerline. Structural steel baseplate cannot be seated without oblong slot enlargement or anchor re-engineering.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Cast-in Grade 8.8 anchor bolt cluster displaced 45mm south of theoretical center",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-004",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-004"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Misaligned Baseplate Anchor Bolts on Gridline D-8 Column"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-004",
+    "title": "Site Photo: Severe Honeycombing and Segregation in Stripped Column C-04",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Severe Honeycombing and Segregation in Stripped Column C-04",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Severe Honeycombing and Segregation in Stripped Column C-04",
+        "missing": false
+      },
+      "description": {
+        "value": "Extensive honeycombing and voiding with exposed deformed rebar ties following formwork stripping. Insufficient internal mechanical vibrator compaction during high slump pour.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Extensive honeycombing and voiding with exposed deformed rebar ties following fo",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Severe Honeycombing and Segregation in Stripped Column C-04"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-005",
+    "title": "Site Photo: Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+        "missing": false
+      },
+      "description": {
+        "value": "Turbid standing groundwater completely submerging foundation raft bottom rebar matting up to 800mm depth following mechanical failure of primary dewatering pump.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Turbid standing groundwater completely submerging foundation raft bottom rebar m",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Flooded Elevator Lift Pit Excavation with Submerged Rebars"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-006",
+    "title": "Site Photo: Fire Sprinkler Main Clashing with Steel Transfer Beam Web Stiffener",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Fire Sprinkler Main Clashing with Steel Transfer Beam Web Stiffener",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Fire Sprinkler Main Clashing with Steel Transfer Beam Web Stiffener",
+        "missing": false
+      },
+      "description": {
+        "value": "Installed 150mm fire sprinkler supply pipe physically jammed against welded web stiffener plate of 700mm structural transfer beam. Zero clearance for seismic pipe sway bracing.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Installed 150mm fire sprinkler supply pipe physically jammed against welded web ",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Fire Sprinkler Main Clashing with Steel Transfer Beam Web Stiffener"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-007",
+    "title": "Site Photo: Damaged Intumescent Fireproofing on Girder G-12",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Damaged Intumescent Fireproofing on Girder G-12",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Damaged Intumescent Fireproofing on Girder G-12",
+        "missing": false
+      },
+      "description": {
+        "value": "Ductwork installation crew mechanically gouged off 1.8m length of newly applied two-hour thin-film intumescent coating while hoisting galvanized sheet metal ducts without protective lagging.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Ductwork installation crew mechanically gouged off 1.8m length of newly applied ",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Damaged Intumescent Fireproofing on Girder G-12"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-008",
+    "title": "Site Photo: Combustible Solvent Drums Blocking Emergency Egress Stairwell",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Combustible Solvent Drums Blocking Emergency Egress Stairwell",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Combustible Solvent Drums Blocking Emergency Egress Stairwell",
+        "missing": false
+      },
+      "description": {
+        "value": "Six 200L drums of solvent-based curing compound and polyurethane adhesive stored directly in exit passageway. Clear breach of OSHA and NFPA Life Safety egress standards.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Six 200L drums of solvent-based curing compound and polyurethane adhesive stored",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Combustible Solvent Drums Blocking Emergency Egress Stairwell"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-009",
+    "title": "Site Photo: Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Delivered 800TR Chiller with Crushed Heat Exchanger Fins",
+        "missing": false
+      },
+      "description": {
+        "value": "Forklift impact during transit cracked protective crating and crushed approximately 300x500mm area of aluminum heat transfer condenser coils on Chiller Unit CH-02.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Forklift impact during transit cracked protective crating and crushed approximat",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-MEP-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-005"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-005",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-005"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Delivered 800TR Chiller with Crushed Heat Exchanger Fins"
+      }
+    }
+  },
+  {
+    "id": "DOC-PHO-010",
+    "title": "Site Photo: Satisfactory QA/QC Rebar Inspection Tag on Column C-18",
+    "document_type": "site_photo",
+    "expected": {
+      "title": {
+        "value": "Satisfactory QA/QC Rebar Inspection Tag on Column C-18",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Satisfactory QA/QC Rebar Inspection Tag on Column C-18",
+        "missing": false
+      },
+      "description": {
+        "value": "Green QA/QC Approved for Concrete Pour tag signed by Supervising Resident Engineer attached to 32mm vertical rebar cage. Mechanical couplers and stirrup spacing verified.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Green QA/QC Approved for Concrete Pour tag signed by Supervising Resident Engine",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-CS-001"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-004",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-004"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "site_photo",
+      "required_fields_present": [
+        "title",
+        "description"
+      ],
+      "value_assertions": {
+        "title": "Satisfactory QA/QC Rebar Inspection Tag on Column C-18"
+      }
+    }
+  }
+]

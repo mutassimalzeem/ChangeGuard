@@ -1,0 +1,66 @@
+{
+  "id": "DUP-002",
+  "title": "Double-Billed Scaffolding Preliminaries and Variation",
+  "category": "duplicate_detection",
+  "input": {
+    "primary_document": {
+      "document_id": "inv-march-prelim",
+      "filename": "IPC-04_Preliminaries_Schedule.pdf",
+      "document_type": "boq",
+      "contract_id": "CON-2026-FAC-005",
+      "item_code": "PRE-08",
+      "amount": "28000.00",
+      "currency": "USD",
+      "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+      "status": "approved"
+    },
+    "candidate_document": {
+      "document_id": "co-facade-scaffold",
+      "filename": "CO-2026-FAC-002_ScaffoldClaim.pdf",
+      "document_type": "change_order",
+      "contract_id": "CON-2026-FAC-005",
+      "item_code": "PRE-08",
+      "amount": "28000.00",
+      "currency": "USD",
+      "description": "Perimeter modular access scaffolding rental for East Elevation month of March 2026",
+      "status": "submitted"
+    }
+  },
+  "expected_output": {
+    "is_duplicate": true,
+    "risk_type": "duplicate_change_order_claim",
+    "severity": "high",
+    "status": "open",
+    "financial_exposure": {
+      "amount": "28000.00",
+      "currency": "USD"
+    },
+    "matched_fields": [
+      "contract_id",
+      "amount",
+      "currency",
+      "normalized_description"
+    ],
+    "recommended_action": "Reconcile duplicate scaffolding rental between preliminaries and variation claim.",
+    "sources": [
+      {
+        "document_id": "inv-march-prelim",
+        "page": 1,
+        "snippet": "PRE-08: Perimeter modular access scaffolding rental"
+      },
+      {
+        "document_id": "co-facade-scaffold",
+        "page": 1,
+        "snippet": "Scaffolding rental for East Elevation"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "duplicate_change_order_claim",
+    "assertions": {
+      "duplicate_detected": true,
+      "exposure_amount": "28000.00"
+    }
+  }
+}

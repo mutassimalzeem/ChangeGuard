@@ -1,0 +1,64 @@
+{
+  "id": "MISS-005",
+  "title": "Thermal Cracking Repair Claim Lacking Batch Tickets & Curing Logs",
+  "category": "missing_evidence",
+  "input": {
+    "document_id": "co-crack-repair",
+    "filename": "CO-2026-CRK-01_EpoxyInjection.pdf",
+    "document_type": "change_order",
+    "extracted_fields": {
+      "co_number": {
+        "value": "CO-2026-CRK-01",
+        "missing": false
+      },
+      "title": {
+        "value": "Epoxy Resin Injection for Thermal Cracking in Raft Pour 3",
+        "missing": false
+      },
+      "description": {
+        "value": "Pressure injection of low-viscosity structural epoxy along 45m of surface cracks.",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "19400.00",
+          "currency": "USD"
+        },
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "missing": false
+      },
+      "document_references": []
+    },
+    "required_supporting_documents": [
+      "Concrete Batch Plant Delivery Tickets",
+      "7-Day Thermocouple Core Temperature Differential Logs",
+      "Post-Crack Core Compressive Strength Test Results"
+    ]
+  },
+  "expected_output": {
+    "risk_detected": true,
+    "risk_type": "missing_required_evidence",
+    "severity": "medium",
+    "status": "insufficient_evidence",
+    "missing_facts": [
+      "batch_tickets",
+      "thermocouple_temperature_logs"
+    ],
+    "refusal_behavior": {
+      "refuse_approval": true,
+      "refusal_reason": "Thermal cracking defect liability cannot be determined without contemporaneous temperature differential records."
+    },
+    "recommended_action": "Provide 7-day temperature curing logs and supplier batch certificates."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "missing_required_evidence",
+    "assertions": {
+      "refuse_approval": true,
+      "status": "insufficient_evidence"
+    }
+  }
+}

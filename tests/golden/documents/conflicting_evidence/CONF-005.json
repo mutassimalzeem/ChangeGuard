@@ -1,0 +1,59 @@
+{
+  "id": "CONF-005",
+  "title": "Status Contradiction: Contractor Claim 'Approved' vs Disapproval Log",
+  "category": "conflicting_evidence",
+  "input": {
+    "document_a": {
+      "document_id": "reg-supervising-eng",
+      "filename": "SER-2026-03_Register.pdf",
+      "document_type": "other",
+      "source_page": 3,
+      "snippet": "CO-2026-007 Status: Disapproved by Supervising Engineer on 2026-03-29 citing failure to comply with acoustic warranty.",
+      "co_number": "CO-2026-007",
+      "official_status": "disapproved"
+    },
+    "document_b": {
+      "document_id": "co-sub-claim-007",
+      "filename": "CO-2026-007_Submission.pdf",
+      "document_type": "change_order",
+      "source_page": 1,
+      "snippet": "Change Order Number: CO-2026-007. Status: approved by Engineer.",
+      "co_number": "CO-2026-007",
+      "asserted_status": "approved",
+      "amount": "134800.00",
+      "currency": "USD"
+    }
+  },
+  "expected_output": {
+    "conflict_detected": true,
+    "risk_type": "conflicting_information",
+    "severity": "high",
+    "contradiction_key": "change_order_status_CO-2026-007",
+    "conflict_summary": "Contractor submission claims change order is approved, but official Supervising Engineer Register SER-2026-03 records status as Disapproved.",
+    "financial_exposure": {
+      "amount": "134800.00",
+      "currency": "USD"
+    },
+    "sources": [
+      {
+        "document_id": "reg-supervising-eng",
+        "page": 3,
+        "snippet": "CO-2026-007 Status: Disapproved by Supervising Engineer"
+      },
+      {
+        "document_id": "co-sub-claim-007",
+        "page": 1,
+        "snippet": "Change Order Number: CO-2026-007. Status: approved"
+      }
+    ],
+    "recommended_action": "Freeze approval workflow and obtain definitive determination from Project Director."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "conflicting_information",
+    "assertions": {
+      "conflict_detected": true,
+      "exposure_amount": "134800.00"
+    }
+  }
+}

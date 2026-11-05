@@ -1,0 +1,103 @@
+{
+  "id": "DOC-EML-005",
+  "title": "Email: steel mill material price escalation notification",
+  "category": "email",
+  "input": {
+    "filename": "DOC-EML-005_2026-03-06.eml",
+    "document_type_hint": "email",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "eml",
+      "page_count": 1,
+      "author": "sales.mgr@titansteel.test"
+    },
+    "extracted_text": "Subject: steel mill material price escalation notification\nFrom: sales.mgr@titansteel.test\nTo: procurement@apexventures.test\nDate: 2026-03-06\nStatus: received\nContract Reference: CON-2026-STL-003\n\nGlobal raw materials surcharge has increased European heavy flange beams by 12.5%. Attached mill index certificates validate this adjustment. Current quotation prices hold for 14 days."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "email",
+      "confidence": 0.99,
+      "reasoning": "Project correspondence email thread with valid sender, recipient, timestamp and message body.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "subject": {
+        "value": "steel mill material price escalation notification",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: steel mill material price escalation notification",
+        "missing": false
+      },
+      "sender": {
+        "value": "sales.mgr@titansteel.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: sales.mgr@titansteel.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "procurement@apexventures.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: procurement@apexventures.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-03-06",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-03-06",
+        "missing": false
+      },
+      "body": {
+        "value": "Global raw materials surcharge has increased European heavy flange beams by 12.5%. Attached mill index certificates validate this adjustment. Current quotation prices hold for 14 days.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Global raw materials surcharge has increased European heavy flange beams by 12.5",
+        "missing": false
+      },
+      "status": {
+        "value": "received",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: received",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-STL-003"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-STL-003",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "email",
+    "required_fields_present": [
+      "subject",
+      "sender",
+      "recipient",
+      "body"
+    ],
+    "value_assertions": {
+      "subject": "steel mill material price escalation notification",
+      "sender": "sales.mgr@titansteel.test",
+      "recipient": "procurement@apexventures.test",
+      "sent_date": "2026-03-06"
+    }
+  }
+}

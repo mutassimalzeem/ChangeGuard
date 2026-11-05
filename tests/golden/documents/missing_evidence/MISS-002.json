@@ -1,0 +1,64 @@
+{
+  "id": "MISS-002",
+  "title": "Weekend Overtime Acceleration Claim Lacking Signed Timesheets",
+  "category": "missing_evidence",
+  "input": {
+    "document_id": "co-accel-overtime",
+    "filename": "CO-2026-ACCEL-02_Overtime.pdf",
+    "document_type": "change_order",
+    "extracted_fields": {
+      "co_number": {
+        "value": "CO-2026-ACCEL-02",
+        "missing": false
+      },
+      "title": {
+        "value": "Weekend Overtime Shift Acceleration for Slab Handover",
+        "missing": false
+      },
+      "description": {
+        "value": "240 journeyman carpenter hours performed over two weekends to achieve milestone.",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "28800.00",
+          "currency": "USD"
+        },
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "missing": false
+      },
+      "document_references": []
+    },
+    "required_supporting_documents": [
+      "Resident Engineer Overtime Pre-Approval Form",
+      "Security Turnstile Biometric Gate In/Out Logs",
+      "Signed Daily Foreman Timesheets"
+    ]
+  },
+  "expected_output": {
+    "risk_detected": true,
+    "risk_type": "missing_required_evidence",
+    "severity": "medium",
+    "status": "insufficient_evidence",
+    "missing_facts": [
+      "supervisor_signed_timesheets",
+      "turnstile_gate_logs"
+    ],
+    "refusal_behavior": {
+      "refuse_approval": true,
+      "refusal_reason": "Claim cannot be audited: daily signed timesheets and biometric gate logs are missing."
+    },
+    "recommended_action": "Upload signed timesheets matching claimed operative names and dates."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "missing_required_evidence",
+    "assertions": {
+      "refuse_approval": true,
+      "status": "insufficient_evidence"
+    }
+  }
+}

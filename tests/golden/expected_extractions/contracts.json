@@ -1,0 +1,556 @@
+[
+  {
+    "id": "DOC-CON-001",
+    "title": "FIDIC Red Book Subcontract - Core & Shell Concrete Package",
+    "document_type": "contract",
+    "expected": {
+      "reference": {
+        "value": "CON-2026-CS-001",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-CS-001",
+        "missing": false
+      },
+      "title": {
+        "value": "Subcontract Agreement for Core & Shell Reinforced Concrete Structure",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Title: Subcontract Agreement for Core & Shell Reinforced Concrete Structure",
+        "missing": false
+      },
+      "employer": {
+        "value": "Apex Real Estate Ventures Ltd",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Apex Real Estate Ventures Ltd",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Horizon Structural Engineering LLC",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Horizon Structural Engineering LLC",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-01-15",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-01-15",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2027-06-30",
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2027-06-30",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "4850000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 4850000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-CS-01"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Bill of Quantities BOQ-2026-CS-01",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-001"
+          },
+          "confidence": 0.94,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-001",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-CS-001"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-CS-01"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-001"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "contract",
+      "required_fields_present": [
+        "reference",
+        "title",
+        "employer",
+        "contractor",
+        "contract_value"
+      ],
+      "value_assertions": {
+        "reference": "CON-2026-CS-001",
+        "contract_value.amount": "4850000.00",
+        "contract_value.currency": "USD",
+        "status": "signed"
+      },
+      "evidence_grounding": {
+        "require_source_snippets": true,
+        "require_source_page": true
+      }
+    }
+  },
+  {
+    "id": "DOC-CON-002",
+    "title": "AIA A401 Standard Subcontract - Mechanical & Chilled Water Plant",
+    "document_type": "contract",
+    "expected": {
+      "reference": {
+        "value": "CON-2026-MEP-002",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-MEP-002",
+        "missing": false
+      },
+      "title": {
+        "value": "Subcontract Agreement for Central Chilled Water Plant and Primary MEP Distribution",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Title: Subcontract Agreement for Central Chilled Water Plant and Primary MEP Distribution",
+        "missing": false
+      },
+      "employer": {
+        "value": "Metro Transit Infrastructure Authority",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Metro Transit Infrastructure Authority",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Pioneer Thermal Dynamics Corp",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Pioneer Thermal Dynamics Corp",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-02-01",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-02-01",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2026-12-31",
+        "confidence": 0.95,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2026-12-31",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "2420000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 2420000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-MEP-02"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "BOQ Reference BOQ-2026-MEP-02",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-MEP-002"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-MEP-02"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "contract",
+      "required_fields_present": [
+        "reference",
+        "title",
+        "employer",
+        "contractor",
+        "contract_value"
+      ],
+      "value_assertions": {
+        "reference": "CON-2026-MEP-002",
+        "contract_value.amount": "2420000.00",
+        "status": "signed"
+      },
+      "evidence_grounding": {
+        "require_source_snippets": true,
+        "require_source_page": true
+      }
+    }
+  },
+  {
+    "id": "DOC-CON-003",
+    "title": "NEC4 Engineering and Construction Subcontract - Structural Steel Frame",
+    "document_type": "contract",
+    "expected": {
+      "reference": {
+        "value": "CON-2026-STL-003",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Subcontract Reference: CON-2026-STL-003",
+        "missing": false
+      },
+      "title": {
+        "value": "Engineering and Construction Subcontract for Structural Steel Frame & Composite Decking",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Engineering and Construction Subcontract for Structural Steel Frame & Composite Decking",
+        "missing": false
+      },
+      "employer": {
+        "value": "Highline Tower Development Corp",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Highline Tower Development Corp",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Titan Metalwork Specialists",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Titan Metalwork Specialists",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-03-01",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-03-01",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2026-11-15",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2026-11-15",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "3150000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 3150000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-STL-03"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "referenced in BOQ-2026-STL-03",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-STL-03"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "contract",
+      "required_fields_present": [
+        "reference",
+        "title",
+        "employer",
+        "contractor",
+        "contract_value"
+      ],
+      "value_assertions": {
+        "reference": "CON-2026-STL-003",
+        "contract_value.amount": "3150000.00"
+      },
+      "evidence_grounding": {
+        "require_source_snippets": true,
+        "require_source_page": true
+      }
+    }
+  },
+  {
+    "id": "DOC-CON-004",
+    "title": "Subcontract for Deep Foundations, Shoring & Dewatering",
+    "document_type": "contract",
+    "expected": {
+      "reference": {
+        "value": "CON-2026-GEO-004",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+        "missing": false
+      },
+      "title": {
+        "value": "Specialized Subcontract for Secant Piling, Foundation Bored Piles and Dewatering",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Specialized Subcontract for Secant Piling, Foundation Bored Piles and Dewatering",
+        "missing": false
+      },
+      "employer": {
+        "value": "Waterfront Logistics Park LLC",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Waterfront Logistics Park LLC",
+        "missing": false
+      },
+      "contractor": {
+        "value": "GeoFoundation Engineering Ltd",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: GeoFoundation Engineering Ltd",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-01-10",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-01-10",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2026-08-30",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2026-08-30",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "1875000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 1875000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "active",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: active",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-GEO-04"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Bill of Quantities BOQ-2026-GEO-04",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-GEO-04"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "contract",
+      "required_fields_present": [
+        "reference",
+        "title",
+        "employer",
+        "contractor",
+        "contract_value"
+      ],
+      "value_assertions": {
+        "reference": "CON-2026-GEO-004",
+        "contract_value.amount": "1875000.00",
+        "status": "active"
+      },
+      "evidence_grounding": {
+        "require_source_snippets": true,
+        "require_source_page": true
+      }
+    }
+  },
+  {
+    "id": "DOC-CON-005",
+    "title": "Subcontract for Architectural Facade & Unitized Curtain Wall Package",
+    "document_type": "contract",
+    "expected": {
+      "reference": {
+        "value": "CON-2026-FAC-005",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-FAC-005",
+        "missing": false
+      },
+      "title": {
+        "value": "Subcontract Agreement for External Building Envelope & Unitized Glazing System",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Subcontract Agreement for External Building Envelope & Unitized Glazing System",
+        "missing": false
+      },
+      "employer": {
+        "value": "Zenith Commercial Towers Ltd",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Zenith Commercial Towers Ltd",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Alumitech Glazing Systems Inc",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Alumitech Glazing Systems Inc",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-04-01",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-04-01",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2027-08-15",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2027-08-15",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "5600000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 5600000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-FAC-05"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "BOQ-2026-FAC-05",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-FAC-005"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-FAC-05"
+      }
+    ],
+    "evaluation_criteria": {
+      "classification_metric": "exact_match",
+      "classification_target": "contract",
+      "required_fields_present": [
+        "reference",
+        "title",
+        "employer",
+        "contractor",
+        "contract_value"
+      ],
+      "value_assertions": {
+        "reference": "CON-2026-FAC-005",
+        "contract_value.amount": "5600000.00",
+        "contract_value.currency": "USD"
+      },
+      "evidence_grounding": {
+        "require_source_snippets": true,
+        "require_source_page": true
+      }
+    }
+  }
+]

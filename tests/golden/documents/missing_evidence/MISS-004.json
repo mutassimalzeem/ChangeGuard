@@ -1,0 +1,64 @@
+{
+  "id": "MISS-004",
+  "title": "Expedited Air Freight Surcharge Lacking Waybill and Customs Proof",
+  "category": "missing_evidence",
+  "input": {
+    "document_id": "co-freight-claim",
+    "filename": "CO-2026-FRT-01_ExpeditedChiller.pdf",
+    "document_type": "change_order",
+    "extracted_fields": {
+      "co_number": {
+        "value": "CO-2026-FRT-01",
+        "missing": false
+      },
+      "title": {
+        "value": "Emergency Air Freight for Chiller Replacement Rotor",
+        "missing": false
+      },
+      "description": {
+        "value": "Air freight from Munich factory to prevent commissioning delay.",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "38500.00",
+          "currency": "USD"
+        },
+        "missing": false
+      },
+      "status": {
+        "value": "submitted",
+        "missing": false
+      },
+      "document_references": []
+    },
+    "required_supporting_documents": [
+      "Air Waybill (AWB) Bill of Lading",
+      "Airport Customs Duty & Clearance Receipt",
+      "Client Prior Written Expedited Delivery Authorization"
+    ]
+  },
+  "expected_output": {
+    "risk_detected": true,
+    "risk_type": "missing_required_evidence",
+    "severity": "medium",
+    "status": "insufficient_evidence",
+    "missing_facts": [
+      "air_waybill_number",
+      "commercial_invoice"
+    ],
+    "refusal_behavior": {
+      "refuse_approval": true,
+      "refusal_reason": "Freight premium claim requires original airway bill and airline carrier payment receipt."
+    },
+    "recommended_action": "Upload certified freight carrier waybill and port clearance voucher."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "missing_required_evidence",
+    "assertions": {
+      "refuse_approval": true,
+      "status": "insufficient_evidence"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "id": "DOC-CO-005",
+  "title": "Change Order CO-2026-005 - Emergency Wellpoint Dewatering and Sheet Piling Stabilization",
+  "category": "change_order",
+  "input": {
+    "filename": "CO-2026-005_executed.pdf",
+    "document_type_hint": "change_order",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 3,
+      "author": "Change Control Board"
+    },
+    "extracted_text": "CHANGE ORDER\nChange Order Number: CO-2026-005\nTitle: Emergency Wellpoint Dewatering and Sheet Piling Stabilization\nDescription: Continuous 24/7 deep wellpoint pumping and installation of 45 lin.m sheet piles following monsoon flooding.\nIssue Date: 2026-03-22\nAmount: USD 118900.00\nStatus: executed\nSchedule Impact: 8 calendar days\nContract Reference: CON-2026-GEO-004\nReferenced RFI: RFI-2026-002"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "change_order",
+      "confidence": 0.99,
+      "reasoning": "Formal change order with agreed financial consideration of USD 118900.00 and schedule adjustments.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "co_number": {
+        "value": "CO-2026-005",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Change Order Number: CO-2026-005",
+        "missing": false
+      },
+      "title": {
+        "value": "Emergency Wellpoint Dewatering and Sheet Piling Stabilization",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Emergency Wellpoint Dewatering and Sheet Piling Stabilization",
+        "missing": false
+      },
+      "description": {
+        "value": "Continuous 24/7 deep wellpoint pumping and installation of 45 lin.m sheet piles following monsoon flooding.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Description: Continuous 24/7 deep wellpoint pumping and installation of 45 lin.m sheet piles following monsoon flooding.",
+        "missing": false
+      },
+      "issue_date": {
+        "value": "2026-03-22",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Issue Date: 2026-03-22",
+        "missing": false
+      },
+      "amount": {
+        "value": {
+          "amount": "118900.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Amount: USD 118900.00",
+        "missing": false
+      },
+      "status": {
+        "value": "executed",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: executed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "change_order",
+        "reference": "CO-2026-005"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "change_order",
+    "required_fields_present": [
+      "co_number",
+      "title",
+      "description",
+      "amount",
+      "status"
+    ],
+    "value_assertions": {
+      "co_number": "CO-2026-005",
+      "amount.amount": "118900.00",
+      "status": "executed"
+    }
+  }
+}

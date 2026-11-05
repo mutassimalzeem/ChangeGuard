@@ -1,0 +1,63 @@
+{
+  "id": "DUP-005",
+  "title": "Double Billing of Subcontractor Labor Timesheets in Daywork",
+  "category": "duplicate_detection",
+  "input": {
+    "primary_document": {
+      "document_id": "ts-week-09",
+      "filename": "Timesheet_Week09_BaseContract.pdf",
+      "document_type": "daily_report",
+      "contract_id": "CON-2026-MEP-002",
+      "amount": "12800.00",
+      "currency": "USD",
+      "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+      "status": "approved"
+    },
+    "candidate_document": {
+      "document_id": "co-daywork-02",
+      "filename": "CO-2026-002_Daywork_Billing.pdf",
+      "document_type": "change_order",
+      "contract_id": "CON-2026-MEP-002",
+      "amount": "12800.00",
+      "currency": "USD",
+      "description": "160 hours journeyman electrician labor for primary cable pulling shift A",
+      "status": "submitted"
+    }
+  },
+  "expected_output": {
+    "is_duplicate": true,
+    "risk_type": "duplicate_change_order_claim",
+    "severity": "high",
+    "status": "open",
+    "financial_exposure": {
+      "amount": "12800.00",
+      "currency": "USD"
+    },
+    "matched_fields": [
+      "contract_id",
+      "amount",
+      "normalized_description"
+    ],
+    "recommended_action": "Verify operative clock-in logs to eliminate dual billing across base work and variation.",
+    "sources": [
+      {
+        "document_id": "ts-week-09",
+        "page": 1,
+        "snippet": "160 hours journeyman electrician labor"
+      },
+      {
+        "document_id": "co-daywork-02",
+        "page": 1,
+        "snippet": "160 hours journeyman electrician labor"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "duplicate_change_order_claim",
+    "assertions": {
+      "duplicate_detected": true,
+      "exposure_amount": "12800.00"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "PERM-008",
+  "title": "Deleted Project Tombstone Scoping in Evidence Queries",
+  "category": "permission_isolation",
+  "input": {
+    "actor": {
+      "user_id": "user-pm-01",
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "role": "project_manager"
+    },
+    "target_resource": {
+      "resource_type": "project",
+      "project_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "deleted_at": "2026-03-01T12:00:00Z"
+    },
+    "action": "evidence.query"
+  },
+  "expected_output": {
+    "allowed": false,
+    "http_status": 404,
+    "error_code": "PROJECT_NOT_FOUND_OR_DELETED",
+    "returned_links_count": 0
+  },
+  "evaluation_criteria": {
+    "metric": "security_isolation",
+    "assertions": {
+      "access_allowed": false,
+      "tombstone_isolated": true
+    }
+  }
+}

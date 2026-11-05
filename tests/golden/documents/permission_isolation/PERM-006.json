@@ -1,0 +1,33 @@
+{
+  "id": "PERM-006",
+  "title": "Read-Only Auditor Blocked from Risk Status Modification",
+  "category": "permission_isolation",
+  "input": {
+    "actor": {
+      "user_id": "user-auditor-01",
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "auditor"
+    },
+    "target_resource": {
+      "resource_type": "risk",
+      "risk_id": "risk-cost-outlier-01"
+    },
+    "action": "risks.write",
+    "mutation": {
+      "status": "accepted"
+    }
+  },
+  "expected_output": {
+    "allowed": false,
+    "http_status": 403,
+    "error_code": "AUDITOR_READ_ONLY"
+  },
+  "evaluation_criteria": {
+    "metric": "security_isolation",
+    "assertions": {
+      "access_allowed": false,
+      "read_only_guarantee": true
+    }
+  }
+}

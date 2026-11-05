@@ -1,0 +1,128 @@
+{
+  "id": "DOC-CON-005",
+  "title": "Subcontract for Architectural Facade & Unitized Curtain Wall Package",
+  "category": "contract",
+  "input": {
+    "filename": "CON-2026-FAC-005_Execution_Copy.pdf",
+    "document_type_hint": "contract",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 26,
+      "author": "Zenith Commercial Legal"
+    },
+    "extracted_text": "LUMP SUM FACADE SUBCONTRACT\nContract Reference: CON-2026-FAC-005\nTitle: Subcontract Agreement for External Building Envelope & Unitized Glazing System\nEmployer: Zenith Commercial Towers Ltd\nContractor: Alumitech Glazing Systems Inc\nEffective Date: 2026-04-01\nExpiry Date: 2027-08-15\nContract Value: USD 5600000.00\nStatus: signed\n\n1.1 The Contractor shall engineer, test, fabricate and install the unitized curtain wall in accordance with BOQ-2026-FAC-05."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "contract",
+      "confidence": 0.98,
+      "reasoning": "Lump sum building envelope subcontract with signed execution terms.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "reference": {
+        "value": "CON-2026-FAC-005",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Reference: CON-2026-FAC-005",
+        "missing": false
+      },
+      "title": {
+        "value": "Subcontract Agreement for External Building Envelope & Unitized Glazing System",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Subcontract Agreement for External Building Envelope & Unitized Glazing System",
+        "missing": false
+      },
+      "employer": {
+        "value": "Zenith Commercial Towers Ltd",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Zenith Commercial Towers Ltd",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Alumitech Glazing Systems Inc",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Alumitech Glazing Systems Inc",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-04-01",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-04-01",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2027-08-15",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2027-08-15",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "5600000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 5600000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-FAC-05"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "BOQ-2026-FAC-05",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-FAC-005"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-FAC-05"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "contract",
+    "required_fields_present": [
+      "reference",
+      "title",
+      "employer",
+      "contractor",
+      "contract_value"
+    ],
+    "value_assertions": {
+      "reference": "CON-2026-FAC-005",
+      "contract_value.amount": "5600000.00",
+      "contract_value.currency": "USD"
+    },
+    "evidence_grounding": {
+      "require_source_snippets": true,
+      "require_source_page": true
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "id": "DOC-EML-003",
+  "title": "Email: confirmation of revised footing depth for grid c-3",
+  "category": "email",
+  "input": {
+    "filename": "DOC-EML-003_2026-02-26.eml",
+    "document_type_hint": "email",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "eml",
+      "page_count": 1,
+      "author": "lead.structural@metroconsult.test"
+    },
+    "extracted_text": "Subject: confirmation of revised footing depth for grid c-3\nFrom: lead.structural@metroconsult.test\nTo: site.eng@geofoundation.test\nDate: 2026-02-26\nStatus: sent\nContract Reference: CON-2026-GEO-004\nReferenced RFI: RFI-2026-002\n\nBased on geotechnical core samples, the founding depth for pile cap PC-03 is revised from -6.50m to -7.80m ECD. Approved for immediate rebar placement."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "email",
+      "confidence": 0.99,
+      "reasoning": "Project correspondence email thread with valid sender, recipient, timestamp and message body.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "subject": {
+        "value": "confirmation of revised footing depth for grid c-3",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Subject: confirmation of revised footing depth for grid c-3",
+        "missing": false
+      },
+      "sender": {
+        "value": "lead.structural@metroconsult.test",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "From: lead.structural@metroconsult.test",
+        "missing": false
+      },
+      "recipient": {
+        "value": "site.eng@geofoundation.test",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "To: site.eng@geofoundation.test",
+        "missing": false
+      },
+      "sent_date": {
+        "value": "2026-02-26",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Date: 2026-02-26",
+        "missing": false
+      },
+      "body": {
+        "value": "Based on geotechnical core samples, the founding depth for pile cap PC-03 is revised from -6.50m to -7.80m ECD. Approved for immediate rebar placement.",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Based on geotechnical core samples, the founding depth for pile cap PC-03 is rev",
+        "missing": false
+      },
+      "status": {
+        "value": "sent",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: sent",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "email",
+    "required_fields_present": [
+      "subject",
+      "sender",
+      "recipient",
+      "body"
+    ],
+    "value_assertions": {
+      "subject": "confirmation of revised footing depth for grid c-3",
+      "sender": "lead.structural@metroconsult.test",
+      "recipient": "site.eng@geofoundation.test",
+      "sent_date": "2026-02-26"
+    }
+  }
+}

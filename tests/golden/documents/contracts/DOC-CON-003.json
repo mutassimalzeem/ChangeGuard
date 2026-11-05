@@ -1,0 +1,127 @@
+{
+  "id": "DOC-CON-003",
+  "title": "NEC4 Engineering and Construction Subcontract - Structural Steel Frame",
+  "category": "contract",
+  "input": {
+    "filename": "CON-2026-STL-003_Executed.pdf",
+    "document_type_hint": "contract",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 18,
+      "author": "Highline Commercial"
+    },
+    "extracted_text": "NEC4 ENGINEERING AND CONSTRUCTION SUBCONTRACT\nSubcontract Reference: CON-2026-STL-003\nTitle: Engineering and Construction Subcontract for Structural Steel Frame & Composite Decking\nEmployer: Highline Tower Development Corp\nContractor: Titan Metalwork Specialists\nEffective Date: 2026-03-01\nExpiry Date: 2026-11-15\nContract Value: USD 3150000.00\nStatus: signed\n\nSubcontract Data Part One:\nPriced contract with bill of quantities (Option B).\nSubcontractor shall supply and erect all steel elements referenced in BOQ-2026-STL-03."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "contract",
+      "confidence": 0.98,
+      "reasoning": "NEC4 ECS priced subcontract agreement with bill of quantities option B.",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "reference": {
+        "value": "CON-2026-STL-003",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Subcontract Reference: CON-2026-STL-003",
+        "missing": false
+      },
+      "title": {
+        "value": "Engineering and Construction Subcontract for Structural Steel Frame & Composite Decking",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Engineering and Construction Subcontract for Structural Steel Frame & Composite Decking",
+        "missing": false
+      },
+      "employer": {
+        "value": "Highline Tower Development Corp",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Employer: Highline Tower Development Corp",
+        "missing": false
+      },
+      "contractor": {
+        "value": "Titan Metalwork Specialists",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contractor: Titan Metalwork Specialists",
+        "missing": false
+      },
+      "effective_date": {
+        "value": "2026-03-01",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Effective Date: 2026-03-01",
+        "missing": false
+      },
+      "expiry_date": {
+        "value": "2026-11-15",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Expiry Date: 2026-11-15",
+        "missing": false
+      },
+      "contract_value": {
+        "value": {
+          "amount": "3150000.00",
+          "currency": "USD"
+        },
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Contract Value: USD 3150000.00",
+        "missing": false
+      },
+      "status": {
+        "value": "signed",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "Status: signed",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "boq",
+            "reference": "BOQ-2026-STL-03"
+          },
+          "confidence": 0.96,
+          "source_page": 1,
+          "source_text_snippet": "referenced in BOQ-2026-STL-03",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-STL-003"
+      },
+      {
+        "kind": "boq",
+        "reference": "BOQ-2026-STL-03"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "contract",
+    "required_fields_present": [
+      "reference",
+      "title",
+      "employer",
+      "contractor",
+      "contract_value"
+    ],
+    "value_assertions": {
+      "reference": "CON-2026-STL-003",
+      "contract_value.amount": "3150000.00"
+    },
+    "evidence_grounding": {
+      "require_source_snippets": true,
+      "require_source_page": true
+    }
+  }
+}

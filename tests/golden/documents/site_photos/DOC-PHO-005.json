@@ -1,0 +1,88 @@
+{
+  "id": "DOC-PHO-005",
+  "title": "Site Photo: Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+  "category": "site_photo",
+  "input": {
+    "filename": "PHO-2026-005_Excavation_Flooding___Dewatering_Stoppage.jpg",
+    "document_type_hint": "site_photo",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "jpeg",
+      "dimensions": "4032x3024",
+      "camera_model": "Trimble SiteVision Rugged / iPhone 15 Pro Max",
+      "gps_latitude": 25.1972,
+      "gps_longitude": 55.2744,
+      "timestamp": "2026-03-07T08:45:00Z",
+      "author": "Site QA/QC Field Engineer"
+    },
+    "extracted_text": "CONSTRUCTION SITE INSPECTION PHOTOGRAPH\nPhoto ID: PHO-2026-005\nTitle: Flooded Elevator Lift Pit Excavation with Submerged Rebars\nTimestamp: 2026-03-07T08:45:00Z\nLocation: Tower Core Elevator Pit B, Formation Level -12.4m ECD\nObserved Scene: Turbid standing groundwater completely submerging foundation raft bottom rebar matting up to 800mm depth following mechanical failure of primary dewatering pump.\nClassification: site_photo\nDefect Category: Excavation Flooding / Dewatering Stoppage\nContract Reference: CON-2026-GEO-004\nReferenced RFI: RFI-2026-002"
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "site_photo",
+      "confidence": 0.98,
+      "reasoning": "Site inspection photograph capturing field visual evidence of Excavation Flooding / Dewatering Stoppage.",
+      "model_or_rule_used": "vision_rules_with_llm"
+    },
+    "extraction": {
+      "title": {
+        "value": "Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Title: Flooded Elevator Lift Pit Excavation with Submerged Rebars",
+        "missing": false
+      },
+      "description": {
+        "value": "Turbid standing groundwater completely submerging foundation raft bottom rebar matting up to 800mm depth following mechanical failure of primary dewatering pump.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Turbid standing groundwater completely submerging foundation raft bottom rebar m",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        },
+        {
+          "value": {
+            "kind": "rfi",
+            "reference": "RFI-2026-002"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Referenced RFI: RFI-2026-002",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      },
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "site_photo",
+    "required_fields_present": [
+      "title",
+      "description"
+    ],
+    "value_assertions": {
+      "title": "Flooded Elevator Lift Pit Excavation with Submerged Rebars"
+    }
+  }
+}

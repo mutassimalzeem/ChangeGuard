@@ -1,0 +1,106 @@
+{
+  "id": "DOC-RFI-002",
+  "title": "Unforeseen Groundwater Table Elevation at Basement B3",
+  "category": "rfi",
+  "input": {
+    "filename": "RFI-2026-002_Groundwater_Table.pdf",
+    "document_type_hint": "rfi",
+    "metadata": {
+      "tenant_id": "11111111-1111-1111-1111-111111111111",
+      "project_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "file_type": "pdf",
+      "page_count": 2,
+      "author": "GeoFoundation Site Engineering"
+    },
+    "extracted_text": "REQUEST FOR INFORMATION\nRFI Number: RFI-2026-002\nSubject: Unforeseen High Water Table Elevation during Basement Level 3 Excavation\nContract Reference: CON-2026-GEO-004\nRaised Date: 2026-02-18\nDue Date: 2026-02-25\nStatus: open\n\nQUESTION:\nDuring final bulk excavation to formation level -11.50m ECD for Basement Level 3, continuous water seepage was encountered at elevation -9.80m ECD, which is 1.70m above the historical water table noted in Geotechnical Report GT-BOR-01. Current 4-inch sump pumps are overwhelmed. We request immediate authorization for continuous perimeter deep well dewatering."
+  },
+  "expected_output": {
+    "classification": {
+      "document_type": "rfi",
+      "confidence": 0.99,
+      "reasoning": "RFI detailing geotechnical groundwater condition without final response yet (status open).",
+      "model_or_rule_used": "rules_with_llm_fallback"
+    },
+    "extraction": {
+      "rfi_number": {
+        "value": "RFI-2026-002",
+        "confidence": 0.99,
+        "source_page": 1,
+        "source_text_snippet": "RFI Number: RFI-2026-002",
+        "missing": false
+      },
+      "subject": {
+        "value": "Unforeseen High Water Table Elevation during Basement Level 3 Excavation",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Subject: Unforeseen High Water Table Elevation during Basement Level 3 Excavation",
+        "missing": false
+      },
+      "question": {
+        "value": "During final bulk excavation to formation level -11.50m ECD for Basement Level 3, continuous water seepage was encountered at elevation -9.80m ECD, which is 1.70m above the historical water table noted in Geotechnical Report GT-BOR-01. Current 4-inch sump pumps are overwhelmed. We request immediate authorization for continuous perimeter deep well dewatering.",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "During final bulk excavation to formation level -11.50m ECD for Basement Level 3",
+        "missing": false
+      },
+      "response": {
+        "value": null,
+        "confidence": 0.0,
+        "source_page": null,
+        "source_text_snippet": null,
+        "missing": true
+      },
+      "raised_date": {
+        "value": "2026-02-18",
+        "confidence": 0.97,
+        "source_page": 1,
+        "source_text_snippet": "Raised Date: 2026-02-18",
+        "missing": false
+      },
+      "due_date": {
+        "value": "2026-02-25",
+        "confidence": 0.96,
+        "source_page": 1,
+        "source_text_snippet": "Due Date: 2026-02-25",
+        "missing": false
+      },
+      "status": {
+        "value": "open",
+        "confidence": 0.98,
+        "source_page": 1,
+        "source_text_snippet": "Status: open",
+        "missing": false
+      },
+      "document_references": [
+        {
+          "value": {
+            "kind": "contract",
+            "reference": "CON-2026-GEO-004"
+          },
+          "confidence": 0.95,
+          "source_page": 1,
+          "source_text_snippet": "Contract Reference: CON-2026-GEO-004",
+          "missing": false
+        }
+      ]
+    },
+    "entities": [
+      {
+        "kind": "rfi",
+        "reference": "RFI-2026-002"
+      },
+      {
+        "kind": "contract",
+        "reference": "CON-2026-GEO-004"
+      }
+    ]
+  },
+  "evaluation_criteria": {
+    "classification_metric": "exact_match",
+    "classification_target": "rfi",
+    "value_assertions": {
+      "rfi_number": "RFI-2026-002",
+      "status": "open"
+    }
+  }
+}

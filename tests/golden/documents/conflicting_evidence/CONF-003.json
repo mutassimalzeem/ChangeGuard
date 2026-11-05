@@ -1,0 +1,59 @@
+{
+  "id": "CONF-003",
+  "title": "Pipe Specification Contradiction: 500mm Installed vs 750mm Billed",
+  "category": "conflicting_evidence",
+  "input": {
+    "document_a": {
+      "document_id": "drg-asbuilt-drain",
+      "filename": "DR-C-701_AsBuilt_Drainage.pdf",
+      "document_type": "drawing",
+      "source_page": 1,
+      "snippet": "Stormwater Line SW-02: Installed 500mm ID Class 4 RCP pipe at 0.5% slope.",
+      "drawing_number": "DR-C-701",
+      "pipe_diameter_mm": 500
+    },
+    "document_b": {
+      "document_id": "co-drain-upsize",
+      "filename": "CO-2026-CV-003_PipeUpsize.pdf",
+      "document_type": "change_order",
+      "source_page": 1,
+      "snippet": "Supply and installation of 750mm ID heavy-duty reinforced stormwater line SW-02.",
+      "co_number": "CO-2026-CV-003",
+      "pipe_diameter_mm": 750,
+      "financial_delta": "34500.00",
+      "currency": "USD"
+    }
+  },
+  "expected_output": {
+    "conflict_detected": true,
+    "risk_type": "conflicting_information",
+    "severity": "high",
+    "contradiction_key": "pipe_diameter_specification",
+    "conflict_summary": "As-built drawing DR-C-701 documents installation of 500mm diameter pipe, but change order CO-2026-CV-003 bills for 750mm diameter pipe.",
+    "financial_exposure": {
+      "amount": "34500.00",
+      "currency": "USD"
+    },
+    "sources": [
+      {
+        "document_id": "drg-asbuilt-drain",
+        "page": 1,
+        "snippet": "Installed 500mm ID Class 4 RCP pipe"
+      },
+      {
+        "document_id": "co-drain-upsize",
+        "page": 1,
+        "snippet": "Supply and installation of 750mm ID heavy-duty"
+      }
+    ],
+    "recommended_action": "Conduct CCTV pipe inspection to confirm physical installed bore diameter."
+  },
+  "evaluation_criteria": {
+    "metric": "deterministic_rule_match",
+    "rule_name": "conflicting_information",
+    "assertions": {
+      "conflict_detected": true,
+      "exposure_amount": "34500.00"
+    }
+  }
+}
