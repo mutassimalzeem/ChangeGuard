@@ -1,7 +1,7 @@
 """Sentry-compatible error tracking and exception telemetry hook."""
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Literal
 from uuid import uuid4
 
 from app.core.config import get_settings
@@ -12,11 +12,13 @@ from app.core.request_logging import request_context
 settings = get_settings()
 logger = get_logger(__name__)
 
+SentryLevel = Literal["fatal", "critical", "error", "warning", "info", "debug"]
+
 # State
 _sentry_initialized = False
 
 
-def _scrub_sentry_event(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any] | None:
+def _scrub_sentry_event(event: Any, hint: Any) -> Any:
     """Scrub sensitive credentials and PII from Sentry error events."""
     # Redact request headers if present
     request_data = event.get("request", {})
@@ -153,7 +155,7 @@ def capture_exception(
 def capture_message(
     message: str,
     *,
-    level: str = "info",
+    level: SentryLevel = "info",
     tags: Mapping[str, Any] | None = None,
     extra: Mapping[str, Any] | None = None,
 ) -> str:
