@@ -1,7 +1,7 @@
 """Project-scoped evidence inspection and append-only creation."""
 
 # FastAPI dependency signatures declare path, query, body and injected arguments.
-# ruff: noqa: B008, PLR0913, PLR0917
+# ruff: noqa: B008, PLR0917
 from typing import Annotated
 from uuid import UUID
 

@@ -1,6 +1,5 @@
 """Workflow Celery tasks."""
 
-from celery import shared_task
 
 from app.core.celery_app import celery_app
 

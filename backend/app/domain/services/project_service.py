@@ -1,16 +1,13 @@
 """Project service layer for business logic."""
 
-from datetime import datetime, timezone
-from decimal import Decimal
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import Base
-from app.domain.models import AuditEvent, Project, Tenant, User
+from app.domain.models import AuditEvent, Project, User
 from app.domain.schemas.project import (
     PaginatedProjectResponse,
     ProjectCreate,
@@ -18,11 +15,10 @@ from app.domain.schemas.project import (
     ProjectRead,
     ProjectUpdate,
 )
-from app.policy.permissions import Action
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class ProjectService:
@@ -123,7 +119,7 @@ class ProjectService:
         user: User,
     ) -> PaginatedProjectResponse:
         """List projects with pagination, filtering, and search."""
-        from app.api.pagination import paginate_query, PageParams
+        from app.api.pagination import PageParams, paginate_query
 
         page_params = PageParams(page=params.page, page_size=params.page_size)
 
@@ -148,7 +144,7 @@ class ProjectService:
         # Convert to read schemas
         project_reads = [ProjectRead.model_validate(item) for item in items]
 
-        return PaginatedProjectResponse.create(
+        return PaginatedProjectResponse.create(  # type: ignore[return-value]
             items=project_reads,
             total_items=total,
             page=page_params.page,

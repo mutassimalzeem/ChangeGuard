@@ -1,3 +1,6 @@
+from datetime import date
+from typing import Any
+
 """Native-format extractors preserve physical and structural source references."""
 
 import re
@@ -29,7 +32,7 @@ class PDFTextExtractor:
             for number, page in enumerate(pdf.pages, 1):
                 words = page.extract_words()
                 page_blocks = []
-                lines = OrderedDict()
+                lines: OrderedDict[float, list[dict[str, Any]]] = OrderedDict()
                 for word in words:
                     key = round(word["top"] / 3) * 3
                     lines.setdefault(key, []).append(word)
@@ -100,11 +103,9 @@ class DOCXExtractor:
         default_lang = document.styles.element.xpath(".//w:docDefaults//w:lang/@w:val")
         default_lang = default_lang[0] if default_lang else "und"
         properties = document.core_properties
-        common = {
-            "author": properties.author or None,
-            "date": properties.created.date() if properties.created else None,
-            "revision": str(properties.revision) if properties.revision else None,
-        }
+        doc_author: str | None = properties.author or None
+        doc_date: date | None = properties.created.date() if properties.created else None
+        doc_revision: str | None = str(properties.revision) if properties.revision else None
         blocks, section = [], None
         # XML document order is essential: tables often sit between clause paragraphs.
         for index, child in enumerate(document.element.body):
@@ -122,7 +123,9 @@ class DOCXExtractor:
                         kind="heading" if heading else "paragraph",
                         section=section,
                         language=lang[0] if lang else default_lang,
-                        **common,
+                        author=doc_author,
+                        date=doc_date,
+                        revision=doc_revision,
                         # DOCX does not contain reliable rendered pagination.
                         location={
                             "source": "docx",
@@ -145,7 +148,9 @@ class DOCXExtractor:
                             kind="table_row",
                             section=section,
                             language=default_lang,
-                            **common,
+                            author=doc_author,
+                        date=doc_date,
+                        revision=doc_revision,
                             location={
                                 "source": "docx",
                                 "body_index": index,

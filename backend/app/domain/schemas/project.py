@@ -149,10 +149,9 @@ class ProjectListParams(BaseModel):
     search: Annotated[str | None, Field(default=None, min_length=1, max_length=255)] = None
 
 
-class PaginatedProjectResponse(BaseModel):
+from app.api.pagination import PaginatedResponse
+
+
+class PaginatedProjectResponse(PaginatedResponse[ProjectRead]):
     """Paginated response for project listings."""
-
-    items: list[ProjectRead]
-    metadata: dict
-
-    model_config = ConfigDict(from_attributes=True)
+    pass

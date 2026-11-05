@@ -1,16 +1,17 @@
 """Unit tests for object storage service."""
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from botocore.exceptions import ClientError
 
 from app.domain.services.object_storage import (
-    ObjectStorageService,
-    ValidationError,
-    StorageError,
     ALLOWED_EXTENSIONS,
-    MAX_FILE_SIZE,
     MAGIC_BYTES,
+    MAX_FILE_SIZE,
+    ObjectStorageService,
+    StorageError,
+    ValidationError,
 )
 
 
@@ -20,7 +21,7 @@ class TestObjectStorageService:
     @pytest.fixture
     def service(self):
         """Create a service instance with mocked client."""
-        with patch("app.domain.services.object_storage.boto3.client") as mock_client:
+        with patch("app.domain.services.object_storage.boto3.client"):
             service = ObjectStorageService()
             service._client = MagicMock()
             yield service
@@ -284,7 +285,7 @@ class TestObjectStorageService:
         """Test presigned URL with max expiry (7 days)."""
         service._client.generate_presigned_url.return_value = "https://example.com/presigned-url"
 
-        url = service.generate_presigned_url("test/key.pdf", 1000000)  # More than 7 days
+        service.generate_presigned_url("test/key.pdf", 1000000)  # More than 7 days
 
         # Should be capped at 7 days (604800 seconds)
         service._client.generate_presigned_url.assert_called_once_with(

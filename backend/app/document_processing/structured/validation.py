@@ -1,3 +1,5 @@
+from typing import Any
+
 """Validate quotations against actual source blocks, not model assertions."""
 
 import re
@@ -25,7 +27,7 @@ def normalize(text):
 
 
 def source_units(source: ExtractionResult):
-    groups = {}
+    groups: dict[tuple[Any, ...], dict[str, Any]] = {}
     for block in source.blocks:
         key = (
             block.page_number,
@@ -35,10 +37,10 @@ def source_units(source: ExtractionResult):
         )
         group = groups.setdefault(key, {"page": block.page_number, "metadata": [], "text": []})
         metadata = []
-        for key in ("section", "author", "date", "revision"):
-            value = getattr(block, key)
+        for attr_name in ("section", "author", "date", "revision"):
+            value = getattr(block, attr_name)
             if value is not None:
-                metadata.append(f"{key}: {value}")
+                metadata.append(f"{attr_name}: {value}")
         headers = block.location.get("headers")
         if headers:
             metadata.append("columns: " + " | ".join(str(v) for v in headers))

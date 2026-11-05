@@ -21,7 +21,7 @@ class SearchFilters(BaseModel):
     @model_validator(mode="after")
     def date_order(self):
         if self.date_from and self.date_to and self.date_from > self.date_to:
-            raise ValueError("date_from must not follow date_to")  # noqa: TRY003
+            raise ValueError("date_from must not follow date_to")
         return self
 
 
@@ -38,7 +38,7 @@ class SearchRequest(BaseModel):
     def meaningful_query(cls, value):
         value = value.strip()
         if not any(character.isalnum() for character in value):
-            raise ValueError("A search query must contain letters or numbers")  # noqa: TRY003
+            raise ValueError("A search query must contain letters or numbers")
         return value
 
 

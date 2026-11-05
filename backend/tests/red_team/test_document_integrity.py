@@ -19,7 +19,7 @@ from pydantic import ValidationError
 from app.domain.models import ChangeOrder, Document
 from app.domain.schemas.change_order import ChangeOrderPatch, CostItem, SubmitInput
 from app.domain.services.change_orders import ChangeOrderService, calculate_cost
-from app.domain.services.risk_engine import Finding, document_rules, entity_rules, money, normalized
+from app.domain.services.risk_engine import document_rules, entity_rules, money, normalized
 
 logger = logging.getLogger("changeguard.red_team")
 

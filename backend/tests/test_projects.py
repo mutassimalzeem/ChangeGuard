@@ -1,6 +1,5 @@
 """Project management API tests - authorization and validation."""
 
-from decimal import Decimal
 from uuid import uuid4
 
 import pytest
@@ -10,8 +9,7 @@ from sqlalchemy import select
 
 from app.core.security import create_access_token
 from app.domain.models import AuditEvent, Project, Tenant, User
-from app.policy.permissions import Action, Role
-
+from app.policy.permissions import Role
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 

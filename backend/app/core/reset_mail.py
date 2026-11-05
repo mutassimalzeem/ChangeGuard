@@ -24,7 +24,8 @@ class PasswordResetMailer:
             f"Use this single-use link to reset your password:\n{link}\n\nIf you did not request this, ignore this email."
         )
         try:
-            with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as smtp:
+            smtp_host = settings.smtp_host or "localhost"
+            with smtplib.SMTP(smtp_host, settings.smtp_port, timeout=10) as smtp:
                 if settings.smtp_starttls:
                     smtp.starttls(context=ssl.create_default_context())
                 if settings.smtp_username:

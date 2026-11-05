@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     password_hash_rounds: int = 12
 
     # Database
-    database_url: PostgresDsn = Field(
+    database_url: PostgresDsn | str = Field(
         default="postgresql+asyncpg://postgres:postgres@localhost:5432/changeguard",
         validation_alias="DATABASE_URL",
     )
@@ -86,6 +86,7 @@ class Settings(BaseSettings):
     celery_task_soft_time_limit: int = 240
     celery_worker_prefetch_multiplier: int = 4
     celery_worker_max_tasks_per_child: int = 1000
+    celery_worker_concurrency: int = Field(default=4, ge=1, le=64, validation_alias="CELERY_WORKER_CONCURRENCY")
 
     # Object Storage (S3/MinIO)
     object_storage_endpoint: str = Field(
@@ -193,19 +194,20 @@ class Settings(BaseSettings):
     # Rate Limiting
     rate_limit_requests: int = 100
     rate_limit_window_seconds: int = 60
+    request_timeout_seconds: int = Field(default=60, ge=1, le=300, validation_alias="REQUEST_TIMEOUT_SECONDS")
 
     # Paths
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def base_path(self) -> Path:
         return Path(__file__).parent.parent.parent
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def alembic_path(self) -> Path:
         return self.base_path / "alembic"
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def upload_path(self) -> Path:
         return self.base_path / "uploads"

@@ -148,7 +148,7 @@ class EvidenceService:
             status="supported" if visible else "insufficient_evidence", evidence=visible
         )
 
-    async def save_claim(  # noqa: PLR0913
+    async def save_claim(
         self, project_id, text, evidence, *, ai_generated=True, verified=False, ai_answer_id=None
     ):
         if not has_permission(self.user.role, Action.CHANGE_WRITE):

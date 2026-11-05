@@ -3,11 +3,13 @@
 import re
 from collections.abc import Callable
 from pathlib import PurePosixPath
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from pydantic import BaseModel, Field
 
 from app.document_processing.schema import Classification
+
+DocumentType = str
 
 RULE_VERSION = "rules:v1"
 METADATA_KEYS = ("file_type", "mime_type", "title", "subject", "document_type")
@@ -69,14 +71,15 @@ class RuleFirstClassifier:
         )
         mime = metadata.get("mime_type", "").lower()
         if extension in {"eml", "msg"} or mime in {"message/rfc822", "application/vnd.ms-outlook"}:
-            return Classification(
+            return Classification(  # type: ignore[arg-type]
                 document_type="email",
                 confidence=0.99,
                 reasoning="The file format identifies an email message container.",
                 model_or_rule_used=f"{RULE_VERSION}:email_format",
             )
 
-        scores, signals = {}, {}
+        scores: dict[str, float] = {}
+        signals: dict[str, set[str]] = {}
 
         def evidence(kind, confidence, source):
             # Corroboration across independent sources helps; repeated words do not.
@@ -88,7 +91,11 @@ class RuleFirstClassifier:
         lines = [
             line.strip() for line in document.extracted_text[:12000].splitlines() if line.strip()
         ]
-        titles = [line for line in lines[:8] if len(line) <= 140]
+        titles = [
+            line
+            for line in lines[:8]
+            if len(line) <= 140 and not line.startswith(("{", "[", "```", "\"\"\""))
+        ]
         image = extension in {"jpg", "jpeg", "png"} or mime.startswith("image/")
         for kind, pattern in PATTERNS.items():
             if re.search(pattern, name):
@@ -115,7 +122,7 @@ class RuleFirstClassifier:
         ):
             evidence("drawing", 0.95, "drawing_title_block")
         if not scores:
-            return Classification(
+            return Classification(  # type: ignore[arg-type]
                 document_type="other",
                 confidence=0.25,
                 reasoning="No decisive filename, metadata or text signature was found.",
@@ -126,14 +133,14 @@ class RuleFirstClassifier:
         score = min(0.99, scores[winner] + (0.03 if len(signals[winner]) > 1 else 0))
         runner_up = scores[ranked[1]] if len(ranked) > 1 else 0
         if score < self.rule_threshold or score - runner_up < self.margin:
-            return Classification(
+            return Classification(  # type: ignore[arg-type]
                 document_type="other",
                 confidence=0.40,
                 reasoning="Rule evidence is weak or conflicts across candidate types.",
                 model_or_rule_used=f"{RULE_VERSION}:inconclusive",
             )
         return Classification(
-            document_type=winner,
+            document_type=cast(Any, winner),
             confidence=score,
             reasoning=f"Matched {winner} signatures from: {', '.join(sorted(signals[winner]))}.",
             model_or_rule_used=f"{RULE_VERSION}:{winner}",

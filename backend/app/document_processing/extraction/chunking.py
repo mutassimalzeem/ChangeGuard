@@ -1,3 +1,5 @@
+from typing import Any
+
 """Structure first; size limits split only oversized logical units."""
 
 import hashlib
@@ -69,7 +71,8 @@ def split_ranges(text, limit):
 def logical_chunks(result: ExtractionResult, document_type="other", *, max_chars=8000, limit=500):
     if max_chars < 1 or limit < 1:
         raise ValueError("Invalid logical chunk limits")
-    groups, current = [], []
+    groups: list[Any] = []
+    current: list[Any] = []
     section, kind = "document", "section"
 
     def flush():

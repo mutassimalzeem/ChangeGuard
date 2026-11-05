@@ -3,7 +3,7 @@
 import hashlib
 import hmac
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
@@ -80,7 +80,7 @@ def create_password_reset_token(subject: str, tenant_id: str, version: int) -> s
 def _signed_token(
     subject: str, tenant_id: str, purpose: str, lifetime: timedelta, version: int, **extra
 ) -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return jwt.encode(
         {
             "sub": subject,

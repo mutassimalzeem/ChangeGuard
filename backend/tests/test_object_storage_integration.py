@@ -14,7 +14,6 @@ from app.domain.services.object_storage import (
     ValidationError,
 )
 
-
 # Skip if MinIO not available
 pytestmark = pytest.mark.integration
 

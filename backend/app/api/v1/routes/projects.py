@@ -5,10 +5,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import require_authenticated_user, require_permission, require_project_access
+from app.api.dependencies import (
+    require_authenticated_user,
+    require_permission,
+)
 from app.api.pagination import PageParams
 from app.core.database import get_session
-from app.domain.models import Project, User
+from app.domain.models import User
 from app.domain.schemas.project import (
     PaginatedProjectResponse,
     ProjectCreate,
@@ -17,7 +20,6 @@ from app.domain.schemas.project import (
     ProjectUpdate,
 )
 from app.domain.services import ProjectService
-
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
