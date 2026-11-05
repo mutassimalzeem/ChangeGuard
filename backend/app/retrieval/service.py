@@ -1,3 +1,5 @@
+from typing import Any, Literal
+
 """Permission-first PostgreSQL FTS + exact pgvector search with reciprocal rank fusion."""
 
 import math
@@ -40,7 +42,7 @@ class HybridRetrieval:
         min_similarity: float = MIN_SIMILARITY,
     ):
         if not math.isfinite(min_similarity) or not 0 <= min_similarity <= 1:
-            raise ValueError("Invalid semantic similarity threshold")  # noqa: TRY003
+            raise ValueError("Invalid semantic similarity threshold")
         self.session, self.user = session, user
         self.access = ProjectAccessService(session, user)
         self.embedder, self.reranker = embedder, reranker
@@ -200,7 +202,8 @@ class HybridRetrieval:
         base = self.eligible(request.filters)
         count = max(50, request.limit * 4)
         keywords = await self.keywords(base, request.query, count)
-        vectors, semantic_status = [], "disabled"
+        vectors: list[Any] = []
+        semantic_status: Literal["used", "disabled", "unavailable"] = "disabled"
         if request.semantic:
             semantic_status = "unavailable"
             if self.embedder is not None:
@@ -211,7 +214,7 @@ class HybridRetrieval:
                     pass
         hits = self.fuse(keywords, vectors)
         reranked = False
-        if request.rerank and hits:
+        if request.rerank and hits and self.reranker is not None:
             scores = await self.reranker.scores(request.query, tuple(hit.text for hit in hits))
             if len(scores) != len(hits) or not all(math.isfinite(score) for score in scores):
                 raise HTTPException(503, "Invalid reranker response")

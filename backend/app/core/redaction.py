@@ -22,7 +22,7 @@ _URL_CREDENTIALS = re.compile(r"(://)[^\s/@]+:[^\s/@]+@")
 def redact(value: Any) -> Any:
     """Return a sanitized copy; avoid arbitrary object reprs and exception messages."""
     if isinstance(value, Mapping):
-        result = {}
+        result: dict[str, Any] = {}
         for key, item in value.items():
             name = str(key)
             normalized = re.sub(r"[^a-z0-9]", "", name.lower())

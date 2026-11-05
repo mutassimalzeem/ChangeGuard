@@ -1,6 +1,6 @@
 """Real PostgreSQL migration, ownership, persistence, and transaction tests."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import uuid4
 
@@ -90,7 +90,7 @@ async def test_persist_complete_project_graph(test_session, tenant, project, use
         document_id=document.id,
         event_type="instruction",
         title="Instruction",
-        occurred_at=datetime.now(timezone.utc),
+        occurred_at=datetime.now(UTC),
     )
     contract = Contract(
         tenant_id=tenant.id,
@@ -330,7 +330,7 @@ async def test_evidence_requires_one_claim_and_one_source(test_session, tenant, 
         project_id=project.id,
         event_type="instruction",
         title="Test",
-        occurred_at=datetime.now(timezone.utc),
+        occurred_at=datetime.now(UTC),
     )
     test_session.add_all([order, document, event])
     await test_session.flush()

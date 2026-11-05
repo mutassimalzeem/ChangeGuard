@@ -13,7 +13,6 @@ from sqlalchemy.orm import aliased, joinedload, selectinload, undefer
 
 from alembic import command
 from app.api.dependencies import (
-    require_authenticated_user,
     require_permission,
     require_policy_action,
     require_project_access,

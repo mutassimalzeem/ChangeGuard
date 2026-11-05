@@ -1,3 +1,5 @@
+from typing import Any
+
 """Bounded strict-output extraction, validation and repair without invented facts."""
 
 import json
@@ -90,7 +92,7 @@ class SchemaConstrainedExtractor:
         if not units or sum(len(u["text"]) for u in units) > 120000:
             raise ValueError("Structured source is empty or exceeds 120000 characters")
         payload = {"document_type": document_type, "source_blocks": units}
-        attempts = []
+        attempts: list[dict[str, Any]] = []
         for attempt in range(self.repair_retries + 1):
             raw = ""
             try:

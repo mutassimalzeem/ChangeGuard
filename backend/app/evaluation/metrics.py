@@ -1,6 +1,5 @@
 """Evaluation metrics calculation for ChangeGuard AI subsystems."""
 
-# ruff: noqa: PLR0912, PLR0915
 from collections import Counter
 from typing import Any
 

@@ -9,17 +9,13 @@
 # ruff: noqa: E501
 import io
 import logging
-from unittest.mock import MagicMock
-from uuid import uuid4
 
-import pytest
 from pypdf import PdfWriter
 
 from app.document_processing.classification.service import ClassificationInput, RuleFirstClassifier
 from app.document_processing.extraction.email import EmailExtractor
 from app.document_processing.schema import Classification
 from app.domain.services.document_files import validate_document
-from tests.red_team.cases import RedTeamCategory
 
 logger = logging.getLogger("changeguard.red_team")
 

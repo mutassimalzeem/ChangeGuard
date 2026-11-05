@@ -1,6 +1,6 @@
 """Report generators for Markdown and JSON evaluation outputs."""
 
-# ruff: noqa: E501, PLR0912, PLR0915
+# ruff: noqa: E501
 import json
 from datetime import UTC, datetime
 from typing import Any

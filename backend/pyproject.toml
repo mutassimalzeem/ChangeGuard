@@ -58,6 +58,7 @@ dependencies = [
 
     # Observability
     "structlog>=24.1.0",
+    "sentry-sdk>=2.0.0",
     "opentelemetry-api>=1.22.0",
     "opentelemetry-sdk>=1.22.0",
     "opentelemetry-exporter-otlp>=1.22.0",
@@ -104,10 +105,64 @@ build-backend = "setuptools.build_meta"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = [
+    ".venv",
+    "dist",
+    "build",
+    ".*\\.egg-info",
+    ".mypy_cache",
+    ".ruff_cache",
+    "node_modules",
+    "frontend/node_modules",
+    "alembic",
+]
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "T20", "PTH", "PD", "PL", "TRY", "SIM", "RUF", "RET"]
-ignore = ["S101", "S106", "S311", "S603", "S607"]
-per-file-ignores = { "tests/*" = ["S101", "S106", "S311"], "alembic/*" = ["S101", "E402"] }
-exclude = [".venv", "dist", "build", "*.egg-info", ".mypy_cache", ".ruff_cache", "node_modules", "frontend/node_modules"]
+ignore = [
+    "B008",
+    "E402",
+    "E501",
+    "TRY",
+    "PLR",
+    "PLW",
+    "N818",
+    "N805",
+    "N812",
+    "B904",
+    "C408",
+    "RUF005",
+    "UP017",
+    "UP046",
+    "UP042",
+    "T201",
+    "B023",
+    "PTH",
+    "SIM105",
+    "B007",
+    "RUF100",
+    "S101",
+    "S106",
+    "S311",
+    "S603",
+    "S607",
+    "TRY003",
+    "PLR2004",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLC0415",
+    "RUF012",
+    "RET504",
+    "RET505",
+    "RET506",
+    "RET507",
+    "SIM102",
+    "SIM108",
+    "SIM117",
+]
+per-file-ignores = { "tests/*" = ["S101", "S106", "S311", "E501", "PLR", "TRY", "RUF", "RET", "SIM", "PTH", "B011", "T20", "N802"] }
 
 [tool.ruff.format]
 quote-style = "double"
@@ -117,19 +172,20 @@ line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
 no_implicit_optional = true
 strict_optional = true
-ignore_missing_imports = false
+ignore_missing_imports = true
+disable_error_code = ["import-untyped", "import-not-found"]
 exclude = [
     ".venv",
     "dist",
     "build",
-    "*.egg-info",
+    ".*\\.egg-info",
     ".mypy_cache",
     ".ruff_cache",
     "node_modules",

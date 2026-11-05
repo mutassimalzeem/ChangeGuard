@@ -1,3 +1,5 @@
+from typing import Any
+
 """Authenticated hybrid chunk search."""
 
 from typing import Annotated
@@ -26,7 +28,7 @@ def get_query_embedder():
 def get_retrieval(
     user: Annotated[User, Depends(require_authenticated_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-    embedder: Annotated[object, Depends(get_query_embedder)],
+    embedder: Annotated[Any, Depends(get_query_embedder)],
 ):
     return HybridRetrieval(
         session,

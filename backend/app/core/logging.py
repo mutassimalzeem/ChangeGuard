@@ -1,9 +1,9 @@
 """Structured logging configuration with structlog."""
 
+import json
 import logging
 import sys
-import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import structlog
@@ -20,7 +20,6 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from app.core.config import get_settings
 from app.core.redaction import redact
 from app.core.request_logging import request_context
-
 
 settings = get_settings()
 
@@ -42,13 +41,13 @@ class JSONFormatter(logging.Formatter):
         context = request_context.get() or {}
         fields.update({k: context[k] for k in ("tenant_id", "user_id") if context.get(k) is not None})
         fields.update(
-            timestamp=datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
+            timestamp=datetime.fromtimestamp(record.created, UTC).isoformat(),
             level=record.levelname.lower(),
             service=settings.otel_service_name,
             environment=settings.environment,
             request_id=context.get("request_id"),
         )
-        if record.exc_info:
+        if record.exc_info and record.exc_info[0]:
             fields["failure_type"] = record.exc_info[0].__name__
         return json.dumps(redact(fields), ensure_ascii=True, allow_nan=False)
 

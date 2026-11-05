@@ -17,13 +17,13 @@ from app.document_processing.structured.service import (
 )
 
 __all__ = [
-    "Contract",
     "BOQ",
-    "BOQItem",
-    "Drawing",
     "RFI",
+    "BOQItem",
     "ChangeOrder",
+    "Contract",
     "DailyReport",
+    "Drawing",
     "Email",
     "Quotation",
     "SchemaConstrainedExtractor",

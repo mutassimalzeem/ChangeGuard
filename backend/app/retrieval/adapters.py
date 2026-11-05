@@ -27,9 +27,9 @@ class Reranker(Protocol):
 
 def validate_embedding(vector):
     if len(vector) != DIMENSIONS or not all(math.isfinite(value) for value in vector):
-        raise ValueError("Expected a finite 1536-dimensional query embedding")  # noqa: TRY003
+        raise ValueError("Expected a finite 1536-dimensional query embedding")
     if not any(vector):
-        raise ValueError("Query embedding must be nonzero")  # noqa: TRY003
+        raise ValueError("Query embedding must be nonzero")
     return vector
 
 

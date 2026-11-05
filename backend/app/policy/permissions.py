@@ -68,5 +68,10 @@ PERMISSIONS = MappingProxyType(
 TENANT_WIDE_ROLES = frozenset({Role.OWNER, Role.ADMIN})
 
 
-def has_permission(role: str, action: str) -> bool:
-    return action in PERMISSIONS.get(role, frozenset())
+def has_permission(role: Role | str, action: Action | str) -> bool:
+    try:
+        r = Role(role) if isinstance(role, str) else role
+        a = Action(action) if isinstance(action, str) else action
+    except ValueError:
+        return False
+    return a in PERMISSIONS.get(r, frozenset())

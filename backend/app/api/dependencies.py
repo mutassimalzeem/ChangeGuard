@@ -96,7 +96,7 @@ async def require_project_access(
     return project
 
 
-def require_permission(action: Action):
+def require_permission(action: Action | str):
     async def dependency(user: User = Depends(require_authenticated_user)) -> User:
         if not has_permission(user.role, action):
             raise HTTPException(status_code=403, detail="Access denied")

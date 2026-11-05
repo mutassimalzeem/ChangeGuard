@@ -42,7 +42,7 @@ class TesseractOCR:
         return blocks
 
     def parse_tsv(self, output: str, page_number: int) -> list[TextBlock]:
-        groups = OrderedDict()
+        groups: OrderedDict[tuple[str, str, str], list[dict[str, str]]] = OrderedDict()
         for row in csv.DictReader(StringIO(output), delimiter="\t", quoting=csv.QUOTE_NONE):
             if row["level"] != "5" or not row.get("text", "").strip():
                 continue

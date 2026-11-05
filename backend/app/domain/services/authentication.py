@@ -1,6 +1,6 @@
 """Transactional authentication. All expected denials are committed by the router."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 from fastapi import Request
@@ -41,7 +41,7 @@ class AuthFailure(Exception):
 
 
 def utcnow():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class AuthenticationService:
@@ -103,6 +103,8 @@ class AuthenticationService:
             bucket = await self.session.scalar(
                 select(AuthRateLimit).where(AuthRateLimit.key_hash == key).with_for_update()
             )
+            if bucket is None:
+                raise AuthFailure(429)
             if bucket.expires_at <= now:
                 bucket.attempts = 0
                 bucket.expires_at = now + timedelta(seconds=self.settings.login_window_seconds)
@@ -233,6 +235,8 @@ class AuthenticationService:
             .with_for_update()
             .execution_options(populate_existing=True)
         )
+        if row is None:
+            raise AuthFailure()
         tenant = await self.session.get(Tenant, row.tenant_id)
         if row.rotated_at is not None:
             await self.revoke_family(row.family_id)

@@ -11,24 +11,24 @@ from app.domain.schemas.auth import (
     TokenPair,
 )
 from app.domain.schemas.project import (
+    PaginatedProjectResponse,
     ProjectCreate,
+    ProjectListParams,
     ProjectRead,
     ProjectUpdate,
-    ProjectListParams,
-    PaginatedProjectResponse,
 )
 
 __all__ = [
     "Identity",
     "Login",
     "Message",
+    "PaginatedProjectResponse",
+    "ProjectCreate",
+    "ProjectListParams",
+    "ProjectRead",
+    "ProjectUpdate",
     "Refresh",
     "Register",
     "ResetConfirm",
     "TokenPair",
-    "ProjectCreate",
-    "ProjectRead",
-    "ProjectUpdate",
-    "ProjectListParams",
-    "PaginatedProjectResponse",
 ]
