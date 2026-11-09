@@ -32,7 +32,7 @@ FOUNDATION_TABLES = {
 SYSTEM_TABLES = {"auth_rate_limits", "authentication_events"}
 TABLES = (
     FOUNDATION_TABLES
-    | {"claims", "ai_answers", "site_photos"}
+    | {"claims", "ai_answers", "site_photos", "pilot_onboarding"}
     | SYSTEM_TABLES
     | {"auth_sessions", "password_reset_grants", "project_memberships"}
     | {"document_entity_links", "document_review_tasks", "processing_dead_letters"}
