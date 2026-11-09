@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.gateway.context import model_scope
 from app.ai.investigation.agent import InvestigationAgent, Trace
 from app.ai.investigation.planner import GatewayPlanner
 from app.ai.investigation.schemas import InvestigationRequest, tool_schemas
@@ -43,7 +44,9 @@ async def investigate(
     project_id: UUID,
     payload: InvestigationRequest,
     request: Request,
-    _rate_limit: User = Depends(require_rate_limit(requests=10, window_seconds=60, endpoint_tag="investigations")),
+    _rate_limit: User = Depends(
+        require_rate_limit(requests=10, window_seconds=60, endpoint_tag="investigations")
+    ),
     user: User = Depends(require_authenticated_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -76,14 +79,15 @@ async def investigate(
             "trace": trace.events,
         }
     planner = GatewayPlanner(user.tenant_id, project_id) if eligible else None
-    result = await InvestigationAgent(planner, tools, trace).run(
-        payload.question,
-        seed,
-        eligible=eligible,
-        max_tool_depth=depth,
-        max_seconds=seconds,
-        absolute_deadline=deadline,
-    )
+    with model_scope(user.tenant_id, project_id, investigation_id=trace.run_id):
+        result = await InvestigationAgent(planner, tools, trace).run(
+            payload.question,
+            seed,
+            eligible=eligible,
+            max_tool_depth=depth,
+            max_seconds=seconds,
+            absolute_deadline=deadline,
+        )
     if result["status"] == "time_limit":
         await session.rollback()
     return result

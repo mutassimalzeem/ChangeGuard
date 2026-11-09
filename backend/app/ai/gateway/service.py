@@ -73,6 +73,7 @@ class Audit:
         self.gateway = gateway
         self.trace_id = str(uuid4())
         scope = current_scope()
+        self.scope = scope
         self.fields = dict(
             trace_id=self.trace_id,
             tenant_id=str(scope.tenant_id) if scope.tenant_id else None,
@@ -156,8 +157,7 @@ class Audit:
         )
 
     def finish(self):
-        self.gateway.emit(
-            "model_gateway_result",
+        summary = dict(
             **self.fields,
             model=self.model,
             attempts=len(self.attempts),
@@ -168,11 +168,36 @@ class Audit:
             cost_currency="USD",
             validation_result=self.validation_result,
         )
+        self.gateway.emit("model_gateway_result", **summary)
+        if self.scope.project_id and (self.scope.document_id or self.scope.investigation_id):
+            summary.update(
+                document_id=str(self.scope.document_id) if self.scope.document_id else None,
+                investigation_id=str(self.scope.investigation_id)
+                if self.scope.investigation_id
+                else None,
+            )
+            try:
+                self.gateway.usage_sink(summary)
+            except Exception:
+                # Billing persistence must not turn a successful provider response into a retry.
+                self.gateway.emit(
+                    "model_usage_persistence_failed",
+                    trace_id=self.trace_id,
+                    tenant_id=self.fields["tenant_id"],
+                    project_id=self.fields["project_id"],
+                )
 
 
 class ModelGateway:
     def __init__(
-        self, *, settings=None, provider=None, emit=None, sleep=time.sleep, clock=time.perf_counter
+        self,
+        *,
+        settings=None,
+        provider=None,
+        emit=None,
+        sleep=time.sleep,
+        clock=time.perf_counter,
+        usage_sink=None,
     ):
         if settings is None:
             from app.core.config import get_settings
@@ -182,6 +207,11 @@ class ModelGateway:
             from app.core.logging import get_logger
 
             emit = get_logger(__name__).info
+        if usage_sink is None:
+            from app.ai.gateway.usage import persist_usage
+
+            usage_sink = persist_usage
+        self.usage_sink = usage_sink
         self.policies = task_policies(settings)
         self.prices = settings.model_gateway_prices
         self.provider = provider or OpenAIProvider(settings)

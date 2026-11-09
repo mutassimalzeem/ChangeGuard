@@ -555,3 +555,39 @@ def test_validator_without_schema_is_rejected(gateway):
     with pytest.raises(ValueError):
         gateway.generate("extraction", MESSAGES, prompt_version="v1", validator=lambda value: value)
     gateway.provider.generate.assert_not_called()
+
+
+def test_attributed_usage_persists_once_with_retry_total_and_no_source(gateway):
+    tenant, project, document = uuid4(), uuid4(), uuid4()
+    summaries = []
+    gateway.usage_sink = summaries.append
+    gateway.provider.generate.side_effect = [
+        ProviderResponse(content="broken", usage=Usage(10, 20)),
+        ProviderResponse(content=VALID, usage=Usage(10, 20)),
+    ]
+    with model_scope(tenant, project, document_id=document):
+        gateway.generate(
+            TaskType.EXTRACTION, MESSAGES, prompt_version="extraction-v1", schema=Answer
+        )
+    assert len(summaries) == 1
+    summary = summaries[0]
+    assert summary["document_id"] == str(document)
+    assert summary["attempts"] == 2
+    assert summary["cost_estimate"] == pytest.approx(0.0001)
+    assert "PRIVATE SOURCE DATA" not in json.dumps(summary)
+    assert "raw_output" not in json.dumps(summary)
+
+
+def test_usage_persistence_failure_is_safe_and_does_not_repeat_provider(gateway):
+    def fail(_summary):
+        raise RuntimeError("SECRET DATABASE ERROR")
+
+    gateway.usage_sink = fail
+    with model_scope(uuid4(), uuid4(), investigation_id=uuid4()):
+        result = gateway.generate(
+            TaskType.REASONING, MESSAGES, prompt_version="investigation-v1", schema=Answer
+        )
+    assert result.value.answer == "grounded"
+    assert gateway.provider.generate.call_count == 1
+    assert gateway.events[-1]["event"] == "model_usage_persistence_failed"
+    assert "SECRET DATABASE ERROR" not in json.dumps(gateway.events)

@@ -84,7 +84,7 @@ def classification_review_reason(result, text):
 async def execute_stage(stage, document, data, session, services, storage):
     from app.ai.gateway.context import model_scope
 
-    with model_scope(document.tenant_id, document.project_id):
+    with model_scope(document.tenant_id, document.project_id, document_id=getattr(document, "id", None)):
         return await _execute_stage(stage, document, data, session, services, storage)
 
 
@@ -372,6 +372,7 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
             ):
                 return None
             state = deepcopy(document.processing_data or {})
+            timing = state.setdefault("metrics", {})
             data = state.setdefault("results", {})
             stage = next((s for s in STAGES if s not in data), None)
             if stage is None:
@@ -382,6 +383,8 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
                     1, (datetime.fromisoformat(retry_at) - datetime.now(UTC)).total_seconds()
                 )
             attempts = state.setdefault("attempts", {})
+            if stage == STAGES[0] and not attempts:
+                timing.setdefault("started_at", datetime.now(UTC).isoformat())
             exhausted = attempts.get(stage, 0) >= MAX_ATTEMPTS
             attempts[stage] = min(attempts.get(stage, 0) + 1, MAX_ATTEMPTS)
             document.processing_status = stage
@@ -456,6 +459,8 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
                         )
                     )
                     delay = None
+            if delay is None:
+                timing["finished_at"] = datetime.now(UTC).isoformat()
             document.processing_data = deepcopy(state)
             await session.commit()
             log.info(
