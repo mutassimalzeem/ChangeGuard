@@ -2,12 +2,15 @@
 
 import os
 from collections.abc import AsyncIterator
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 from alembic.config import Config
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
@@ -15,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.pool import NullPool
 
 from alembic import command
-from app.core.database import ScopedAsyncSession, get_session
+from app.core.database import Base, ScopedAsyncSession, get_session
 from app.domain.models import Project, Tenant, User
 from app.main import app
 
@@ -124,3 +127,48 @@ async def client(test_session: AsyncSession) -> AsyncIterator[AsyncClient]:
     finally:
         app.dependency_overrides.clear()
         app.dependency_overrides.update(previous)
+
+
+@pytest_asyncio.fixture(scope="session", loop_scope="session")
+async def pilot_engine(test_database_url):
+    engine = create_async_engine(test_database_url, poolclass=NullPool)
+    async with engine.begin() as connection:
+
+        def initialize(conn):
+            if not os.getenv("PILOT_SCHEMA_ONLY"):
+                command.upgrade(migration_config(conn), "head")
+                return
+            tables = [
+                t
+                for t in Base.metadata.sorted_tables
+                if t.name not in {"document_chunks", "pilot_onboarding"}
+            ]
+            Base.metadata.create_all(conn, tables=tables)
+            conn.execute(
+                text(
+                    "CREATE FUNCTION changeguard_set_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END $$"
+                )
+            )
+            spec = spec_from_file_location(
+                "pilot_migration",
+                Path(__file__).parents[1] / "alembic/versions/0014_pilot_onboarding.py",
+            )
+            migration = module_from_spec(spec)
+            spec.loader.exec_module(migration)
+            with Operations.context(MigrationContext.configure(conn)):
+                migration.upgrade()
+
+        await connection.run_sync(initialize)
+    yield engine
+    await engine.dispose()
+
+
+@pytest.fixture
+async def pilot_session(pilot_engine):
+    async with pilot_engine.connect() as conn:
+        transaction = await conn.begin()
+        async with ScopedAsyncSession(
+            bind=conn, expire_on_commit=False, join_transaction_mode="create_savepoint"
+        ) as session:
+            yield session
+        await transaction.rollback()
