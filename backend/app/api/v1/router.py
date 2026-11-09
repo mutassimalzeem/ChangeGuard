@@ -9,6 +9,7 @@ from app.api.v1.routes import (
     evidence,
     health,
     investigations,
+    pilot,
     potential_changes,
     projects,
     retrieval,
@@ -16,6 +17,7 @@ from app.api.v1.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(pilot.router)
 api_router.include_router(investigations.router)
 api_router.include_router(change_orders.router)
 api_router.include_router(potential_changes.router)

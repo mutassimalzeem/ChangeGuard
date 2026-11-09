@@ -27,6 +27,7 @@ FINANCIAL_FIELDS = {
 }
 _WRITE_ACTIONS = {
     "projects": Action.PROJECT_UPDATE,
+    "pilot_onboarding": Action.DOCUMENT_WRITE,
     "project_memberships": Action.MEMBERS_MANAGE,
     "documents": Action.DOCUMENT_WRITE,
     "document_chunks": Action.DOCUMENT_WRITE,
@@ -342,11 +343,29 @@ def enforce_write_scope(session, flush_context, instances):
         tenant_id = instance.id if table.name == "tenants" else getattr(instance, "tenant_id", None)
         if tenant_id != principal.tenant_id:
             raise AuthorizationError("Tenant access denied")
+        pilot_audit = session.info.get("pilot_audit")
+        pilot_member = session.info.get("pilot_membership")
+        is_pilot_audit = instance is pilot_audit and instance in session.new
+        is_pilot_member = instance is pilot_member and instance in session.new
+        if is_pilot_audit or is_pilot_member:
+            if pilot_audit is None:
+                raise AuthorizationError("Missing pilot audit")
+            required = Action.PROJECT_CREATE if pilot_audit.action == "pilot.create" else Action.DOCUMENT_WRITE
+            if (pilot_audit not in session.new or pilot_audit.actor_id != principal.user_id
+                    or pilot_audit.tenant_id != principal.tenant_id
+                    or pilot_audit.action not in {"pilot.create", "pilot.review", "pilot.checklist"}
+                    or pilot_audit.entity_type != "pilot" or pilot_audit.entity_id != pilot_audit.project_id
+                    or not has_permission(principal.role, required)):
+                raise AuthorizationError("Invalid pilot audit")
+            if is_pilot_member and (pilot_audit.action != "pilot.create"
+                    or pilot_member.user_id != principal.user_id
+                    or pilot_member.project_id != pilot_audit.project_id):
+                raise AuthorizationError("Invalid pilot creator membership")
         action = _WRITE_ACTIONS.get(table.name)
         if table.name == "projects" and instance in session.new:
             action = Action.PROJECT_CREATE
         if not (review_audit or workflow_audit or workflow_approval
-                or investigation_audit or investigation_task) and (
+                or investigation_audit or investigation_task or is_pilot_audit or is_pilot_member) and (
             action is None or not has_permission(principal.role, action)
         ):
             raise AuthorizationError()
@@ -373,7 +392,15 @@ def enforce_write_scope(session, flush_context, instances):
         project_id = (
             instance.id if table.name == "projects" else getattr(instance, "project_id", None)
         )
-        if project_id is not None and not (table.name == "projects" and instance in session.new):
+        pilot_created = session.info.get("pilot_created_project")
+        pilot_creation_record = (
+            pilot_created is not None and pilot_created.id == project_id
+            and pilot_created.tenant_id == principal.tenant_id
+            and has_permission(principal.role, Action.PROJECT_CREATE)
+            and instance in session.new
+            and (is_pilot_member or is_pilot_audit or table.name == "pilot_onboarding")
+        )
+        if project_id is not None and not (table.name == "projects" and instance in session.new) and not pilot_creation_record:
             with session.no_autoflush:
                 exists = session.scalar(select(Project.id).where(Project.id == project_id))
             if exists is None:

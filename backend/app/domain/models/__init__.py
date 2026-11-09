@@ -31,6 +31,7 @@ from app.domain.models.foundation import (
     Tenant,
     User,
 )
+from app.domain.models.pilot import PilotOnboarding
 
 __all__ = [
     "RFI",
@@ -52,6 +53,7 @@ __all__ = [
     "DocumentReviewTask",
     "EvidenceLink",
     "PasswordResetGrant",
+    "PilotOnboarding",
     "ProcessingDeadLetter",
     "Project",
     "ProjectEvent",
