@@ -54,6 +54,7 @@ export function AppHeader() {
 
   // Navigation items with role-aware visibility
   const navItems = [
+    { label: "Pilot onboarding", href: "/pilot", icon: IconProjects, visible: true, active: pathname.startsWith("/pilot") },
     {
       label: "Projects",
       href: "/projects",
