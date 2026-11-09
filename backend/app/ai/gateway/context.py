@@ -10,6 +10,8 @@ from uuid import UUID
 class ModelScope:
     tenant_id: UUID | None = None
     project_id: UUID | None = None
+    document_id: UUID | None = None
+    investigation_id: UUID | None = None
 
 
 _DEFAULT_SCOPE = ModelScope()
@@ -21,8 +23,24 @@ def current_scope():
 
 
 @contextmanager
-def model_scope(tenant_id, project_id=None):
-    scope = ModelScope(UUID(str(tenant_id)), UUID(str(project_id)) if project_id else None)
+def model_scope(tenant_id, project_id=None, *, document_id=None, investigation_id=None):
+    tenant, project = UUID(str(tenant_id)), UUID(str(project_id)) if project_id else None
+    previous = current_scope()
+    if (
+        previous.tenant_id == tenant
+        and previous.project_id == project
+        and document_id is None
+        and investigation_id is None
+    ):
+        document_id, investigation_id = previous.document_id, previous.investigation_id
+    if document_id is not None and investigation_id is not None:
+        raise ValueError("A model call has exactly one billing resource")
+    scope = ModelScope(
+        tenant,
+        project,
+        UUID(str(document_id)) if document_id else None,
+        UUID(str(investigation_id)) if investigation_id else None,
+    )
     token = _scope.set(scope)
     try:
         yield scope
