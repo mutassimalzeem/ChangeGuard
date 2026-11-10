@@ -48,7 +48,7 @@ _WRITE_ACTIONS = {
 _REVIEWED_STATUSES = {
     "change_orders": frozenset({"submitted", "approved", "accepted", "executed", "paid"}),
     "contracts": frozenset({"active", "signed", "executed", "committed"}),
-    "risks": frozenset({"accepted", "dismissed", "overridden"}),
+    "risks": frozenset({"accepted", "dismissed", "overridden", "resolved"}),
 }
 
 
@@ -292,6 +292,47 @@ def enforce_write_scope(session, flush_context, instances):
     for instance in session.new | session.dirty | session.deleted:
         state = inspect(instance)
         table = state.mapper.local_table
+        link_write = session.info.get("event_link_write")
+        is_link = link_write is not None and instance is link_write[0] and instance in session.new
+        is_link_audit = link_write is not None and instance is link_write[1] and instance in session.new
+        if is_link or is_link_audit:
+            link, audit = link_write
+            if (audit not in session.new or link not in session.new
+                    or audit.actor_id != principal.user_id or link.actor_id != principal.user_id
+                    or link.tenant_id != principal.tenant_id or audit.tenant_id != principal.tenant_id
+                    or audit.project_id != link.project_id or audit.entity_id != link.event_id
+                    or audit.entity_type != "project_event" or audit.action != "project_event.link_entity"
+                    or not link.reason.strip() or audit.details.get("reason") != link.reason
+                    or not has_permission(principal.role, Action.RISK_ACCEPT)
+                    or not has_permission(principal.role, Action.RFI_WRITE if link.rfi_id else Action.CHANGE_WRITE)):
+                raise AuthorizationError("Invalid explicit event link")
+        resolution = session.info.get("risk_resolution")
+        resolved_risk = resolution is not None and instance is resolution[0]
+        resolution_audit = resolution is not None and instance is resolution[1] and instance in session.new
+        if resolved_risk or resolution_audit:
+            risk, audit, link = resolution
+            kind, target = ("rfi", link.rfi_id) if link.rfi_id else ("change_order", link.change_order_id)
+            if (audit not in session.new or risk.resolution_link_id != link.id
+                    or risk.project_event_id != link.event_id or risk.project_id != link.project_id
+                    or risk.tenant_id != principal.tenant_id or link.tenant_id != principal.tenant_id
+                    or risk.risk_type != "daily_report_delay_without_link" or risk.status != "resolved"
+                    or audit.actor_id != principal.user_id or risk.resolved_by_id != principal.user_id
+                    or audit.tenant_id != principal.tenant_id or audit.project_id != risk.project_id
+                    or audit.entity_id != risk.id or audit.entity_type != "risk" or audit.action != "risk.resolve"
+                    or audit.details.get("reason") != risk.resolution_reason or not risk.resolution_reason
+                    or audit.details.get("resolved_at") != risk.resolved_at.isoformat()
+                    or audit.details.get("resolving_entity_type") != kind
+                    or audit.details.get("resolving_entity_id") != str(target)
+                    or not has_permission(principal.role, Action.RISK_ACCEPT)
+                    or not has_permission(principal.role, Action.RFI_WRITE if link.rfi_id else Action.CHANGE_WRITE)):
+                raise AuthorizationError("Invalid risk resolution")
+        if table.name == "event_entity_links" and not is_link:
+            raise AuthorizationError("Event links require the append-only audited workflow")
+        if table.name == "risks" and not resolved_risk:
+            if any(state.attrs[name].history.has_changes() for name in (
+                "resolution_link_id", "resolved_by_id", "resolved_at", "resolution_reason"
+            )):
+                raise AuthorizationError("Risk resolution requires an audited event link")
         review = session.info.get("risk_review")
         reviewed_risk = review is not None and instance is review[0]
         review_audit = review is not None and instance is review[1] and instance in session.new
@@ -388,7 +429,7 @@ def enforce_write_scope(session, flush_context, instances):
             action = Action.PROJECT_CREATE
         if not (review_audit or workflow_audit or workflow_approval
                 or investigation_audit or investigation_task or is_pilot_audit or is_pilot_member
-                or is_user_audit or creator_membership) and (
+                or is_user_audit or creator_membership or is_link or is_link_audit or resolution_audit) and (
             action is None or not has_permission(principal.role, action)
         ):
             raise AuthorizationError()
@@ -404,7 +445,7 @@ def enforce_write_scope(session, flush_context, instances):
             raise AuthorizationError("Project deletion requires human approval")
         if "status" in state.attrs and state.attrs.status.history.has_changes():
             if (instance.status in _REVIEWED_STATUSES.get(table.name, ())
-                    and not reviewed_risk and not workflow_order):
+                    and not reviewed_risk and not workflow_order and not resolved_risk):
                 raise AuthorizationError(
                     "This status transition requires a verified human workflow"
                 )

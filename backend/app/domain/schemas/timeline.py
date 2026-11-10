@@ -7,6 +7,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from app.domain.schemas.event_link import RiskResolution
 from app.domain.schemas.evidence import EvidenceRead
 
 
@@ -22,6 +23,7 @@ class TimelineItem(BaseModel):
     severity: str | None = None
     evidence: list[EvidenceRead]
     evidence_status: Literal["supported", "insufficient_evidence"]
+    resolution: RiskResolution | None = None
 
 
 class TimelinePage(BaseModel):

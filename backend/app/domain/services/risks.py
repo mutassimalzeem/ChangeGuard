@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from sqlalchemy import select
 
-from app.domain.models import AuditEvent, EvidenceLink, Risk
+from app.domain.models import AuditEvent, EventEntityLink, EvidenceLink, Risk
 from app.domain.services.evidence import EvidenceService
 from app.policy.permissions import Action, has_permission
 
@@ -87,12 +87,37 @@ class RiskService:
             await self.evidence.source(project_id, link.source_type, link.source_id)
         if risk.document_id:
             await self.evidence.source(project_id, "document", risk.document_id)
+        if risk.resolution_link_id:
+            from app.domain.services.event_links import entity, visible_entity
+
+            link = await self.session.scalar(
+                select(EventEntityLink).where(
+                    EventEntityLink.id == risk.resolution_link_id,
+                    EventEntityLink.tenant_id == self.user.tenant_id,
+                    EventEntityLink.project_id == project_id,
+                )
+            )
+            if link is None:
+                raise HTTPException(404, "Risk resolution not found")
+            await visible_entity(self.session, self.user, project_id, *entity(link))
         return risk, links
 
     async def read(self, project_id, risk_id):
         if not has_permission(self.user.role, Action.FINANCIAL_READ):
             raise HTTPException(403, "Access denied")
         risk, links = await self.load(project_id, risk_id)
+        resolution = None
+        if risk.resolution_link_id:
+            from app.domain.services.event_links import resolution_data
+
+            link = await self.session.scalar(
+                select(EventEntityLink).where(
+                    EventEntityLink.id == risk.resolution_link_id,
+                    EventEntityLink.tenant_id == self.user.tenant_id,
+                    EventEntityLink.project_id == project_id,
+                )
+            )
+            resolution = resolution_data(risk, link).model_dump(mode="json")
         return {
             "id": risk.id,
             "risk_type": risk.risk_type or risk.category,
@@ -109,12 +134,17 @@ class RiskService:
             "recommended_action": risk.recommended_action,
             "confidence": risk.confidence,
             "status": risk.status if links else "insufficient_evidence",
+            "resolution": resolution,
         }
 
     async def decide(self, project_id: UUID, risk_id: UUID, payload: RiskDecision, request_id=None):
         if not has_permission(self.user.role, Action.RISK_ACCEPT):
             raise HTTPException(403, "Access denied")
         risk, links = await self.load(project_id, risk_id, lock=True)
+        if risk.resolution_link_id:
+            raise HTTPException(
+                409, "Resolved risk history cannot be reopened by a review decision"
+            )
         if payload.action != "dismiss" and (not links or risk.status == "insufficient_evidence"):
             raise HTTPException(422, "insufficient_evidence")
         before = {

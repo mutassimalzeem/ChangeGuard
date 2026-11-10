@@ -14,6 +14,7 @@ from app.domain.models import (
     ChangeOrder,
     Document,
     DocumentEntityLink,
+    EventEntityLink,
     EvidenceLink,
     ProjectEvent,
     Risk,
@@ -302,7 +303,7 @@ def document_rules(document, comparisons):
     return findings
 
 
-def daily_report_delay_rules(document, events, evidence, links, changes):
+def daily_report_delay_rules(document, events, evidence, links, changes, event_links=()):
     """A recorded delay without an explicit same-project RFI/CO relationship.
 
     Absence means absence in ChangeGuard's linked records, never a claim about
@@ -317,6 +318,8 @@ def daily_report_delay_rules(document, events, evidence, links, changes):
     findings = []
     for event in events:
         if event.document_id != document.id or event.event_type != "delay":
+            continue
+        if any(link.event_id == event.id for link in event_links):
             continue
         if any(change.source_event_id == event.id for change in changes):
             continue
@@ -387,14 +390,28 @@ async def run_risk_checks(document, session):
 
     changes = list(await session.scalars(scoped(ChangeOrder)))
     events = list(
-        await session.scalars(scoped(ProjectEvent).where(ProjectEvent.document_id == document.id))
+        await session.scalars(
+            scoped(ProjectEvent)
+            .where(ProjectEvent.document_id == document.id)
+            .order_by(ProjectEvent.id)
+            .with_for_update()
+        )
     )
     event_evidence = list(
         await session.scalars(
             scoped(EvidenceLink).where(EvidenceLink.subject_type == "project_event")
         )
     )
-    findings.extend(daily_report_delay_rules(document, events, event_evidence, links, changes))
+    event_links = list(
+        await session.scalars(
+            scoped(EventEntityLink).where(
+                EventEntityLink.event_id.in_([event.id for event in events])
+            )
+        )
+    )
+    findings.extend(
+        daily_report_delay_rules(document, events, event_evidence, links, changes, event_links)
+    )
     approvals = list(await session.scalars(scoped(Approval)))
     for change in changes:
         if not any(

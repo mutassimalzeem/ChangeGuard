@@ -15,7 +15,15 @@ from app.ai.gateway.context import model_scope
 from app.ai.gateway.service import ModelGateway
 from app.ai.gateway.types import GatewayError
 from app.core.config import get_settings
-from app.domain.models import RFI, Approval, AuditEvent, ChangeOrder, Contract, EvidenceLink
+from app.domain.models import (
+    RFI,
+    Approval,
+    AuditEvent,
+    ChangeOrder,
+    Contract,
+    EvidenceLink,
+    ProjectEvent,
+)
 from app.domain.schemas.change_order import CitedDraft, CitedParagraph, CostItem
 from app.domain.schemas.evidence import EvidenceCreate
 from app.domain.services.evidence import EvidenceService
@@ -148,9 +156,21 @@ class ChangeOrderService:
         ):
             raise HTTPException(409, "Change-order reference already exists")
         evidence = list(payload.evidence)
+        copied_evidence = []
         if payload.source_event_id:
             source = await self.evidence.source(
                 project_id, "project_event", payload.source_event_id
+            )
+            # Take the same event lock as later-link requests before inserting
+            # the FK-bearing change order; this avoids competing lock upgrades.
+            source = await self.session.scalar(
+                select(ProjectEvent)
+                .where(
+                    ProjectEvent.id == source.id,
+                    ProjectEvent.tenant_id == self.user.tenant_id,
+                    ProjectEvent.project_id == project_id,
+                )
+                .with_for_update()
             )
             if not source.detection_key or source.status != "potential_change":
                 raise HTTPException(422, "Source must be a potential change")
@@ -174,13 +194,13 @@ class ChangeOrderService:
             )
             if not source_links:
                 raise HTTPException(422, "insufficient_evidence")
-            evidence.extend(
+            copied_evidence.extend(
                 EvidenceCreate.model_validate(
                     {name: getattr(link, name) for name in EvidenceCreate.model_fields}
                 )
                 for link in source_links
             )
-        for item in evidence:
+        for item in evidence + copied_evidence:
             await self.evidence.source(project_id, item.source_type, item.source_id)
         order = ChangeOrder(
             id=uuid4(),
@@ -202,7 +222,34 @@ class ChangeOrderService:
         self.session.add(order)
         await self.flush_audit(order, "create", None, "Created potential change order", request_id)
         if evidence:
-            await self.evidence.append(project_id, "change_order", order.id, evidence)
+            await self.evidence.append(
+                project_id, "change_order", order.id, evidence, request_id=request_id
+            )
+        if copied_evidence:
+            # Copied provenance is not a new explicit relationship to every
+            # event mentioned in the source event's evidence package.
+            await self.evidence.append(
+                project_id,
+                "change_order",
+                order.id,
+                copied_evidence,
+                request_id=request_id,
+                explicit_event_links=False,
+            )
+        if payload.source_event_id:
+            from app.domain.schemas.event_link import EventLinkCreate
+            from app.domain.services.event_links import EventLinkService
+
+            await EventLinkService(self.session, self.user).link(
+                project_id,
+                payload.source_event_id,
+                EventLinkCreate(
+                    entity_type="change_order",
+                    entity_id=order.id,
+                    reason="Change order explicitly created from this source event",
+                ),
+                request_id,
+            )
         return await self.read(order.id)
 
     async def read(self, order_id):

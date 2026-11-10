@@ -59,8 +59,12 @@ class TimelineService:
                 )
             )
             try:
+                resolution = None
                 if kind == "risk":
-                    await RiskService(self.session, self.user).load(project_id, record.id)
+                    risk_data = await RiskService(self.session, self.user).read(
+                        project_id, record.id
+                    )
+                    resolution = risk_data["resolution"]
                 elif record.document_id:
                     await self.evidence.source(project_id, "document", record.document_id)
                 for link in links:
@@ -85,6 +89,7 @@ class TimelineService:
                     severity=record.severity if kind == "risk" else None,
                     evidence=[EvidenceRead.model_validate(link) for link in links],
                     evidence_status="supported" if supported else "insufficient_evidence",
+                    resolution=resolution,
                 )
             )
         return TimelinePage(items=items, offset=offset, limit=limit, has_more=len(rows) > limit)

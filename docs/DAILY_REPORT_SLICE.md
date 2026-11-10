@@ -110,8 +110,9 @@ readers. The client now needs the timeline endpoint deployed with it.
    Neither should produce a deterministic delay assertion. Low/uncertain evidence
    should enter review. A page-less delay signal must be `insufficient_evidence`.
 9. In a fresh processing case, link the report to an RFI/change order (or create
-   a change order from the event); verify the rule is suppressed. Existing risk
-   snapshots still need human review; automatic resolution is not included.
+   a change order from the event); verify the rule is suppressed. For an existing
+   risk, explicitly link its source event using the API in `RISK_RESOLUTION.md`;
+   the risk should become resolved with its original evidence retained.
 10. Try another tenant, a project nonmember and a member without access to a
     restricted report. Confirm no derived event, risk or quotation leaks.
 11. Inspect audit records as an authorized auditor: `project.create`,
@@ -175,9 +176,10 @@ end-to-end deployment test.
   path effects or calculate exposure.
 - Links are explicit document/entity relationships or change orders sourced from
   events. No fuzzy matching of unlinked RFIs/change orders is added.
-- Risks are processing-time snapshots. Later linking does not automatically close
-  an existing risk; use the audited review flow. Historical documents need
-  deliberate reprocessing/backfill to acquire this new rule's risks and audits.
+- Original risk facts are processing-time snapshots. Explicit source-event
+  linkage now resolves the matching unlinked-delay risk with immutable audit
+  history (see `RISK_RESOLUTION.md`). Fuzzy/document-level relationships do not
+  resolve it. Historical documents still need deliberate reprocessing/backfill.
 - Timeline follows existing financial-read permission requirements. Site engineers
   can upload, but risk/timeline review needs a permitted commercial role.
 - Create-only application storage prevents overwrites through this application;

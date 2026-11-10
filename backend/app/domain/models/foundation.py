@@ -415,6 +415,28 @@ class ChangeOrder(ProjectRecord, Base):
     )
 
 
+class EventEntityLink(ProjectRecord, Base):
+    """An explicit, append-only relationship; similarity never creates this row."""
+
+    __tablename__ = "event_entity_links"
+    __table_args__ = project_constraints(
+        project_reference("event_id", "project_events"),
+        project_reference("rfi_id", "rfis"),
+        project_reference("change_order_id", "change_orders"),
+        user_reference("actor_id"),
+        CheckConstraint("num_nonnulls(rfi_id, change_order_id) = 1", name="one_entity"),
+        CheckConstraint("length(btrim(reason)) > 0", name="reason_required"),
+        UniqueConstraint("event_id", "rfi_id"),
+        UniqueConstraint("event_id", "change_order_id"),
+        UniqueConstraint("id", "event_id", "project_id", "tenant_id"),
+    )
+    event_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    rfi_id: Mapped[UUID | None] = mapped_column(Uuid)
+    change_order_id: Mapped[UUID | None] = mapped_column(Uuid)
+    actor_id: Mapped[UUID] = mapped_column(Uuid)
+    reason: Mapped[str] = mapped_column(String(2000))
+
+
 class Risk(ProjectRecord, Base):
     __tablename__ = "risks"
     __table_args__ = project_constraints(
@@ -422,7 +444,25 @@ class Risk(ProjectRecord, Base):
         project_reference("document_id", "documents"),
         project_reference("project_event_id", "project_events"),
         user_reference("owner_id"),
+        user_reference("resolved_by_id"),
+        ForeignKeyConstraint(
+            ["resolution_link_id", "project_event_id", "project_id", "tenant_id"],
+            ["event_entity_links.id", "event_entity_links.event_id", "event_entity_links.project_id", "event_entity_links.tenant_id"],
+            ondelete="RESTRICT",
+        ),
+        CheckConstraint(
+            "(resolution_link_id IS NULL AND resolved_by_id IS NULL AND resolved_at IS NULL AND resolution_reason IS NULL "
+            "AND (risk_type IS DISTINCT FROM 'daily_report_delay_without_link' OR status <> 'resolved')) OR "
+            "(resolution_link_id IS NOT NULL AND resolved_by_id IS NOT NULL AND resolved_at IS NOT NULL "
+            "AND resolution_reason IS NOT NULL AND length(btrim(resolution_reason)) > 0 AND project_event_id IS NOT NULL "
+            "AND risk_type IS NOT DISTINCT FROM 'daily_report_delay_without_link' AND status = 'resolved')",
+            name="resolution_complete",
+        ),
     )
+    resolution_link_id: Mapped[UUID | None] = mapped_column(Uuid)
+    resolved_by_id: Mapped[UUID | None] = mapped_column(Uuid)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolution_reason: Mapped[str | None] = mapped_column(String(2000))
     title: Mapped[str] = mapped_column(String(255))
     risk_type: Mapped[str | None] = mapped_column(String(64))
     rule_key: Mapped[str | None] = mapped_column(String(255), unique=True)

@@ -434,3 +434,44 @@ and unavailable native OCR tools; no skip was added. Focused Ruff, `pip check`,
 `git diff --check` and staged whitespace checks passed. Test temporary files used
 the workspace `.tmp` directory. The disposable database container was stopped;
 existing developer containers/databases were left unchanged.
+
+## 2026-11-10: Resolution after explicit later evidence linkage
+
+- Added `POST /api/v1/projects/{project_id}/events/{event_id}/links` for existing
+  RFIs/change orders, with a mandatory reason. It resolves only
+  `daily_report_delay_without_link` risks whose `project_event_id` exactly matches
+  the linked event. No text similarity, document-level association or LLM judgment
+  alone resolves a risk; investigation/model capabilities are unchanged.
+- Existing human change-order creation with `source_event_id`, and explicitly
+  appending an event as change-order evidence, use the same service. Copied source
+  provenance is deliberately excluded so events merely mentioned in a copied
+  evidence package do not acquire explicit resolving relationships.
+- Migration `0016_risk_resolution` adds immutable `event_entity_links` and risk
+  resolution fields. Composite foreign keys bind event/entity/project/tenant and
+  the exact risk source event. Resolution records entity type/ID, actor, UTC
+  timestamp and reason, with `project_event.link_entity` and `risk.resolve` audits.
+  Failed audit writes roll back the link/status transition; a deferred database
+  constraint also forbids unaudited resolution.
+- Original risk IDs, descriptions, impacts, confidence and evidence are retained.
+  The first resolution remains immutable on retries or later additional links.
+  Review decisions cannot reopen it. Worker checks respect explicit links and
+  preserve resolved risks without creating another unlinked-delay risk.
+- Linking requires existing project/source access, document and financial read,
+  risk-review permission and the relevant RFI/CO write permission. Risk and timeline
+  reads also recheck resolving-entity visibility to avoid leaking restricted IDs
+  or reasons. Both expose additive `resolution` metadata; the timeline's existing
+  status rendering shows `resolved`.
+- Full backend validation: **967 passed, 13 existing skips, zero failures**.
+  New resolution tests cover RFI/CO links, existing CO paths, unrelated/similar/
+  copied evidence, tenant/project/role/source permissions, retries, rule reruns,
+  audit failure rollback, immutable SQL history and unaudited-write rejection.
+  Migration round-trip/metadata checks, focused Ruff, pip check and whitespace
+  checks pass. Validation uses disposable PostgreSQL/pgvector; no live model calls
+  are needed. Existing developer containers/databases are unchanged.
+
+Deployment: apply `alembic upgrade head` before restarting API/workers. Downgrade
+refuses to discard link/resolution history. No automatic historical reconciliation
+or unlink/reopen workflow is included. Existing pre-deployment links can be
+explicitly replayed through the new endpoint. API/manual steps and limitations:
+`docs/RISK_RESOLUTION.md`. This supersedes the earlier vertical-slice limitation
+that later event linkage could not resolve an existing risk.

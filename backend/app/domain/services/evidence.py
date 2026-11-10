@@ -98,7 +98,16 @@ class EvidenceService:
             raise HTTPException(404, "Evidence resource not found")
         return row
 
-    async def append(self, project_id, subject_type, subject_id, payloads):
+    async def append(
+        self,
+        project_id,
+        subject_type,
+        subject_id,
+        payloads,
+        *,
+        request_id=None,
+        explicit_event_links=True,
+    ):
         if not has_permission(self.user.role, Action.CHANGE_WRITE):
             raise HTTPException(403, "Access denied")
         await self.access.project(project_id)
@@ -119,6 +128,22 @@ class EvidenceService:
         ]
         self.session.add_all(links)
         await self.session.flush()
+        if subject_type == "change_order" and explicit_event_links:
+            from app.domain.schemas.event_link import EventLinkCreate
+            from app.domain.services.event_links import EventLinkService
+
+            for payload in payloads:
+                if payload.source_type == "project_event":
+                    await EventLinkService(self.session, self.user).link(
+                        project_id,
+                        payload.source_id,
+                        EventLinkCreate(
+                            entity_type="change_order",
+                            entity_id=subject_id,
+                            reason="Change order explicitly linked to this event as evidence",
+                        ),
+                        request_id,
+                    )
         return links
 
     async def view(self, project_id, subject_type, subject_id, offset=0, limit=50):

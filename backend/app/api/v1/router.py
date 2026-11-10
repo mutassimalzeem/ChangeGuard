@@ -6,6 +6,7 @@ from app.api.v1.routes import (
     auth,
     change_orders,
     documents,
+    event_links,
     evidence,
     health,
     investigations,
@@ -19,6 +20,7 @@ from app.api.v1.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(event_links.router)
 api_router.include_router(pilot.router)
 api_router.include_router(pilot_metrics.router)
 api_router.include_router(investigations.router)
