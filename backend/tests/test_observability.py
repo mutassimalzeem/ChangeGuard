@@ -30,11 +30,26 @@ def records(stream):
     return [json.loads(line) for line in stream.getvalue().splitlines()]
 
 
-@pytest.mark.parametrize("key", [
-    "password", "Password", "access_token", "refreshToken", "API-Key",
-    "Authorization", "cookie", "JWT_SECRET", "raw_document_text", "document_content",
-    "extracted_text", "body", "payload", "prompt", "client_secret",
-])
+@pytest.mark.parametrize(
+    "key",
+    [
+        "password",
+        "Password",
+        "access_token",
+        "refreshToken",
+        "API-Key",
+        "Authorization",
+        "cookie",
+        "JWT_SECRET",
+        "raw_document_text",
+        "document_content",
+        "extracted_text",
+        "body",
+        "payload",
+        "prompt",
+        "client_secret",
+    ],
+)
 def test_nested_redaction_does_not_mutate_input(key):
     source = {"items": [{key: "private-value", "count": 3}]}
     assert redact(source) == {"items": [{key: REDACTED, "count": 3}]}
@@ -43,8 +58,11 @@ def test_nested_redaction_does_not_mutate_input(key):
 
 def test_structlog_and_stdlib_are_json_and_redacted(logs):
     get_logger(__name__).info(
-        "safe_event", password="password-value", headers={"Authorization": "Bearer token-value"},
-        document_text="private document", nested=[{"api_key": "key-value"}],
+        "safe_event",
+        password="password-value",
+        headers={"Authorization": "Bearer token-value"},
+        document_text="private document",
+        nested=[{"api_key": "key-value"}],
     )
     logging.getLogger(__name__).error(
         "password=hunter2 Bearer abc.def postgresql://user:password@host/db",
@@ -52,7 +70,15 @@ def test_structlog_and_stdlib_are_json_and_redacted(logs):
         exc_info=(ValueError, ValueError("private document"), None),
     )
     output = logs.getvalue()
-    for secret in ("password-value", "token-value", "private document", "key-value", "hunter2", "abc.def", "user:password"):
+    for secret in (
+        "password-value",
+        "token-value",
+        "private document",
+        "key-value",
+        "hunter2",
+        "abc.def",
+        "user:password",
+    ):
         assert secret not in output
     for record in records(logs):
         assert {"timestamp", "level", "service", "environment", "request_id"} <= record.keys()
@@ -61,7 +87,9 @@ def test_structlog_and_stdlib_are_json_and_redacted(logs):
 
 def test_free_form_library_logs_and_objects_cannot_leak_documents(logs):
     logging.getLogger("third_party").warning("arbitrary confidential document words")
-    get_logger(__name__).info("document_processed", document_text="confidential", result=ValueError("secret"))
+    get_logger(__name__).info(
+        "document_processed", document_text="confidential", result=ValueError("secret")
+    )
     output = logs.getvalue()
     assert "confidential" not in output
     assert "arbitrary" not in output
@@ -70,7 +98,8 @@ def test_free_form_library_logs_and_objects_cannot_leak_documents(logs):
 
 def test_redacts_credentials_embedded_in_structured_strings(logs):
     get_logger(__name__).info(
-        "operation_failed", detail="password=hunter2 Bearer abc.def postgresql://user:pass@host/db",
+        "operation_failed",
+        detail="password=hunter2 Bearer abc.def postgresql://user:pass@host/db",
     )
     output = logs.getvalue()
     assert "hunter2" not in output
@@ -91,11 +120,18 @@ async def test_request_context_timing_and_isolation(logs):
         get_logger(__name__).info("endpoint_event")
         return {"ok": True}
 
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
-        responses = await asyncio.gather(*[
-            client.get(f"/tenants/{tenant}?token=query-secret", headers={"Authorization": "Bearer header-secret", "X-Request-ID": "untrusted"})
-            for tenant in ("a", "b")
-        ])
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        responses = await asyncio.gather(
+            *[
+                client.get(
+                    f"/tenants/{tenant}?token=query-secret",
+                    headers={"Authorization": "Bearer header-secret", "X-Request-ID": "untrusted"},
+                )
+                for tenant in ("a", "b")
+            ]
+        )
         await client.get("/missing/private-path")
     assert request_context.get() is None
     ids = [r.headers["x-request-id"] for r in responses]
@@ -106,7 +142,10 @@ async def test_request_context_timing_and_isolation(logs):
     for index, tenant in enumerate(("a", "b")):
         tenant_records = [r for r in records(logs) if r.get("tenant_id") == tenant]
         assert len(tenant_records) == 2
-        assert all(r["request_id"] == ids[index] and r["user_id"] == "user-" + tenant for r in tenant_records)
+        assert all(
+            r["request_id"] == ids[index] and r["user_id"] == "user-" + tenant
+            for r in tenant_records
+        )
     assert all(r["duration_ms"] >= 0 and r["method"] == "GET" for r in access)
     assert {r["path"] for r in access} == {"/tenants/{tenant}", "<unmatched>"}
     assert access[-1]["status_code"] == 404
@@ -125,7 +164,9 @@ async def test_failure_is_logged_and_context_reset(logs):
     async def fail():
         raise ValueError("password=never-log-this")
 
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as client:
         with pytest.raises(ValueError):
             await client.get("/fail")
     access = [r for r in records(logs) if r["event"] == "http_request"]

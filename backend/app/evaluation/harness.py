@@ -107,4 +107,3 @@ class EvaluationHarness:
             md_path.write_text(content, encoding="utf-8")
 
         return json_path, md_path
-

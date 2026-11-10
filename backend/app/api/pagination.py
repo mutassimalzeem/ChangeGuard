@@ -11,6 +11,7 @@ T = TypeVar("T")
 
 class PageParams(BaseModel):
     """Pagination request parameters."""
+
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
     page_size: int = Field(default=20, ge=1, le=100, description="Items per page")
 
@@ -25,6 +26,7 @@ class PageParams(BaseModel):
 
 class PageMetadata(BaseModel):
     """Pagination metadata."""
+
     page: int = Field(ge=1)
     page_size: int = Field(ge=1)
     total_items: int = Field(ge=0)
@@ -35,6 +37,7 @@ class PageMetadata(BaseModel):
 
 class PaginatedResponse(BaseModel, Generic[T]):
     """Paginated response wrapper."""
+
     items: list[T]
     metadata: PageMetadata
 

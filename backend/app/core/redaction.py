@@ -6,10 +6,28 @@ from typing import Any
 
 REDACTED = "[REDACTED]"
 _SENSITIVE = (
-    "password", "passwd", "secret", "token", "apikey", "accesskey",
-    "authorization", "cookie", "text", "documentcontent",
-    "body", "payload", "content", "prompt", "completion", "extractedtext", "rawoutput",
-    "exception", "excinfo", "stack", "error", "credential",
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "apikey",
+    "accesskey",
+    "authorization",
+    "cookie",
+    "text",
+    "documentcontent",
+    "body",
+    "payload",
+    "content",
+    "prompt",
+    "completion",
+    "extractedtext",
+    "rawoutput",
+    "exception",
+    "excinfo",
+    "stack",
+    "error",
+    "credential",
 )
 _ASSIGNMENT = re.compile(
     r"(?i)\b(password|passwd|[\w-]*token|[\w-]*secret|api[_-]?key|authorization)"
@@ -30,19 +48,21 @@ def redact(value: Any) -> Any:
             # never arbitrary token values or prompt bodies.
             if (
                 normalized in {"inputtokens", "outputtokens", "totaltokens"}
-                and type(item) is int and item >= 0
+                and type(item) is int
+                and item >= 0
             ):
                 result[name] = item
                 continue
             if (
-                normalized == "promptversion" and isinstance(item, str) and len(item) <= 64
+                normalized == "promptversion"
+                and isinstance(item, str)
+                and len(item) <= 64
                 and re.fullmatch(r"(?:[a-z][a-z0-9_.-]{0,48}-)?v[0-9]+(?:[.-][0-9]+)*", item)
             ):
                 result[name] = item
                 continue
             result[name] = (
-                REDACTED if any(part in normalized for part in _SENSITIVE)
-                else redact(item)
+                REDACTED if any(part in normalized for part in _SENSITIVE) else redact(item)
             )
         return result
     if isinstance(value, (list, tuple)):

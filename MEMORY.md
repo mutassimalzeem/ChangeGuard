@@ -363,3 +363,161 @@ By the end of the year, ChangeGuard should demonstrate:
 5. At least 2–3 documented case studies.
 6. A clear path from pilot to paid subscription.
 7. A portfolio asset that proves advanced AI systems engineering ability.
+
+## 2026-11-10: Daily report vertical slice
+
+Repository inspection found uploads, immutable originals, Celery stages, OCR,
+classification, strict grounded fields, potential-change events, evidence and a
+deterministic risk engine already implemented. Reused those systems.
+
+Implemented:
+
+- Migration `0015_project_metadata`: persist client name, contract value and
+  stakeholders; repair timestamp serialization and authenticated creator membership/
+  audit handling. Financial fields remain permission-protected.
+- Strict closed Pydantic event validation before event/evidence persistence.
+- `daily_report_delay_without_link`: evidence-backed daily-report delay with no
+  explicit linked RFI/change order. Links to the event and original, null impacts,
+  insufficient_evidence when provenance/confidence is inadequate. Such risks cannot
+  be accepted merely because an original-file link exists.
+- `GET /api/v1/projects/{id}/timeline`: chronological events/risks with complete
+  source visibility checks and pagination, plus the frontend timeline using real
+  quotations/pages, signed-original access and five-second refresh.
+- Audit records for upload, document deletion, processing outcomes and risk
+  creation; server-generated upload request IDs propagate into worker audits.
+- Unit/integration/contract tests including PDF/image worker stages, retries,
+  tenant/project/restricted/deleted-source access and insufficient evidence.
+
+Plan: `tasks/plan.md`. File map, deployment compatibility, manual verification and
+known limitations: `docs/DAILY_REPORT_SLICE.md`.
+
+Validation: full backend 914 passed / 13 skipped / 10 failed, with every failing
+test ID reproduced on unchanged starting commit `9184f006` (its project module had
+19 failures). No test/access controls were weakened. Focused backend 136 passed;
+final new integration module 7 passed, including PDF/image worker execution and
+insufficient-evidence rejection. Frontend 20 passed; typecheck/lint/production
+build, focused Ruff, pip check and whitespace checks passed. Isolated Chrome
+verified risk/evidence UI with intercepted API fixtures and zero runtime console
+errors. PostgreSQL/pgvector was real; storage/model/OCR/broker boundaries were
+faked in the new integration tests. Temporary test servers stopped afterward.
+
+Remaining: live broker/storage/model/OCR deployment verification; automatic risk
+resolution after later linking; deliberate historical backfill; broader language
+and project-packet evaluation. Original create-only storage still requires bucket
+retention/admin controls. Timeline follows existing commercial-read permissions.
+
+## 2026-11-10: Backend contract and baseline-test repairs
+
+Scope: repair the six reported failure areas without adding features or weakening
+tenant, membership, financial, audit or human-approval controls. Reproduced the
+starting project's 10 failures before editing.
+
+| Area | Root cause | Fix and regression coverage |
+| --- | --- | --- |
+| Error envelopes | Domain exceptions used `error`, HTTP/framework validation used `detail`, and authentication constructed its own responses. Tests incorrectly treated a validation error list as a string. OpenAPI also advertised the old `HTTPValidationError` contract. | Shared `error_responses.py` supplies `{error: {code, message, details}}` for domain, HTTP, authentication and validation failures; OpenAPI 422 uses the same envelope. Preserve statuses and `WWW-Authenticate`/`Retry-After` headers. Generic validation details contain location/type and safe messages, never rejected input, body, context or custom exception text. Authentication responses remain generic and non-enumerating. Regression tests cover 401/404/405/409/422/429/500, header preservation, OpenAPI and secret reflection through custom validators. |
+| Project list fixtures | Pagination/search/status fixtures inserted projects without assigning the non-admin caller. Correct membership filtering returned no rows, and the status test could pass vacuously on an empty list. | A fixture inserts active memberships in the proper tenant/project. Tests retain exact pagination/search assertions and now require an actual matching status result. Production membership filters are unchanged. |
+| Own-tenant project creation | A test expected a caller from another fixture tenant to be forbidden from creating in their own authenticated tenant, despite the request containing no foreign tenant target. Its JWT helper also supplied token version in the roles argument. | Correct the helper to pass roles and keyword version. Assert creation in the caller's tenant and subsequent membership-protected access; add a rejected foreign `tenant_id` override case. Production tenant assignment remains derived exclusively from the authenticated user. |
+| Project deletion | Tests expected project managers to hard-delete despite lacking delete permission and the policy/ORM requiring human approval. The service attempted a success audit/delete rather than reporting that policy outcome. | The service checks existing project policy before any mutation and returns 409 with `human_approval_required` for permitted owners/admins; unauthorized roles remain 403 and inaccessible/missing projects remain concealed. Keep the ORM guard. Tests verify project retention, no false success audit, rejection of self-declared confirmation, and service/ORM enforcement. No approval workflow was added: execution stays blocked until verified approval infrastructure exists. |
+| Dates | A fixture assigned an ISO string directly to an ORM Date column. Pydantic already parses API dates, but PATCH validation only considered dates supplied together and missed conflicts with stored dates. | Convert fixture strings with `date.fromisoformat`. Before mutating a project, validate the merged incoming/persisted date pair. Tests verify typed ORM dates, start-only/end-only invalid ranges, atomic rejection and explicit null versus omitted dates. |
+| Audit reads | Audit assertions queried using the request's project-manager session, which correctly lacks `audit.read`. | Read assertions through a separate, authenticated admin session on the test transaction, keeping the production audit guard unchanged. Add denial assertions for ORM rows, scalar IDs and aggregates from a project manager who otherwise has project access. Positive audit assertions still verify actor and recorded changes. |
+
+Compatibility: clients must consume the canonical `error` envelope; validation
+issues are under `error.details.errors`. The existing frontend recognizes the
+`error` envelope. Authentication failure commits, no-store headers, rate limiting,
+permissions and secret-redaction protections remain intact. No migration or new
+feature is required.
+
+Final validation: **942 passed, 13 skipped, zero failures** in the full backend
+suite against a disposable pgvector PostgreSQL database, with all migrations
+applied. The existing 13 skips cover unconfigured live MinIO/Redis integrations
+and unavailable native OCR tools; no skip was added. Focused Ruff, `pip check`,
+`git diff --check` and staged whitespace checks passed. Test temporary files used
+the workspace `.tmp` directory. The disposable database container was stopped;
+existing developer containers/databases were left unchanged.
+
+## 2026-11-10: Resolution after explicit later evidence linkage
+
+- Added `POST /api/v1/projects/{project_id}/events/{event_id}/links` for existing
+  RFIs/change orders, with a mandatory reason. It resolves only
+  `daily_report_delay_without_link` risks whose `project_event_id` exactly matches
+  the linked event. No text similarity, document-level association or LLM judgment
+  alone resolves a risk; investigation/model capabilities are unchanged.
+- Existing human change-order creation with `source_event_id`, and explicitly
+  appending an event as change-order evidence, use the same service. Copied source
+  provenance is deliberately excluded so events merely mentioned in a copied
+  evidence package do not acquire explicit resolving relationships.
+- Migration `0016_risk_resolution` adds immutable `event_entity_links` and risk
+  resolution fields. Composite foreign keys bind event/entity/project/tenant and
+  the exact risk source event. Resolution records entity type/ID, actor, UTC
+  timestamp and reason, with `project_event.link_entity` and `risk.resolve` audits.
+  Failed audit writes roll back the link/status transition; a deferred database
+  constraint also forbids unaudited resolution.
+- Original risk IDs, descriptions, impacts, confidence and evidence are retained.
+  The first resolution remains immutable on retries or later additional links.
+  Review decisions cannot reopen it. Worker checks respect explicit links and
+  preserve resolved risks without creating another unlinked-delay risk.
+- Linking requires existing project/source access, document and financial read,
+  risk-review permission and the relevant RFI/CO write permission. Risk and timeline
+  reads also recheck resolving-entity visibility to avoid leaking restricted IDs
+  or reasons. Both expose additive `resolution` metadata; the timeline's existing
+  status rendering shows `resolved`.
+- Full backend validation: **967 passed, 13 existing skips, zero failures**.
+  New resolution tests cover RFI/CO links, existing CO paths, unrelated/similar/
+  copied evidence, tenant/project/role/source permissions, retries, rule reruns,
+  audit failure rollback, immutable SQL history and unaudited-write rejection.
+  Migration round-trip/metadata checks, focused Ruff, pip check and whitespace
+  checks pass. Validation uses disposable PostgreSQL/pgvector; no live model calls
+  are needed. Existing developer containers/databases are unchanged.
+
+Deployment: apply `alembic upgrade head` before restarting API/workers. Downgrade
+refuses to discard link/resolution history. No automatic historical reconciliation
+or unlink/reopen workflow is included. Existing pre-deployment links can be
+explicitly replayed through the new endpoint. API/manual steps and limitations:
+`docs/RISK_RESOLUTION.md`. This supersedes the earlier vertical-slice limitation
+that later event linkage could not resolve an existing risk.
+
+## 2026-11-10: Review Queue & Delay Risk Conversion to Change-Order Draft
+
+Scope: Implement the commercial Review Queue and the complete 10-step conversion
+workflow turning an evidence-backed delay risk into a grounded change-order draft.
+
+### Review Queue Core Capabilities
+- Surfaces items across all six core review categories:
+  1. `insufficient_evidence_risk`
+  2. `low_confidence_extraction`
+  3. `missing_required_field`
+  4. `potential_duplicate`
+  5. `conflicting_evidence`
+  6. `high_severity_risk`
+- Displays all 8 mandatory fields on every review card: title, risk type, confidence score,
+  evidence links, source quotations with page citations, link to original document,
+  recommended action/correction, and current status.
+- Actions: Accept risk, Dismiss risk, Request more evidence, Convert risk to change order.
+- Invariants: Insufficient-evidence risks strictly blocked from acceptance as supported evidence
+  (throws 422 / error). Dismissal and overrides require mandatory justifications. Every action
+  appends an immutable `AuditEvent`.
+
+### Evidence-Backed Delay Risk to Change-Order Draft Flow & Constraints
+- Flow:
+  1. User selects "Create change-order draft" in Timeline or Review Queue.
+  2. Backend validates risk existence and verifies linked evidence links. If risk has status
+     `insufficient_evidence` or 0 evidence links, rejects with 422 HTTP exception ("Every draft must cite evidence").
+  3. LLM Model Gateway (`TaskType.DRAFTING`) drafts narrative text only, citing evidence sources ($E_1, E_2, \dots$).
+     Monetary and schedule calculations are strictly excluded from automated drafting.
+  4. Change order is created with `status="drafted"`, `amount=None`, `time_impact_days=None`, `cost_items=[]`,
+     `source_event_id=risk.project_event_id`, and `responsible_party` recorded from the risk.
+  5. Evidence package is copied/linked from the risk to the change order.
+  6. Original risk remains linked (`risk.change_order_id = order.id`, `risk.status = "converted"`).
+  7. User can edit the draft (`patch()`), entering cost items, deterministic total `amount`, and schedule impact.
+     Draft citations are preserved during human edits to keep submission validation intact.
+  8. User submits for approval (`drafted -> submitted`), requiring human cost confirmation and creating a pending `Approval`.
+  9. Explicit human approval or rejection requires non-empty reason; self-approval/rejection by creator or submitter
+     is strictly forbidden (`403 Forbidden`).
+  10. Every transition emits structured `AuditEvent` records. No automated external communication (emails/webhooks) is sent.
+
+### Verification & Quality Assurance
+- Backend unit and authorization tests: **63 passed, zero failures** (`pytest backend/tests/test_risk_to_change_order_draft.py backend/tests/test_review_queue_authorization.py`).
+- Frontend Node native test runner tests: **34 passed, zero failures** (`node --test src/test/*.test.ts`).
+- Frontend static typing & linting: `tsc --noEmit` exited `0` with zero errors; ESLint exited `0` with zero warnings.
+- Backend Ruff lint and format: `ruff check` and `ruff format` passed with zero errors.
+

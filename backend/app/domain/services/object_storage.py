@@ -91,8 +91,11 @@ class ObjectStorageService:
         """Create once; an existing original must never be overwritten."""
         try:
             self.client.put_object(
-                Bucket=self._bucket, Key=object_key, Body=stream,
-                ContentType=mime_type, IfNoneMatch="*",
+                Bucket=self._bucket,
+                Key=object_key,
+                Body=stream,
+                ContentType=mime_type,
+                IfNoneMatch="*",
             )
         except ClientError as exc:
             raise StorageError("Failed to preserve original") from exc
@@ -331,9 +334,7 @@ class ObjectStorageService:
                         },
                     )
                 except ClientError as create_error:
-                    raise StorageError(
-                        f"Failed to create bucket: {create_error}"
-                    ) from create_error
+                    raise StorageError(f"Failed to create bucket: {create_error}") from create_error
             else:
                 raise StorageError(f"Failed to check bucket: {e}") from e
 

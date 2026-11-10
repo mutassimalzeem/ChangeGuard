@@ -90,6 +90,15 @@ generic 401. Authentication validation errors do not echo request inputs. Token
 responses use Cache-Control: no-store. Clients must securely store bearer tokens
 and use HTTPS; cookie transport/CSRF policies are not implemented here.
 
+All API failures use `{ "error": { "code", "message", "details" } }`, including
+authentication, HTTP exceptions and framework validation. Authentication failures
+remain identical across unknown accounts, tenants and wrong credentials. Their
+code is `AUTHENTICATION_ERROR`; invalid authentication requests use
+`VALIDATION_ERROR` with empty details. General validation issues use
+`error.details.errors` with safe field locations/types, excluding input and custom
+validator exception text. Status codes and challenge/retry headers are preserved.
+OpenAPI's 422 response documents this same envelope.
+
 `authentication_events` is a system audit stream that can record failures even for
 unknown tenants; it permits a null tenant and never stores raw email, password,
 token, or IP. `auth_rate_limits` is also system-owned. Tenant-owned sessions/grants

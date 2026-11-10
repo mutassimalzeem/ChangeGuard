@@ -149,8 +149,8 @@ class DOCXExtractor:
                             section=section,
                             language=default_lang,
                             author=doc_author,
-                        date=doc_date,
-                        revision=doc_revision,
+                            date=doc_date,
+                            revision=doc_revision,
                             location={
                                 "source": "docx",
                                 "body_index": index,

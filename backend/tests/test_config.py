@@ -36,7 +36,10 @@ class TestConfigLoading:
             clear=True,
         ):
             settings = Settings()
-            assert settings.jwt_secret == "your-super-secret-key-change-in-production-at-least-32-chars-long"
+            assert (
+                settings.jwt_secret
+                == "your-super-secret-key-change-in-production-at-least-32-chars-long"
+            )
 
     def test_database_url_validation_alias(self):
         """Test that DATABASE_URL env var maps to database_url field."""
@@ -121,14 +124,18 @@ class TestConfigLoading:
 
     def test_llm_provider_validation(self):
         """Test that LLM_PROVIDER must be openai, anthropic, or none."""
-        with patch.dict(os.environ, {"JWT_SECRET": "a" * 32, "LLM_PROVIDER": "invalid"}, clear=True):
+        with patch.dict(
+            os.environ, {"JWT_SECRET": "a" * 32, "LLM_PROVIDER": "invalid"}, clear=True
+        ):
             with pytest.raises(ValidationError) as exc_info:
                 Settings()
             assert "llm_provider" in str(exc_info.value).lower()
 
     def test_ocr_provider_validation(self):
         """Test that OCR_PROVIDER must be valid value."""
-        with patch.dict(os.environ, {"JWT_SECRET": "a" * 32, "OCR_PROVIDER": "invalid"}, clear=True):
+        with patch.dict(
+            os.environ, {"JWT_SECRET": "a" * 32, "OCR_PROVIDER": "invalid"}, clear=True
+        ):
             with pytest.raises(ValidationError) as exc_info:
                 Settings()
             assert "ocr_provider" in str(exc_info.value).lower()
@@ -207,7 +214,9 @@ class TestProductionValidation:
         ):
             with pytest.raises(ValueError) as exc_info:
                 Settings()
-            assert "OBJECT_STORAGE_ACCESS_KEY and OBJECT_STORAGE_SECRET_KEY must be changed" in str(exc_info.value)
+            assert "OBJECT_STORAGE_ACCESS_KEY and OBJECT_STORAGE_SECRET_KEY must be changed" in str(
+                exc_info.value
+            )
 
     def test_production_rejects_missing_llm_api_key(self):
         """Test that production fails when LLM_PROVIDER is set but LLM_API_KEY is missing."""
@@ -281,6 +290,7 @@ class TestGetSettingsCache:
         """Test that module-level settings is same as get_settings()."""
         with patch.dict(os.environ, {"JWT_SECRET": "a" * 32}, clear=True):
             from app.core.config import settings as module_settings
+
             assert module_settings is get_settings()
 
 

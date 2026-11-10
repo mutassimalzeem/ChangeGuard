@@ -96,13 +96,15 @@ class ClassificationEvaluator:
             targets.append(expected)
 
             if pred.document_type != expected:
-                failures.append({
-                    "id": c["id"],
-                    "expected": expected,
-                    "predicted": pred.document_type,
-                    "confidence": pred.confidence,
-                    "reasoning": pred.reasoning,
-                })
+                failures.append(
+                    {
+                        "id": c["id"],
+                        "expected": expected,
+                        "predicted": pred.document_type,
+                        "confidence": pred.confidence,
+                        "reasoning": pred.reasoning,
+                    }
+                )
 
         metrics = calculate_classification_metrics(predictions, targets)
         metrics["failures"] = failures
@@ -124,20 +126,24 @@ class ExtractionEvaluator:
                 exp_facts = c["expected"]
                 doc_type = c["document_type"]
 
-                all_expected.append({
-                    "id": c["id"],
-                    "document_type": doc_type,
-                    "expected": exp_facts,
-                })
+                all_expected.append(
+                    {
+                        "id": c["id"],
+                        "document_type": doc_type,
+                        "expected": exp_facts,
+                    }
+                )
 
                 # In evaluation mode without live LLM, evaluate structured golden extraction
                 pred_facts = self.extractor(c) if self.extractor else exp_facts
 
-                all_predicted.append({
-                    "id": c["id"],
-                    "document_type": doc_type,
-                    "predicted": pred_facts,
-                })
+                all_predicted.append(
+                    {
+                        "id": c["id"],
+                        "document_type": doc_type,
+                        "predicted": pred_facts,
+                    }
+                )
 
         return calculate_extraction_metrics(all_predicted, all_expected, CRITICAL_FIELDS)
 
@@ -207,14 +213,16 @@ class RetrievalEvaluator:
             if output.get("relevant_documents"):
                 expected_ids.extend(output["relevant_documents"])
 
-            query_results.append({
-                "query": c["input"]["query"],
-                "retrieved_ids": retrieved_ids,
-                "expected_ids": list(set(expected_ids)),
-                "is_exact_id_query": is_exact_id,
-                "is_refusal_query": is_refusal,
-                "status": status,
-            })
+            query_results.append(
+                {
+                    "query": c["input"]["query"],
+                    "retrieved_ids": retrieved_ids,
+                    "expected_ids": list(set(expected_ids)),
+                    "is_exact_id_query": is_exact_id,
+                    "is_refusal_query": is_refusal,
+                    "status": status,
+                }
+            )
 
         return calculate_retrieval_metrics(query_results)
 
@@ -236,11 +244,13 @@ class CitationGroundednessEvaluator:
                     doc_data = json.loads(doc_file.read_text(encoding="utf-8"))
                     source_text = doc_data.get("input", {}).get("extracted_text", "")
 
-                extracted_items.append({
-                    "id": c["id"],
-                    "source_text": source_text,
-                    "facts": c["expected"],
-                })
+                extracted_items.append(
+                    {
+                        "id": c["id"],
+                        "source_text": source_text,
+                        "facts": c["expected"],
+                    }
+                )
 
         return calculate_citation_groundedness_metrics(extracted_items)
 
@@ -279,10 +289,12 @@ class DuplicateEvaluator:
                 and normalized(primary.get("description", ""))
                 == normalized(cand.get("description", ""))
             )
-            predictions.append({
-                "is_duplicate": is_dup,
-                "risk_type": "duplicate_change_order_claim" if is_dup else None,
-            })
+            predictions.append(
+                {
+                    "is_duplicate": is_dup,
+                    "risk_type": "duplicate_change_order_claim" if is_dup else None,
+                }
+            )
 
         return calculate_duplicate_metrics(cases, predictions)
 

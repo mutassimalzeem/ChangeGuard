@@ -55,9 +55,19 @@ def test_manifest_categories_and_counts(manifest):
 def test_all_document_files_exist_and_have_required_structure():
     """Verify every document file exists under tests/golden/documents and contains required sections."""
     doc_dirs = [
-        "contracts", "boqs", "rfis", "change_orders", "daily_reports", "emails", "site_photos",
-        "duplicate_detection", "missing_evidence", "conflicting_evidence",
-        "permission_isolation", "prompt_injection", "e2e_workflows"
+        "contracts",
+        "boqs",
+        "rfis",
+        "change_orders",
+        "daily_reports",
+        "emails",
+        "site_photos",
+        "duplicate_detection",
+        "missing_evidence",
+        "conflicting_evidence",
+        "permission_isolation",
+        "prompt_injection",
+        "e2e_workflows",
     ]
     for sub in doc_dirs:
         folder = GOLDEN_ROOT / "documents" / sub

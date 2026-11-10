@@ -5,7 +5,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,6 +40,7 @@ async def view_evidence(
 
 @router.post("/{subject_type}/{subject_id}", response_model=list[EvidenceRead], status_code=201)
 async def append_evidence(
+    request: Request,
     project_id: UUID,
     subject_type: SubjectType,
     subject_id: UUID,
@@ -48,5 +49,9 @@ async def append_evidence(
     session: AsyncSession = Depends(get_session),
 ):
     return await EvidenceService(session, user).append(
-        project_id, subject_type, subject_id, payload
+        project_id,
+        subject_type,
+        subject_id,
+        payload,
+        request_id=getattr(request.state, "request_id", None),
     )

@@ -3,9 +3,16 @@
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.error_responses import (
+    ErrorEnvelope,
+    error_response,
+    http_exception_handler,
+    request_validation_handler,
+)
 from app.api.exceptions import ChangeGuardException
 from app.api.v1.router import api_router
 from app.api.v1.routes.health import (
@@ -56,6 +63,7 @@ app = FastAPI(
     redoc_url=settings.redoc_url if settings.debug else None,
     openapi_url=f"{settings.api_prefix}/openapi.json" if settings.debug else None,
     lifespan=lifespan,
+    responses={422: {"model": ErrorEnvelope, "description": "Request validation failed"}},
 )
 
 # CORS
@@ -79,19 +87,14 @@ app.add_middleware(RequestLoggingMiddleware)
 
 
 # Exception handlers
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, request_validation_handler)
+
+
 @app.exception_handler(ChangeGuardException)
 async def changeguard_exception_handler(request: Request, exc: ChangeGuardException):
     """Handle ChangeGuard domain exceptions."""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": {
-                "code": exc.code,
-                "message": exc.message,
-                "details": exc.details,
-            }
-        },
-    )
+    return error_response(exc.status_code, exc.message, code=exc.code, details=exc.details)
 
 
 @app.exception_handler(Exception)
@@ -102,15 +105,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         tags={"path": request.url.path, "method": request.method},
     )
     details = {"event_id": event_id} if settings.debug else {}
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": {
-                "code": "INTERNAL_SERVER_ERROR",
-                "message": "An unexpected error occurred while processing the request",
-                "details": details,
-            }
-        },
+    return error_response(
+        500,
+        "An unexpected error occurred while processing the request",
+        code="INTERNAL_SERVER_ERROR",
+        details=details,
     )
 
 

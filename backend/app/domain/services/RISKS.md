@@ -79,3 +79,14 @@ Already completed processing checkpoints are retained; there is no automatic
 historical backfill, periodic reevaluation, frontend or notification work in 5.1.
 Do not add exposures from duplicate or conflicting findings as if they were
 independent project losses.
+
+## Later explicit event linkage
+
+Migration `0016_risk_resolution` and `EventLinkService` add audited resolution for
+`daily_report_delay_without_link` only. An explicit same-project RFI/CO link to
+the exact source event sets `resolved` and records entity type/ID, actor, timestamp
+and reason. Original risk facts and evidence remain. Idempotent retries, database
+immutability and a deferred audit constraint protect the first resolution.
+Risk/timeline reads expose resolution metadata and recheck resolving-entity source
+visibility. See [RISK_RESOLUTION.md](../../../../docs/RISK_RESOLUTION.md) for API,
+permissions, deployment and manual checks.

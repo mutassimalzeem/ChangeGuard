@@ -28,6 +28,7 @@ logger = logging.getLogger("changeguard.red_team")
 # Category 5: Contradictory Documents
 # ---------------------------------------------------------------------------
 
+
 def test_contradictory_delay_documents_flagged_as_high_risk(caplog):
     """Attack RT-DOC-001: Opposing Delay Liability Documents for Same Claim.
 
@@ -161,6 +162,7 @@ def test_duplicate_change_order_claims_detected_across_descriptions(caplog):
 # Category 6: Malformed Financial Data
 # ---------------------------------------------------------------------------
 
+
 def test_negative_financial_amounts_and_overflow_rejected(caplog):
     """Attack RT-FIN-001: Negative Amounts & Extreme Numeric Overflow Injections.
 
@@ -239,12 +241,15 @@ def test_currency_code_sql_injection_and_tampering_rejected(caplog):
     # Valid currency passes
     valid_patch = ChangeOrderPatch(currency="USD")
     assert valid_patch.currency == "USD"
-    logger.info("RT-FIN-002 passed: Currency injection and tampering rejected by schema validation.")
+    logger.info(
+        "RT-FIN-002 passed: Currency injection and tampering rejected by schema validation."
+    )
 
 
 # ---------------------------------------------------------------------------
 # Category 7: Missing Required Fields
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_change_order_submission_fails_without_required_fields(caplog):
@@ -275,7 +280,7 @@ async def test_change_order_submission_fails_without_required_fields(caplog):
         amount=Decimal("100000.00"),
         currency="USD",
         draft_content=None,  # Missing draft
-        cost_items=[],       # Missing cost items
+        cost_items=[],  # Missing cost items
     )
 
     service.load = AsyncMock(return_value=order)
@@ -323,5 +328,6 @@ def test_extraction_missing_required_contractual_facts_flags_risk(caplog):
     assert len(findings_bad) == 1
     assert findings_bad[0].risk_type == "missing_required_evidence"
 
-    logger.info("RT-REQ-002 passed: Missing required facts detected as missing_required_evidence risk.")
-
+    logger.info(
+        "RT-REQ-002 passed: Missing required facts detected as missing_required_evidence risk."
+    )

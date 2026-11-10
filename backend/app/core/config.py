@@ -36,8 +36,12 @@ class Settings(BaseSettings):
         min_length=32,
         validation_alias="JWT_SECRET",
     )
-    jwt_algorithm: Literal["HS256", "HS384", "HS512"] = Field(default="HS256", validation_alias="JWT_ALGORITHM")
-    access_token_expire_minutes: int = Field(default=15, ge=1, le=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    jwt_algorithm: Literal["HS256", "HS384", "HS512"] = Field(
+        default="HS256", validation_alias="JWT_ALGORITHM"
+    )
+    access_token_expire_minutes: int = Field(
+        default=15, ge=1, le=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+    )
     refresh_token_expire_days: int = Field(default=7, ge=1, le=90)
     password_reset_expire_minutes: int = Field(default=30, ge=1, le=60)
     login_max_failures: int = Field(default=5, ge=1, le=100)
@@ -86,7 +90,9 @@ class Settings(BaseSettings):
     celery_task_soft_time_limit: int = 240
     celery_worker_prefetch_multiplier: int = 4
     celery_worker_max_tasks_per_child: int = 1000
-    celery_worker_concurrency: int = Field(default=4, ge=1, le=64, validation_alias="CELERY_WORKER_CONCURRENCY")
+    celery_worker_concurrency: int = Field(
+        default=4, ge=1, le=64, validation_alias="CELERY_WORKER_CONCURRENCY"
+    )
 
     # Object Storage (S3/MinIO)
     object_storage_endpoint: str = Field(
@@ -114,7 +120,9 @@ class Settings(BaseSettings):
         validation_alias="LLM_PROVIDER",
     )
     llm_api_key: str | None = Field(default=None, validation_alias="LLM_API_KEY")
-    embedding_model: str = Field(default="text-embedding-3-small", validation_alias="EMBEDDING_MODEL")
+    embedding_model: str = Field(
+        default="text-embedding-3-small", validation_alias="EMBEDDING_MODEL"
+    )
     default_classification_model: str = "gpt-4o-mini"
     default_extraction_model: str = "gpt-4o-mini"
     default_reasoning_model: str = "gpt-4o"
@@ -140,9 +148,15 @@ class Settings(BaseSettings):
     email_imap_port: int = 993
     email_imap_user: str | None = Field(default=None, validation_alias="EMAIL_IMAP_USER")
     email_imap_password: str | None = Field(default=None, validation_alias="EMAIL_IMAP_PASSWORD")
-    email_graph_client_id: str | None = Field(default=None, validation_alias="EMAIL_GRAPH_CLIENT_ID")
-    email_graph_client_secret: str | None = Field(default=None, validation_alias="EMAIL_GRAPH_CLIENT_SECRET")
-    email_graph_tenant_id: str | None = Field(default=None, validation_alias="EMAIL_GRAPH_TENANT_ID")
+    email_graph_client_id: str | None = Field(
+        default=None, validation_alias="EMAIL_GRAPH_CLIENT_ID"
+    )
+    email_graph_client_secret: str | None = Field(
+        default=None, validation_alias="EMAIL_GRAPH_CLIENT_SECRET"
+    )
+    email_graph_tenant_id: str | None = Field(
+        default=None, validation_alias="EMAIL_GRAPH_TENANT_ID"
+    )
 
     # Observability
     otel_endpoint: str | None = Field(default=None, validation_alias="OTEL_ENDPOINT")
@@ -194,7 +208,9 @@ class Settings(BaseSettings):
     # Rate Limiting
     rate_limit_requests: int = 100
     rate_limit_window_seconds: int = 60
-    request_timeout_seconds: int = Field(default=60, ge=1, le=300, validation_alias="REQUEST_TIMEOUT_SECONDS")
+    request_timeout_seconds: int = Field(
+        default=60, ge=1, le=300, validation_alias="REQUEST_TIMEOUT_SECONDS"
+    )
 
     # Paths
     @computed_field  # type: ignore[prop-decorator]
@@ -229,8 +245,13 @@ class Settings(BaseSettings):
     def validate_jwt_secret(cls, v: str) -> str:
         if len(v) < 32:
             raise ValueError("JWT_SECRET must be at least 32 characters long")
-        if v in ("your-super-secret-key-change-in-production-at-least-32-chars-long", "changeme", "secret"):
+        if v in (
+            "your-super-secret-key-change-in-production-at-least-32-chars-long",
+            "changeme",
+            "secret",
+        ):
             import warnings
+
             warnings.warn(
                 "JWT_SECRET appears to be a placeholder value. "
                 "Use a strong random secret in production!",
@@ -245,6 +266,7 @@ class Settings(BaseSettings):
         url_str = str(v)
         if "localhost" in url_str and "postgres:postgres" in url_str:
             import warnings
+
             warnings.warn(
                 "DATABASE_URL appears to use default local credentials. "
                 "Use proper credentials in production!",
@@ -259,37 +281,57 @@ class Settings(BaseSettings):
         if self.environment == "production":
             errors = []
 
-            if self.jwt_secret in ("your-super-secret-key-change-in-production-at-least-32-chars-long", "local-development-secret-key-change-in-production-32-chars-min", "changeme", "secret"):
+            if self.jwt_secret in (
+                "your-super-secret-key-change-in-production-at-least-32-chars-long",
+                "local-development-secret-key-change-in-production-32-chars-min",
+                "changeme",
+                "secret",
+            ):
                 errors.append("JWT_SECRET must be a strong random secret in production")
 
             db_url = str(self.database_url)
             if "localhost" in db_url and "postgres:postgres" in db_url:
-                errors.append("DATABASE_URL must use proper production credentials (not default local)")
+                errors.append(
+                    "DATABASE_URL must use proper production credentials (not default local)"
+                )
 
             if "localhost" in self.redis_url:
                 errors.append("REDIS_URL must point to production Redis instance (not localhost)")
 
-            if self.object_storage_access_key == "minioadmin" or self.object_storage_secret_key == "minioadmin":
-                errors.append("OBJECT_STORAGE_ACCESS_KEY and OBJECT_STORAGE_SECRET_KEY must be changed from defaults in production")
+            if (
+                self.object_storage_access_key == "minioadmin"
+                or self.object_storage_secret_key == "minioadmin"
+            ):
+                errors.append(
+                    "OBJECT_STORAGE_ACCESS_KEY and OBJECT_STORAGE_SECRET_KEY must be changed from defaults in production"
+                )
 
             if self.llm_provider != "none" and not self.llm_api_key:
                 errors.append(f"LLM_API_KEY is required when LLM_PROVIDER is '{self.llm_provider}'")
 
-            if self.smtp_host and (not self.smtp_starttls or not self.frontend_url.startswith("https://")):
-                errors.append("Password reset delivery in production requires STARTTLS and an HTTPS FRONTEND_URL")
+            if self.smtp_host and (
+                not self.smtp_starttls or not self.frontend_url.startswith("https://")
+            ):
+                errors.append(
+                    "Password reset delivery in production requires STARTTLS and an HTTPS FRONTEND_URL"
+                )
 
             import os
+
             if os.getenv("DEBUG", "").lower() in ("true", "1", "yes"):
                 errors.append("DEBUG mode must be disabled in production")
 
             if os.getenv("CORS_ORIGINS"):
                 for origin in self.cors_origins:
                     if "localhost" in origin or "127.0.0.1" in origin:
-                        errors.append(f"CORS origins must not contain localhost in production: {origin}")
+                        errors.append(
+                            f"CORS origins must not contain localhost in production: {origin}"
+                        )
 
             if errors:
                 raise ValueError(
-                    "Production configuration validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+                    "Production configuration validation failed:\n"
+                    + "\n".join(f"  - {e}" for e in errors)
                 )
 
         return self

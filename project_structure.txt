@@ -1,0 +1,63 @@
+ChangeGuard Repository Structure
+==================================
+
+ChangeGuard/
+├── backend/                              # FastAPI application & worker services
+│   ├── alembic/                          # PostgreSQL database migrations
+│   │   ├── versions/                     # 0001 to 0015 schema migrations
+│   │   └── env.py
+│   ├── app/                              # Core application source
+│   │   ├── ai/                           # AI model gateway, prompt templates & agentic loops
+│   │   │   ├── gateway/                  # Multi-provider model gateway (Claude, Vertex, OpenAI)
+│   │   │   ├── investigation/            # Multi-turn claim & delay investigation engine
+│   │   │   └── tasks.py                  # Celery AI background tasks
+│   │   ├── api/                          # HTTP REST interface
+│   │   │   ├── dependencies.py           # User authentication, RBAC & database sessions
+│   │   │   ├── exceptions.py             # Error contracts & RFC 7807 problem details
+│   │   │   ├── router.py                 # API router assembly
+│   │   │   └── v1/                       # Versioned route handlers (projects, documents, risks, etc.)
+│   │   ├── core/                         # Configuration, logging, database engine & security
+│   │   ├── document_processing/          # OCR, classification & structured extraction
+│   │   │   ├── classification/           # Document type classifier (contracts, RFIs, reports)
+│   │   │   ├── extraction/               # PyMuPDF, Tesseract & multimodal extractors
+│   │   │   └── pipeline.py               # Celery processing pipeline orchestrator
+│   │   ├── domain/                       # Core business models, schemas & services
+│   │   │   ├── models/                   # SQLAlchemy ORM mapped entities
+│   │   │   ├── schemas/                  # Pydantic v2 validation contracts
+│   │   │   └── services/                 # Domain logic (projects, risks, change orders, evidence)
+│   │   ├── evaluation/                   # Golden dataset harness & accuracy regression gates
+│   │   ├── ingestion/                    # Object storage upload & dedup registry
+│   │   ├── observability/                # Prometheus metrics, OpenTelemetry & structured logging
+│   │   ├── policy/                       # Tenant isolation & Role-Based Access Control (RBAC)
+│   │   └── retrieval/                    # Hybrid BM25 full-text + pgvector cosine retrieval
+│   ├── tests/                            # Pytest test suites (unit, integration, red-team)
+│   ├── Dockerfile
+│   └── pyproject.toml
+├── frontend/                             # Next.js 15 App Router web interface
+│   ├── src/
+│   │   ├── app/                          # App router pages
+│   │   │   ├── layout.tsx                # Enterprise shell & global providers
+│   │   │   ├── page.tsx                  # Landing / dashboard overview
+│   │   │   ├── login/                    # Authentication page
+│   │   │   ├── projects/                 # Project detail & timeline views
+│   │   │   ├── review-queue/             # Commercial review queue & risk conversion
+│   │   │   └── investigations/           # Grounded investigation interface
+│   │   ├── components/                   # Reusable UI component library (forms, modals, cards)
+│   │   ├── lib/                          # API client, Zod schemas, RBAC contracts & auth
+│   │   └── test/                         # Node.js native test runner test suites
+│   ├── package.json
+│   └── tsconfig.json
+├── docs/                                 # Technical documentation & implementation guides
+├── infra/                                # Infrastructure deployment configurations
+├── tests/                                # Shared evaluation benchmarks & golden cases
+├── docker-compose.yml                    # Local multi-service development compose stack
+├── docker-compose.staging.yml            # Staging compose stack
+├── PRD.md                                # Product Requirements Document
+├── MEMORY.md                             # Architectural memory & non-negotiables
+├── README.md                             # Repository quickstart & API guide
+├── ARCHITECTURE.md                       # System architecture design
+├── DESIGN.md                             # UX design specification
+├── DECISIONS.md                          # Architecture Decision Records (ADRs)
+├── TEST_PLAN.md                          # Quality assurance & validation test plan
+├── SECURITY.md                           # Security policy & tenant isolation standards
+└── SECURITY_AUDIT_REPORT.md              # White-box SAST audit report & verification

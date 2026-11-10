@@ -102,12 +102,16 @@ def main(argv: list[str] | None = None) -> int:
     print("=" * 60)
     for g in gates.get("gates", []):
         status = "PASSED" if g["passed"] else "FAILED"
-        print(f"  [{status:^6}] {g['name']:<38} Actual: {g['actual']:<10} Required: {g['threshold']}")
+        print(
+            f"  [{status:^6}] {g['name']:<38} Actual: {g['actual']:<10} Required: {g['threshold']}"
+        )
 
     overall_passed = gates.get("passed", False)
     status_str = "PASSED" if overall_passed else "FAILED"
     print("=" * 60)
-    print(f"Overall Status: {status_str} ({gates.get('passed_gates', 0)}/{gates.get('total_gates', 0)} gates passed)\n")
+    print(
+        f"Overall Status: {status_str} ({gates.get('passed_gates', 0)}/{gates.get('total_gates', 0)} gates passed)\n"
+    )
 
     if args.verbose and md_path:
         print(md_path.read_text(encoding="utf-8"))

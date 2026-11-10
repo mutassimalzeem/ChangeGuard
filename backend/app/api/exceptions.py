@@ -30,14 +30,18 @@ class ValidationError(ChangeGuardException):
 class AuthenticationError(ChangeGuardException):
     """Authentication error."""
 
-    def __init__(self, message: str = "Authentication failed", details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str = "Authentication failed", details: dict[str, Any] | None = None
+    ):
         super().__init__(message, "AUTHENTICATION_ERROR", 401, details)
 
 
 class AuthorizationError(ChangeGuardException):
     """Authorization error."""
 
-    def __init__(self, message: str = "Insufficient permissions", details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str = "Insufficient permissions", details: dict[str, Any] | None = None
+    ):
         super().__init__(message, "AUTHORIZATION_ERROR", 403, details)
 
 
@@ -46,7 +50,12 @@ class NotFoundError(ChangeGuardException):
 
     def __init__(self, resource: str, identifier: str | int, details: dict[str, Any] | None = None):
         message = f"{resource} not found: {identifier}"
-        super().__init__(message, "NOT_FOUND", 404, {"resource": resource, "identifier": identifier, **(details or {})})
+        super().__init__(
+            message,
+            "NOT_FOUND",
+            404,
+            {"resource": resource, "identifier": identifier, **(details or {})},
+        )
 
 
 class ConflictError(ChangeGuardException):
@@ -59,14 +68,20 @@ class ConflictError(ChangeGuardException):
 class ProcessingError(ChangeGuardException):
     """Document processing error."""
 
-    def __init__(self, message: str, document_id: str | None = None, details: dict[str, Any] | None = None):
-        super().__init__(message, "PROCESSING_ERROR", 500, {"document_id": document_id, **(details or {})})
+    def __init__(
+        self, message: str, document_id: str | None = None, details: dict[str, Any] | None = None
+    ):
+        super().__init__(
+            message, "PROCESSING_ERROR", 500, {"document_id": document_id, **(details or {})}
+        )
 
 
 class AIError(ChangeGuardException):
     """AI service error."""
 
-    def __init__(self, message: str, model: str | None = None, details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str, model: str | None = None, details: dict[str, Any] | None = None
+    ):
         super().__init__(message, "AI_ERROR", 502, {"model": model, **(details or {})})
 
 
@@ -80,19 +95,27 @@ class RateLimitError(ChangeGuardException):
 class TenantIsolationError(ChangeGuardException):
     """Tenant isolation violation."""
 
-    def __init__(self, message: str = "Tenant isolation violation", details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str = "Tenant isolation violation", details: dict[str, Any] | None = None
+    ):
         super().__init__(message, "TENANT_ISOLATION_ERROR", 403, details)
 
 
 class WorkflowError(ChangeGuardException):
     """Workflow state machine error."""
 
-    def __init__(self, message: str, state: str | None = None, details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str, state: str | None = None, details: dict[str, Any] | None = None
+    ):
         super().__init__(message, "WORKFLOW_ERROR", 400, {"state": state, **(details or {})})
 
 
 class InsufficientEvidenceError(ChangeGuardException):
     """Insufficient evidence for AI conclusion."""
 
-    def __init__(self, message: str = "Insufficient evidence to reach conclusion", details: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        message: str = "Insufficient evidence to reach conclusion",
+        details: dict[str, Any] | None = None,
+    ):
         super().__init__(message, "INSUFFICIENT_EVIDENCE", 422, details)
