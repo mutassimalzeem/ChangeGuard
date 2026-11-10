@@ -10,10 +10,12 @@ from sqlalchemy import select, text
 from app.document_processing.structured.schemas import schema_for
 from app.domain.models import (
     Approval,
+    AuditEvent,
     ChangeOrder,
     Document,
     DocumentEntityLink,
     EvidenceLink,
+    ProjectEvent,
     Risk,
 )
 
@@ -38,10 +40,11 @@ class Finding:
     responsible_party: str | None = None
     severity: str = "medium"
     confidence: Decimal = Decimal("1")
+    insufficient: bool = False
 
     @property
     def status(self):
-        return "open" if self.sources else "insufficient_evidence"
+        return "open" if self.sources and not self.insufficient else "insufficient_evidence"
 
 
 def money(value):
@@ -299,6 +302,53 @@ def document_rules(document, comparisons):
     return findings
 
 
+def daily_report_delay_rules(document, events, evidence, links, changes):
+    """A recorded delay without an explicit same-project RFI/CO relationship.
+
+    Absence means absence in ChangeGuard's linked records, never a claim about
+    all project correspondence. Financial and programme effects remain unknown.
+    """
+    if document.document_type != "daily_report":
+        return []
+    if any(
+        link.document_id == document.id and (link.rfi_id or link.change_order_id) for link in links
+    ):
+        return []
+    findings = []
+    for event in events:
+        if event.document_id != document.id or event.event_type != "delay":
+            continue
+        if any(change.source_event_id == event.id for change in changes):
+            continue
+        sources = [
+            Source(document.id, link.source_page, link.source_text_snippet)
+            for link in evidence
+            if link.subject_id == event.id
+            and link.source_type == "document"
+            and link.source_id == document.id
+            and link.source_page
+            and link.source_text_snippet
+            and link.source_text_snippet.strip()
+        ]
+        sufficient = (
+            bool(sources) and event.confidence is not None and event.confidence >= Decimal("0.7")
+        )
+        findings.append(
+            Finding(
+                "daily_report_delay_without_link",
+                str(event.id),
+                "Daily report indicates delay, but no linked RFI or change order exists in ChangeGuard."
+                if sufficient
+                else "Daily report delay signal needs source evidence review.",
+                "Review the report and link the relevant RFI or change order.",
+                sources if sufficient else [Source(document.id)],
+                confidence=event.confidence or Decimal("0"),
+                insufficient=not sufficient,
+            )
+        )
+    return findings
+
+
 async def run_risk_checks(document, session):
     # Serialize shared entity findings when different documents finish together.
     lock = int.from_bytes(
@@ -336,6 +386,15 @@ async def run_risk_checks(document, session):
         ]
 
     changes = list(await session.scalars(scoped(ChangeOrder)))
+    events = list(
+        await session.scalars(scoped(ProjectEvent).where(ProjectEvent.document_id == document.id))
+    )
+    event_evidence = list(
+        await session.scalars(
+            scoped(EvidenceLink).where(EvidenceLink.subject_type == "project_event")
+        )
+    )
+    findings.extend(daily_report_delay_rules(document, events, event_evidence, links, changes))
     approvals = list(await session.scalars(scoped(Approval)))
     for change in changes:
         if not any(
@@ -363,6 +422,9 @@ async def run_risk_checks(document, session):
                 tenant_id=document.tenant_id,
                 project_id=document.project_id,
                 document_id=document.id,
+                project_event_id=UUID(finding.key)
+                if finding.risk_type == "daily_report_delay_without_link"
+                else None,
                 rule_key=key,
                 risk_type=finding.risk_type,
                 category="deterministic_v1",
@@ -379,7 +441,9 @@ async def run_risk_checks(document, session):
             )
             session.add(risk)
             await session.flush()
-            for source in dict.fromkeys(finding.sources):
+            # A review-only finding still points to the triggering original;
+            # that link does not upgrade insufficient evidence to a supported risk.
+            for source in dict.fromkeys(finding.sources or [Source(document.id)]):
                 session.add(
                     EvidenceLink(
                         tenant_id=document.tenant_id,
@@ -394,5 +458,20 @@ async def run_risk_checks(document, session):
                         rationale=finding.description,
                     )
                 )
+            session.add(
+                AuditEvent(
+                    tenant_id=document.tenant_id,
+                    project_id=document.project_id,
+                    action="risk.create",
+                    entity_type="risk",
+                    entity_id=risk.id,
+                    request_id=(document.processing_data or {}).get("request_id"),
+                    details={
+                        "rule": finding.risk_type,
+                        "status": finding.status,
+                        "document_id": str(document.id),
+                    },
+                )
+            )
         ids.append(str(risk.id))
     return ids

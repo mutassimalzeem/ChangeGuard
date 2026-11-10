@@ -11,15 +11,17 @@ from sqlalchemy.exc import IntegrityError
 from starlette.concurrency import run_in_threadpool
 
 from app.domain.models import Document
+from app.domain.services.audit import record_user_action
 from app.domain.services.document_files import MAX_SIZE, TYPES, validate_document
 from app.domain.services.project_access import ProjectAccessService
 from app.policy.permissions import Action, has_permission
 
 
 class DocumentService:
-    def __init__(self, session, user, storage):
+    def __init__(self, session, user, storage, request_id=None):
         self.session, self.user, self.storage = session, user, storage
         self.access = ProjectAccessService(session, user)
+        self.request_id = request_id
 
     def permission(self, write=False):
         if not has_permission(
@@ -111,6 +113,7 @@ class DocumentService:
             document_version=1,
             access_level=access_level,
             error_message=error,
+            processing_data={"request_id": self.request_id},
         )
         self.session.add(document)
         try:
@@ -137,6 +140,16 @@ class DocumentService:
             ) from None
         document.status = "quarantined" if error else "stored"
         document.processing_status = document.status
+        await record_user_action(
+            self.session,
+            self.user,
+            project_id,
+            "document.upload",
+            "document",
+            document.id,
+            self.request_id,
+            {"status": document.status, "checksum": checksum},
+        )
         await self.session.commit()
         if not error:
             document.status = "queued"
@@ -157,6 +170,15 @@ class DocumentService:
     async def delete(self, document_id):
         document = await self.get(document_id, write=True)
         document.deleted_at = datetime.now(UTC)
+        await record_user_action(
+            self.session,
+            self.user,
+            document.project_id,
+            "document.delete",
+            "document",
+            document.id,
+            self.request_id,
+        )
         await self.session.commit()
 
     async def download_url(self, document_id):

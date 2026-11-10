@@ -115,7 +115,7 @@ class RiskService:
         if not has_permission(self.user.role, Action.RISK_ACCEPT):
             raise HTTPException(403, "Access denied")
         risk, links = await self.load(project_id, risk_id, lock=True)
-        if payload.action != "dismiss" and not links:
+        if payload.action != "dismiss" and (not links or risk.status == "insufficient_evidence"):
             raise HTTPException(422, "insufficient_evidence")
         before = {
             "status": risk.status,

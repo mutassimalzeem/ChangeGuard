@@ -3,7 +3,7 @@
 from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Query, Request, Response, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import require_authenticated_user, require_rate_limit
@@ -17,11 +17,12 @@ router = APIRouter(tags=["documents"])
 
 
 def get_document_service(
+    request: Request,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(require_authenticated_user),
     storage=Depends(get_object_storage_service),
 ):
-    return DocumentService(session, user, storage)
+    return DocumentService(session, user, storage, getattr(request.state, "request_id", None))
 
 
 @router.post(

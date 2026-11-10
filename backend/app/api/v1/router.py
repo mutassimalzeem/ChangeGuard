@@ -15,6 +15,7 @@ from app.api.v1.routes import (
     projects,
     retrieval,
     risks,
+    timeline,
 )
 
 api_router = APIRouter()
@@ -24,6 +25,7 @@ api_router.include_router(investigations.router)
 api_router.include_router(change_orders.router)
 api_router.include_router(potential_changes.router)
 api_router.include_router(risks.router)
+api_router.include_router(timeline.router)
 api_router.include_router(evidence.router)
 api_router.include_router(retrieval.router)
 api_router.include_router(documents.router)

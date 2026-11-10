@@ -11,6 +11,7 @@ import { Field, Input, Select } from "@/components/ui/form";
 import { Modal } from "@/components/ui/modal";
 import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/ui/states";
 import { Tabs, type TabItem } from "@/components/ui/tabs";
+import { ProjectTimeline } from "@/components/project-timeline";
 import { ProtectedRoute } from "@/components/protected-route";
 import {
   IconArrowLeft,
@@ -26,7 +27,6 @@ import {
   changeOrdersApi,
   documentsApi,
   investigationsApi,
-  potentialChangesApi,
   projectsApi,
   risksApi,
 } from "@/lib/api/resources";
@@ -88,18 +88,6 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
   } = useQuery({
     queryKey: ["project-documents", projectId],
     queryFn: () => documentsApi.list(projectId),
-  });
-
-  // 3. Potential changes query (acts as timeline events source)
-  const {
-    data: potentialChanges,
-    isLoading: isChangesLoading,
-    isError: isChangesError,
-    error: changesError,
-    refetch: refetchChanges,
-  } = useQuery({
-    queryKey: ["potential-changes", projectId],
-    queryFn: () => potentialChangesApi.list(projectId),
   });
 
   // 4. Risks query
@@ -427,7 +415,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
   const workspaceTabs: readonly TabItem[] = [
     { id: "overview", label: "Overview" },
     { id: "documents", label: "Documents", count: documents?.length },
-    { id: "timeline", label: "Timeline", count: potentialChanges?.length },
+    { id: "timeline", label: "Timeline" },
     { id: "change-orders", label: "Change Orders", count: changeOrdersList.length },
     { id: "risks", label: "Risks", count: risks?.length },
     { id: "approvals", label: "Approvals", count: overdueApprovalsCount > 0 ? overdueApprovalsCount : undefined },
@@ -837,104 +825,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
           </div>
         )}
 
-        {/* TAB 3: TIMELINE (Chronological Evidence-Linked Events) */}
-        {activeTab === "timeline" && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-base font-semibold text-ink">Project Evidence Timeline</h2>
-              <p className="text-xs text-ink-muted">
-                Chronological sequence of scope instructions, notices, geotechnical variances, and commercial milestones
-              </p>
-            </div>
-
-            {isChangesLoading ? (
-              <LoadingSkeleton rows={4} variant="cards" />
-            ) : isChangesError ? (
-              <ErrorState
-                title="Failed to Load Timeline"
-                message={errorMessage(changesError, "Could not load project events.")}
-                onRetry={() => refetchChanges()}
-              />
-            ) : potentialChanges && potentialChanges.length > 0 ? (
-              <div className="relative pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-border space-y-6">
-                {potentialChanges.map((event, index) => (
-                  <div key={event.id} className="relative flex flex-col gap-2">
-                    <div className="absolute -left-6 top-1.5 size-3.5 rounded-full border-2 border-surface bg-brand shadow-sm" />
-                    <Card>
-                      <CardBody className="p-4 flex flex-col gap-2 text-xs">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-semibold uppercase text-brand">
-                              {event.event_type}
-                            </span>
-                            <span className="text-ink-muted font-mono">
-                              {event.detected_date || `Event #${index + 1}`}
-                            </span>
-                          </div>
-                          {event.confidence !== null && (
-                            <span className="font-semibold text-success">
-                              {Math.round((event.confidence ?? 0.85) * 100)}% Confidence
-                            </span>
-                          )}
-                        </div>
-
-                        <h3 className="font-semibold text-sm text-ink">{event.title}</h3>
-                        <p className="text-ink leading-relaxed">{event.description}</p>
-
-                        <div className="grid grid-cols-2 gap-4 border-t border-border pt-2.5 mt-1 text-ink-muted">
-                          <div>
-                            <span>Estimated Cost Variance:</span>
-                            <p className="font-semibold text-ink tabular text-xs">
-                              {event.suggested_cost_impact
-                                ? `${Number(event.suggested_cost_impact).toLocaleString()} ${event.suggested_currency}`
-                                : "Under Evaluation"}
-                            </p>
-                          </div>
-                          <div>
-                            <span>Schedule Variance:</span>
-                            <p className="font-semibold text-ink text-xs">
-                              {event.suggested_schedule_impact !== null
-                                ? `+${event.suggested_schedule_impact} Calendar Days`
-                                : "No Time Extension"}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Evidence Links */}
-                        <div className="flex flex-wrap items-center justify-between border-t border-border pt-2 mt-1">
-                          <div className="flex items-center gap-1.5 text-xs text-ink-muted">
-                            <IconFileCheck className="size-3.5 text-brand" />
-                            <span>Linked Evidence: {event.evidence_links.length} sources cited</span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEvidenceModalData({
-                                title: event.title,
-                                excerpts: [
-                                  event.description,
-                                  `Verified against project contract ${project.code}. Variance detected per sub-clause requirements.`,
-                                ],
-                              });
-                            }}
-                          >
-                            Inspect Evidence Package &rarr;
-                          </Button>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                title="No timeline events recorded"
-                description="Events detected across uploaded correspondence and variation notices will appear in chronological order."
-              />
-            )}
-          </div>
-        )}
+        {activeTab === "timeline" && <ProjectTimeline key={projectId} projectId={projectId} />}
 
         {/* TAB 4: CHANGE ORDERS (List, Detail, Status, Evidence Package) */}
         {activeTab === "change-orders" && (

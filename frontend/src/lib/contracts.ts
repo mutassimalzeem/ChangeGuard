@@ -331,6 +331,35 @@ export const timelineEventSchema = z
 
 export type TimelineEvent = z.infer<typeof timelineEventSchema>;
 
+export const timelineSourceSchema = z.object({
+  evidence_link_id: z.string().uuid(),
+  source_type: z.string(),
+  source_id: z.string().uuid(),
+  source_page: z.number().int().positive().nullable(),
+  source_text_snippet: z.string().nullable(),
+});
+
+export const projectTimelineItemSchema = z.object({
+  id: z.string().uuid(),
+  kind: z.enum(["event", "risk"]),
+  occurred_at: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  event_type: z.string(),
+  status: z.string(),
+  confidence: z.coerce.number().min(0).max(1).nullable(),
+  severity: z.string().nullable(),
+  evidence_status: z.enum(["supported", "insufficient_evidence"]),
+  evidence: z.array(timelineSourceSchema),
+});
+
+export const projectTimelineSchema = z.object({
+  items: z.array(projectTimelineItemSchema),
+  offset: z.number().int().nonnegative(),
+  limit: z.number().int().positive(),
+  has_more: z.boolean(),
+});
+
 /* ----------------------------------------------------------------- evidence */
 
 export const evidenceItemSchema = z

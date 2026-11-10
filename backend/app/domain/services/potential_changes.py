@@ -91,6 +91,22 @@ class Signal:
     days: int | None = None
 
 
+class ExtractedEvent(BaseModel):
+    """Closed event contract; impacts can only be copied by deterministic parsers."""
+
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+    event_type: EventType
+    quote: str = Field(min_length=1, max_length=2000)
+    page: int | None = Field(ge=1)
+    confidence: Decimal = Field(ge=0, le=1, allow_inf_nan=False)
+    method: Literal["rules:v1", "llm:v1", "vision:v1"]
+    explanation: str = Field(min_length=1, max_length=1500)
+    owner: str | None = Field(default=None, max_length=100)
+    cost: Decimal | None = Field(default=None, ge=0, allow_inf_nan=False)
+    currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
+    days: int | None = Field(default=None, ge=0, le=36500)
+
+
 def suggestions(text):
     """Copy only explicitly labelled positive suggestions. Never estimate or sum."""
     costs = re.findall(
@@ -196,6 +212,8 @@ async def detect(source, *, fallback=None, unresolved=None):
 
 
 async def persist(document, signals, session):
+    # Validate the entire batch before any database side effects.
+    signals = [ExtractedEvent.model_validate(vars(signal)) for signal in signals]
     ids = []
     for signal in signals:
         source_key = signal.quote if signal.method != "vision:v1" else "image"

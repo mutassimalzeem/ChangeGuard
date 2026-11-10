@@ -18,7 +18,7 @@ from app.policy.permissions import TENANT_WIDE_ROLES, Action, Role, has_permissi
 SCOPE_KEY = "access_principal"
 FINANCIAL_FIELDS = {
     "project_events": frozenset({"suggested_cost_impact", "suggested_currency"}),
-    "projects": frozenset({"currency"}),
+    "projects": frozenset({"currency", "contract_value"}),
     "contracts": frozenset({"value", "currency"}),
     "boq_items": frozenset({"unit_rate", "currency"}),
     "change_orders": frozenset({"amount", "currency", "cost_items", "draft_content"}),
@@ -346,6 +346,28 @@ def enforce_write_scope(session, flush_context, instances):
         pilot_audit = session.info.get("pilot_audit")
         pilot_member = session.info.get("pilot_membership")
         is_pilot_audit = instance is pilot_audit and instance in session.new
+        user_audit = session.info.get("user_action_audit")
+        is_user_audit = instance is user_audit and instance in session.new
+        if is_user_audit:
+            required = {
+                "project.create": (Action.PROJECT_CREATE, "project"),
+                "project.update": (Action.PROJECT_UPDATE, "project"),
+                "document.upload": (Action.DOCUMENT_WRITE, "document"),
+                "document.delete": (Action.DOCUMENT_WRITE, "document"),
+            }.get(user_audit.action)
+            if (required is None or user_audit.actor_id != principal.user_id
+                    or user_audit.tenant_id != principal.tenant_id
+                    or user_audit.entity_type != required[1]
+                    or not has_permission(principal.role, required[0])):
+                raise AuthorizationError("Invalid user action audit")
+        created_project = session.info.get("created_project")
+        creator_membership = (created_project is not None
+                              and table.name == "project_memberships"
+                              and instance in session.new
+                              and instance.project_id == created_project.id
+                              and instance.tenant_id == principal.tenant_id
+                              and instance.user_id == principal.user_id
+                              and has_permission(principal.role, Action.PROJECT_CREATE))
         is_pilot_member = instance is pilot_member and instance in session.new
         if is_pilot_audit or is_pilot_member:
             if pilot_audit is None:
@@ -365,7 +387,8 @@ def enforce_write_scope(session, flush_context, instances):
         if table.name == "projects" and instance in session.new:
             action = Action.PROJECT_CREATE
         if not (review_audit or workflow_audit or workflow_approval
-                or investigation_audit or investigation_task or is_pilot_audit or is_pilot_member) and (
+                or investigation_audit or investigation_task or is_pilot_audit or is_pilot_member
+                or is_user_audit or creator_membership) and (
             action is None or not has_permission(principal.role, action)
         ):
             raise AuthorizationError()
@@ -400,7 +423,9 @@ def enforce_write_scope(session, flush_context, instances):
             and instance in session.new
             and (is_pilot_member or is_pilot_audit or table.name == "pilot_onboarding")
         )
-        if project_id is not None and not (table.name == "projects" and instance in session.new) and not pilot_creation_record:
+        project_creation_record = (created_project is not None and project_id == created_project.id
+                                   and (creator_membership or (is_user_audit and user_audit.action == "project.create")))
+        if project_id is not None and not (table.name == "projects" and instance in session.new) and not pilot_creation_record and not project_creation_record:
             with session.no_autoflush:
                 exists = session.scalar(select(Project.id).where(Project.id == project_id))
             if exists is None:

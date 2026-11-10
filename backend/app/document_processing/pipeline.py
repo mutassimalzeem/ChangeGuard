@@ -19,6 +19,7 @@ from app.document_processing.providers import Services
 from app.document_processing.schema import Classification, Extraction
 from app.domain.models import (
     RFI,
+    AuditEvent,
     ChangeOrder,
     Contract,
     Document,
@@ -462,6 +463,13 @@ async def run_one_stage(document_id, tenant_id, session_factory, *, services=Non
             if delay is None:
                 timing["finished_at"] = datetime.now(UTC).isoformat()
             document.processing_data = deepcopy(state)
+            session.add(AuditEvent(
+                tenant_id=document.tenant_id, project_id=document.project_id,
+                action="document.processing", entity_type="document", entity_id=document.id,
+                request_id=state.get("request_id"),
+                details={"stage": stage, "outcome": outcome,
+                         "attempt": attempts[stage], "status": document.processing_status},
+            ))
             await session.commit()
             log.info(
                 "document_processing_stage",

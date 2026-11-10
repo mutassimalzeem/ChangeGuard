@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.models import AuditEvent, Project, User
+from app.domain.models import Project, User
 from app.domain.schemas.project import (
     PaginatedProjectResponse,
     ProjectCreate,
@@ -15,6 +15,8 @@ from app.domain.schemas.project import (
     ProjectRead,
     ProjectUpdate,
 )
+from app.domain.services.audit import record_user_action
+from app.policy.permissions import Action, has_permission
 
 
 def utcnow() -> datetime:
@@ -33,30 +35,44 @@ class ProjectService:
             return self.request.state.request_id
         return None
 
-    def _get_actor_id(self) -> UUID | None:
-        if self.request and hasattr(self.request.state, "user_id"):
-            return UUID(self.request.state.user_id)
-        return None
-
     async def _record_audit(
         self,
         action: str,
         project: Project,
-        actor_id: UUID | None = None,
+        user: User,
         details: dict[str, Any] | None = None,
     ) -> None:
         """Record an audit event for project operations."""
-        audit = AuditEvent(
-            tenant_id=project.tenant_id,
-            project_id=project.id,
-            actor_id=actor_id or self._get_actor_id(),
-            action=action,
-            entity_type="project",
-            entity_id=project.id,
-            request_id=self._get_request_id(),
-            details=details or {},
+        await record_user_action(
+            self.session,
+            user,
+            project.id,
+            action,
+            "project",
+            project.id,
+            self._get_request_id(),
+            details,
         )
-        self.session.add(audit)
+
+    def _read(self, project, user):
+        # Do not touch deferred financial columns for callers without permission.
+        financial = has_permission(user.role, Action.FINANCIAL_READ)
+        return ProjectRead(
+            id=project.id,
+            tenant_id=project.tenant_id,
+            code=project.code,
+            name=project.name,
+            client_name=project.client_name,
+            description=project.description,
+            status=project.status,
+            start_date=project.start_date,
+            expected_end_date=project.end_date,
+            stakeholders=project.stakeholders,
+            contract_value=project.contract_value if financial else None,
+            currency=project.currency if financial else "USD",
+            created_at=project.created_at,
+            updated_at=project.updated_at,
+        )
 
     async def create_project(self, payload: ProjectCreate, user: User) -> ProjectRead:
         """Create a new project."""
@@ -80,14 +96,19 @@ class ProjectService:
             start_date=payload.start_date,
             end_date=payload.expected_end_date,
             currency=payload.currency.upper(),
+            client_name=payload.client_name,
+            contract_value=payload.contract_value,
+            stakeholders=payload.stakeholders,
         )
         self.session.add(project)
         await self.session.flush()
+        self.session.info["created_project"] = project
 
         # Record audit event
         await self._record_audit(
             "project.create",
             project,
+            user,
             details={
                 "name": project.name,
                 "code": project.code,
@@ -103,6 +124,7 @@ class ProjectService:
 
         # Add creator as project member
         from app.domain.models import ProjectMembership
+
         membership = ProjectMembership(
             tenant_id=user.tenant_id,
             project_id=project.id,
@@ -111,7 +133,9 @@ class ProjectService:
         )
         self.session.add(membership)
 
-        return ProjectRead.model_validate(project)
+        await self.session.flush()
+        self.session.info.pop("created_project", None)
+        return self._read(project, user)
 
     async def list_projects(
         self,
@@ -142,7 +166,7 @@ class ProjectService:
         items, total = await paginate_query(self.session, query, page_params)
 
         # Convert to read schemas
-        project_reads = [ProjectRead.model_validate(item) for item in items]
+        project_reads = [self._read(item, user) for item in items]
 
         return PaginatedProjectResponse.create(  # type: ignore[return-value]
             items=project_reads,
@@ -161,7 +185,7 @@ class ProjectService:
         )
         if not project:
             raise ValueError("Project not found")
-        return ProjectRead.model_validate(project)
+        return self._read(project, user)
 
     async def update_project(
         self,
@@ -195,18 +219,32 @@ class ProjectService:
 
             old_value = getattr(project, field, None)
             if old_value != value:
-                changes[field] = {"old": str(old_value) if old_value is not None else None, "new": str(value) if value is not None else None}
+                changes[field] = {
+                    "old": str(old_value) if old_value is not None else None,
+                    "new": str(value) if value is not None else None,
+                }
                 setattr(project, field, value)
 
         if changes:
             await self._record_audit(
                 "project.update",
                 project,
+                user,
                 details={"changes": changes},
             )
 
         await self.session.flush()
-        return ProjectRead.model_validate(project)
+        # Server-generated updated_at expires on UPDATE; reload through the
+        # scoped SELECT boundary rather than triggering an implicit column load.
+        project = await self.session.scalar(
+            select(Project)
+            .where(
+                Project.id == project_id,
+                Project.tenant_id == user.tenant_id,
+            )
+            .execution_options(populate_existing=True)
+        )
+        return self._read(project, user)
 
     async def delete_project(self, project_id: UUID, user: User) -> None:
         """Delete a project."""
@@ -223,6 +261,7 @@ class ProjectService:
         await self._record_audit(
             "project.delete",
             project,
+            user,
             details={
                 "name": project.name,
                 "code": project.code,

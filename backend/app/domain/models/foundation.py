@@ -126,10 +126,16 @@ class Project(TenantRecord, Base):
     __table_args__ = (UniqueConstraint("id", "tenant_id"), UniqueConstraint("tenant_id", "code"))
     code: Mapped[str] = mapped_column(String(64))
     name: Mapped[str] = mapped_column(String(255))
+    client_name: Mapped[str] = mapped_column(String(255), server_default="Unspecified")
+    contract_value: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 2), deferred=True, deferred_raiseload=True
+    )
+    stakeholders: Mapped[list | None] = mapped_column(JSONB)
     description: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(32), server_default="active", index=True)
     start_date: Mapped[date | None] = mapped_column(Date, index=True)
     end_date: Mapped[date | None] = mapped_column(Date, index=True)
+    expected_end_date = synonym("end_date")
     currency: Mapped[str] = mapped_column(
         String(3), server_default="USD", deferred=True, deferred_raiseload=True
     )

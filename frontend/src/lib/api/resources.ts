@@ -17,6 +17,7 @@ import {
   projectListParamsSchema,
   projectSchema,
   projectUpdateSchema,
+  projectTimelineSchema,
   riskDecisionSchema,
   riskSchema,
   evidenceResultSchema,
@@ -196,6 +197,15 @@ export const risksApi = {
     const validated = riskDecisionSchema.parse(payload);
     const response = await client.post(`/projects/${projectId}/risks/${riskId}/decisions`, validated);
     return parse(riskSchema, response.data);
+  },
+};
+
+export const timelineApi = {
+  async list(projectId: string, offset = 0, limit = 50) {
+    const response = await client.get(`/projects/${projectId}/timeline`, {
+      params: { offset, limit },
+    });
+    return parse(projectTimelineSchema, response.data);
   },
 };
 

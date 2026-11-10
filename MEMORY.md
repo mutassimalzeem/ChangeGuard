@@ -363,3 +363,45 @@ By the end of the year, ChangeGuard should demonstrate:
 5. At least 2–3 documented case studies.
 6. A clear path from pilot to paid subscription.
 7. A portfolio asset that proves advanced AI systems engineering ability.
+
+## 2026-11-10: Daily report vertical slice
+
+Repository inspection found uploads, immutable originals, Celery stages, OCR,
+classification, strict grounded fields, potential-change events, evidence and a
+deterministic risk engine already implemented. Reused those systems.
+
+Implemented:
+
+- Migration `0015_project_metadata`: persist client name, contract value and
+  stakeholders; repair timestamp serialization and authenticated creator membership/
+  audit handling. Financial fields remain permission-protected.
+- Strict closed Pydantic event validation before event/evidence persistence.
+- `daily_report_delay_without_link`: evidence-backed daily-report delay with no
+  explicit linked RFI/change order. Links to the event and original, null impacts,
+  insufficient_evidence when provenance/confidence is inadequate. Such risks cannot
+  be accepted merely because an original-file link exists.
+- `GET /api/v1/projects/{id}/timeline`: chronological events/risks with complete
+  source visibility checks and pagination, plus the frontend timeline using real
+  quotations/pages, signed-original access and five-second refresh.
+- Audit records for upload, document deletion, processing outcomes and risk
+  creation; server-generated upload request IDs propagate into worker audits.
+- Unit/integration/contract tests including PDF/image worker stages, retries,
+  tenant/project/restricted/deleted-source access and insufficient evidence.
+
+Plan: `tasks/plan.md`. File map, deployment compatibility, manual verification and
+known limitations: `docs/DAILY_REPORT_SLICE.md`.
+
+Validation: full backend 914 passed / 13 skipped / 10 failed, with every failing
+test ID reproduced on unchanged starting commit `9184f006` (its project module had
+19 failures). No test/access controls were weakened. Focused backend 136 passed;
+final new integration module 7 passed, including PDF/image worker execution and
+insufficient-evidence rejection. Frontend 20 passed; typecheck/lint/production
+build, focused Ruff, pip check and whitespace checks passed. Isolated Chrome
+verified risk/evidence UI with intercepted API fixtures and zero runtime console
+errors. PostgreSQL/pgvector was real; storage/model/OCR/broker boundaries were
+faked in the new integration tests. Temporary test servers stopped afterward.
+
+Remaining: live broker/storage/model/OCR deployment verification; automatic risk
+resolution after later linking; deliberate historical backfill; broader language
+and project-packet evaluation. Original create-only storage still requires bucket
+retention/admin controls. Timeline follows existing commercial-read permissions.

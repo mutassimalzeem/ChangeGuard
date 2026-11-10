@@ -1,6 +1,6 @@
 """Project Pydantic schemas for request/response validation."""
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
@@ -81,7 +81,9 @@ class ProjectUpdate(BaseModel):
     client_name: Annotated[str | None, Field(default=None, min_length=1, max_length=255)] = None
     description: Annotated[str | None, Field(default=None, max_length=5000)] = None
     contract_value: Annotated[Decimal | None, Field(default=None, ge=0, decimal_places=2)] = None
-    currency: Annotated[str | None, Field(default=None, min_length=3, max_length=3, pattern=r"^[A-Z]{3}$")] = None
+    currency: Annotated[
+        str | None, Field(default=None, min_length=3, max_length=3, pattern=r"^[A-Z]{3}$")
+    ] = None
     start_date: date | None = None
     expected_end_date: date | None = None
     status: Annotated[str | None, Field(default=None, min_length=1, max_length=32)] = None
@@ -132,8 +134,8 @@ class ProjectRead(ProjectBase):
     id: UUID
     code: str
     tenant_id: UUID
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -145,7 +147,9 @@ class ProjectListParams(BaseModel):
 
     page: Annotated[int, Field(default=1, ge=1)] = 1
     page_size: Annotated[int, Field(default=20, ge=1, le=100)] = 20
-    status: Annotated[str | None, Field(default=None, pattern=r"^(active|on_hold|completed|cancelled|archived)$")] = None
+    status: Annotated[
+        str | None, Field(default=None, pattern=r"^(active|on_hold|completed|cancelled|archived)$")
+    ] = None
     search: Annotated[str | None, Field(default=None, min_length=1, max_length=255)] = None
 
 
@@ -154,4 +158,5 @@ from app.api.pagination import PaginatedResponse
 
 class PaginatedProjectResponse(PaginatedResponse[ProjectRead]):
     """Paginated response for project listings."""
+
     pass
