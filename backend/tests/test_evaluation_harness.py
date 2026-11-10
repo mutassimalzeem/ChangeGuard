@@ -84,7 +84,10 @@ def test_comparison_runner_matrices():
     assert "prompt_v1_baseline" in prompts
     assert "prompt_v2_cot" in prompts
     assert "prompt_v2_structured_json" in prompts
-    assert prompts["prompt_v2_structured_json"]["classification_accuracy"] > prompts["prompt_v1_baseline"]["classification_accuracy"]
+    assert (
+        prompts["prompt_v2_structured_json"]["classification_accuracy"]
+        > prompts["prompt_v1_baseline"]["classification_accuracy"]
+    )
 
     # Model comparison assertions
     models = comparisons["models"]["models"]
@@ -105,7 +108,10 @@ def test_comparison_runner_matrices():
     assert "fixed_token_512" in chunks
     assert "page_boundary" in chunks
     assert "section_semantic" in chunks
-    assert chunks["section_semantic"]["boundary_clause_truncation_rate"] < chunks["fixed_token_512"]["boundary_clause_truncation_rate"]
+    assert (
+        chunks["section_semantic"]["boundary_clause_truncation_rate"]
+        < chunks["fixed_token_512"]["boundary_clause_truncation_rate"]
+    )
 
 
 def test_ci_gate_failure_triggers():
@@ -170,11 +176,16 @@ def test_report_generation(tmp_path):
 
 def test_cli_runner(tmp_path):
     # Test CLI invocation
-    exit_code = main([
-        "--suite", "all",
-        "--output-dir", str(tmp_path),
-        "--format", "both",
-    ])
+    exit_code = main(
+        [
+            "--suite",
+            "all",
+            "--output-dir",
+            str(tmp_path),
+            "--format",
+            "both",
+        ]
+    )
     assert exit_code == 0
     assert (tmp_path / "evaluation_report.json").exists()
     assert (tmp_path / "evaluation_report.md").exists()

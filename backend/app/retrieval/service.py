@@ -208,7 +208,9 @@ class HybridRetrieval:
             semantic_status = "unavailable"
             if self.embedder is not None:
                 try:
-                    vectors = await self.vectors(base, request.query, count, request.filters.project_id)
+                    vectors = await self.vectors(
+                        base, request.query, count, request.filters.project_id
+                    )
                     semantic_status = "used"
                 except EmbeddingUnavailableError:
                     pass

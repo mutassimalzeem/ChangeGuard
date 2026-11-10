@@ -530,19 +530,32 @@ async def test_status_and_resolution_metadata_require_audited_service(linked_wor
                 await test_session.flush()
 
 
-async def test_resolution_entity_visibility_is_checked_on_later_reads(client, linked_world, test_session):
+async def test_resolution_entity_visibility_is_checked_on_later_reads(
+    client, linked_world, test_session
+):
     world = linked_world
     assert (await link(client, world)).status_code == 200
     # A later restriction on the resolving RFI's source must not leak its ID/reason.
-    doc = Document(tenant_id=world.owner.tenant_id, project_id=world.project_id, filename="rfi.pdf",
-        storage_key="rfi-restricted", mime_type="application/pdf", size_bytes=1, access_level="restricted")
+    doc = Document(
+        tenant_id=world.owner.tenant_id,
+        project_id=world.project_id,
+        filename="rfi.pdf",
+        storage_key="rfi-restricted",
+        mime_type="application/pdf",
+        size_bytes=1,
+        access_level="restricted",
+    )
     test_session.add(doc)
     await test_session.flush()
     rfi = await test_session.get(RFI, world.rfi_id)
     rfi.document_id = doc.id
     await test_session.flush()
     pm = world.users["project_manager"]
-    response = await client.get(f"/api/v1/projects/{world.project_id}/risks/{world.risk_id}", headers=headers(pm))
+    response = await client.get(
+        f"/api/v1/projects/{world.project_id}/risks/{world.risk_id}", headers=headers(pm)
+    )
     assert response.status_code == 404
-    timeline = await client.get(f"/api/v1/projects/{world.project_id}/timeline", headers=headers(pm))
+    timeline = await client.get(
+        f"/api/v1/projects/{world.project_id}/timeline", headers=headers(pm)
+    )
     assert all(row["id"] != str(world.risk_id) for row in timeline.json()["items"])

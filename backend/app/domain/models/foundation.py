@@ -146,7 +146,10 @@ class Document(ProjectRecord, Base):
     __table_args__ = project_constraints(
         user_reference("uploaded_by_id"),
         UniqueConstraint("tenant_id", "project_id", "checksum"),
-        CheckConstraint("status IN ('received','validating','stored','queued','processing','extracted','classified','indexed','linked','review_required','failed','quarantined')", name="document_status_allowed"),
+        CheckConstraint(
+            "status IN ('received','validating','stored','queued','processing','extracted','classified','indexed','linked','review_required','failed','quarantined')",
+            name="document_status_allowed",
+        ),
         CheckConstraint("access_level IN ('project','restricted')", name="document_access_allowed"),
     )
     filename: Mapped[str] = mapped_column(String(512))
@@ -188,15 +191,19 @@ class DocumentChunk(ProjectRecord, Base):
         CheckConstraint("chunk_index >= 0", name="chunk_index_nonnegative"),
         CheckConstraint("access_level IN ('project','restricted')", name="chunk_access_allowed"),
         Index(
-            "ix_document_chunks_search", sql_text("to_tsvector('english', text)"),
+            "ix_document_chunks_search",
+            sql_text("to_tsvector('english', text)"),
             postgresql_using="gin",
         ),
         Index(
-            "ix_document_chunks_identifiers", sql_text("to_tsvector('simple', text)"),
+            "ix_document_chunks_identifiers",
+            sql_text("to_tsvector('simple', text)"),
             postgresql_using="gin",
         ),
         Index(
-            "ix_document_chunks_vector", "embedding", postgresql_using="hnsw",
+            "ix_document_chunks_vector",
+            "embedding",
+            postgresql_using="hnsw",
             postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
     )
@@ -237,7 +244,9 @@ class DocumentEntityLink(ProjectRecord, Base):
         project_reference("contract_id", "contracts"),
         project_reference("rfi_id", "rfis"),
         project_reference("change_order_id", "change_orders"),
-        CheckConstraint("num_nonnulls(contract_id, rfi_id, change_order_id) = 1", name="one_entity"),
+        CheckConstraint(
+            "num_nonnulls(contract_id, rfi_id, change_order_id) = 1", name="one_entity"
+        ),
         UniqueConstraint("document_id", "contract_id"),
         UniqueConstraint("document_id", "rfi_id"),
         UniqueConstraint("document_id", "change_order_id"),
@@ -379,7 +388,8 @@ class ChangeOrder(ProjectRecord, Base):
         UniqueConstraint("source_event_id"),
         CheckConstraint(
             "status IN ('potential','under_review','drafted','submitted',"
-            "'approved','rejected','disputed','closed')", name="workflow_status"
+            "'approved','rejected','disputed','closed')",
+            name="workflow_status",
         ),
         UniqueConstraint("tenant_id", "project_id", "reference"),
     )
@@ -447,7 +457,12 @@ class Risk(ProjectRecord, Base):
         user_reference("resolved_by_id"),
         ForeignKeyConstraint(
             ["resolution_link_id", "project_event_id", "project_id", "tenant_id"],
-            ["event_entity_links.id", "event_entity_links.event_id", "event_entity_links.project_id", "event_entity_links.tenant_id"],
+            [
+                "event_entity_links.id",
+                "event_entity_links.event_id",
+                "event_entity_links.project_id",
+                "event_entity_links.tenant_id",
+            ],
             ondelete="RESTRICT",
         ),
         CheckConstraint(

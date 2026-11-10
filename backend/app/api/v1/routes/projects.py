@@ -96,7 +96,12 @@ async def update_project(
     try:
         return await service.update_project(project_id, payload, user)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST if "Invalid" in str(e) else status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST
+            if "Invalid" in str(e)
+            else status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
 
 
 @router.delete(

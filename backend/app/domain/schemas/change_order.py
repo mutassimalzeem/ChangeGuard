@@ -66,6 +66,16 @@ class ChangeOrderPatch(Input):
         return self
 
 
+class ChangeOrderDraftFromRisk(Input):
+    reference: str | None = Field(
+        default=None, max_length=100, pattern=r"^[A-Za-z0-9][A-Za-z0-9 ._/-]*$"
+    )
+    title: str | None = Field(default=None, max_length=255)
+    reason: str = Field(
+        default="Draft created from evidence-backed delay risk", min_length=1, max_length=2000
+    )
+
+
 class ActionInput(Input):
     reason: str | None = Field(default=None, min_length=1, max_length=2000)
 

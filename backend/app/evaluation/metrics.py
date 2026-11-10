@@ -14,9 +14,7 @@ class EvaluationInputError(ValueError):
         super().__init__(message)
 
 
-def calculate_classification_metrics(
-    predictions: list[str], targets: list[str]
-) -> dict[str, Any]:
+def calculate_classification_metrics(predictions: list[str], targets: list[str]) -> dict[str, Any]:
     if not targets or len(predictions) != len(targets):
         raise EvaluationInputError
 
@@ -118,15 +116,11 @@ def calculate_extraction_metrics(
                             if is_critical:
                                 correct_critical_facts += 1
 
-    precision = (
-        correct_facts / total_predicted_facts if total_predicted_facts > 0 else 0.0
-    )
+    precision = correct_facts / total_predicted_facts if total_predicted_facts > 0 else 0.0
     recall = correct_facts / total_expected_facts if total_expected_facts > 0 else 0.0
     f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
     critical_accuracy = (
-        correct_critical_facts / total_critical_facts
-        if total_critical_facts > 0
-        else 1.0
+        correct_critical_facts / total_critical_facts if total_critical_facts > 0 else 1.0
     )
 
     by_field = {}
@@ -261,7 +255,7 @@ def calculate_retrieval_metrics(
 
 
 def calculate_citation_groundedness_metrics(
-    extracted_items: list[dict[str, Any]]
+    extracted_items: list[dict[str, Any]],
 ) -> dict[str, Any]:
     total_facts = 0
     facts_with_citation = 0
@@ -295,12 +289,8 @@ def calculate_citation_groundedness_metrics(
             else:
                 unsupported_factual_claims += 1
 
-    citation_coverage = (
-        facts_with_citation / total_facts if total_facts > 0 else 1.0
-    )
-    groundedness_rate = (
-        facts_grounded_in_text / total_facts if total_facts > 0 else 1.0
-    )
+    citation_coverage = facts_with_citation / total_facts if total_facts > 0 else 1.0
+    groundedness_rate = facts_grounded_in_text / total_facts if total_facts > 0 else 1.0
 
     return {
         "total_facts": total_facts,
@@ -321,11 +311,12 @@ def calculate_refusal_metrics(
 
     correct = 0
     for case, pred in zip(refusal_cases, predictions, strict=True):
-        expected_refusal = case.get("expected_output", {}).get(
-            "refusal_behavior", {}
-        ).get("refuse_approval", True)
+        expected_refusal = (
+            case.get("expected_output", {}).get("refusal_behavior", {}).get("refuse_approval", True)
+        )
         predicted_refusal = pred.get("refused", False) or pred.get("status") in (
-            "insufficient_evidence", "rejected"
+            "insufficient_evidence",
+            "rejected",
         )
         if expected_refusal == predicted_refusal:
             correct += 1

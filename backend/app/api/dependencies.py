@@ -198,4 +198,3 @@ def require_rate_limit(requests: int = 60, window_seconds: int = 60, endpoint_ta
         return user
 
     return dependency
-

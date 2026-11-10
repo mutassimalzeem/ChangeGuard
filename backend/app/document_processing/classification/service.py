@@ -94,7 +94,7 @@ class RuleFirstClassifier:
         titles = [
             line
             for line in lines[:8]
-            if len(line) <= 140 and not line.startswith(("{", "[", "```", "\"\"\""))
+            if len(line) <= 140 and not line.startswith(("{", "[", "```", '"""'))
         ]
         image = extension in {"jpg", "jpeg", "png"} or mime.startswith("image/")
         for kind, pattern in PATTERNS.items():

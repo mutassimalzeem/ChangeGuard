@@ -29,7 +29,9 @@ def get_document_service(
     "/projects/{project_id}/documents",
     response_model=DocumentRead,
     status_code=201,
-    dependencies=[Depends(require_rate_limit(requests=30, window_seconds=60, endpoint_tag="document_upload"))],
+    dependencies=[
+        Depends(require_rate_limit(requests=30, window_seconds=60, endpoint_tag="document_upload"))
+    ],
     responses={
         409: {"description": "Duplicate document"},
         413: {"model": DocumentRead},

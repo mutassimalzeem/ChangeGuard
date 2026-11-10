@@ -50,7 +50,9 @@ def init_sentry() -> bool:
     global _sentry_initialized
 
     if not settings.sentry_dsn:
-        logger.info("Sentry DSN not configured; using structured logging fallback for error tracking")
+        logger.info(
+            "Sentry DSN not configured; using structured logging fallback for error tracking"
+        )
         return False
 
     try:

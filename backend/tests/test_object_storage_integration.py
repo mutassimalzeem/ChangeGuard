@@ -63,10 +63,7 @@ class TestObjectStorageIntegration:
             tenant_id, project_id, document_id, "test.pdf", valid_pdf
         )
 
-        assert (
-            object_key
-            == f"{tenant_id}/{project_id}/documents/{document_id}/original.pdf"
-        )
+        assert object_key == f"{tenant_id}/{project_id}/documents/{document_id}/original.pdf"
 
         # Download
         downloaded = minio_service.download_file(object_key)
@@ -193,9 +190,7 @@ class TestObjectStorageIntegration:
         project_id = "123e4567-e89b-12d3-a456-426614174001"
         document_id = "123e4567-e89b-12d3-a456-426614174007"
 
-        key = minio_service.upload_file(
-            tenant_id, project_id, document_id, "image.jpg", valid_jpeg
-        )
+        key = minio_service.upload_file(tenant_id, project_id, document_id, "image.jpg", valid_jpeg)
         assert key.endswith(".jpg")
 
         downloaded = minio_service.download_file(key)

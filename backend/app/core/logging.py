@@ -30,16 +30,29 @@ class JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         # Third-party free-form messages can contain request URLs, SQL values,
         # document text, or credentials. Keep metadata, never their message text.
-        fields = dict(record.msg) if isinstance(record.msg, dict) else {
-            "event": "stdlib_log", "logger": record.name,
-        }
+        fields = (
+            dict(record.msg)
+            if isinstance(record.msg, dict)
+            else {
+                "event": "stdlib_log",
+                "logger": record.name,
+            }
+        )
         # Include structured stdlib extras, but never raw traceback/stack messages.
         reserved = logging.makeLogRecord({}).__dict__
-        fields.update({k: v for k, v in record.__dict__.items() if k not in reserved and not k.startswith("_")})
+        fields.update(
+            {
+                k: v
+                for k, v in record.__dict__.items()
+                if k not in reserved and not k.startswith("_")
+            }
+        )
         fields.pop("exc_info", None)
         fields.pop("stack_info", None)
         context = request_context.get() or {}
-        fields.update({k: context[k] for k in ("tenant_id", "user_id") if context.get(k) is not None})
+        fields.update(
+            {k: context[k] for k in ("tenant_id", "user_id") if context.get(k) is not None}
+        )
         fields.update(
             timestamp=datetime.fromtimestamp(record.created, UTC).isoformat(),
             level=record.levelname.lower(),

@@ -157,19 +157,34 @@ class TestObjectStorageService:
     def test_build_object_key_invalid_tenant_uuid(self, service):
         """Test object key building with invalid tenant UUID."""
         with pytest.raises(ValidationError) as exc_info:
-            service._build_object_key("invalid", "123e4567-e89b-12d3-a456-426614174001", "123e4567-e89b-12d3-a456-426614174002", ".pdf")
+            service._build_object_key(
+                "invalid",
+                "123e4567-e89b-12d3-a456-426614174001",
+                "123e4567-e89b-12d3-a456-426614174002",
+                ".pdf",
+            )
         assert "Invalid tenant_id" in str(exc_info.value)
 
     def test_build_object_key_invalid_project_uuid(self, service):
         """Test object key building with invalid project UUID."""
         with pytest.raises(ValidationError) as exc_info:
-            service._build_object_key("123e4567-e89b-12d3-a456-426614174000", "invalid", "123e4567-e89b-12d3-a456-426614174002", ".pdf")
+            service._build_object_key(
+                "123e4567-e89b-12d3-a456-426614174000",
+                "invalid",
+                "123e4567-e89b-12d3-a456-426614174002",
+                ".pdf",
+            )
         assert "Invalid project_id" in str(exc_info.value)
 
     def test_build_object_key_invalid_document_uuid(self, service):
         """Test object key building with invalid document UUID."""
         with pytest.raises(ValidationError) as exc_info:
-            service._build_object_key("123e4567-e89b-12d3-a456-426614174000", "123e4567-e89b-12d3-a456-426614174001", "invalid", ".pdf")
+            service._build_object_key(
+                "123e4567-e89b-12d3-a456-426614174000",
+                "123e4567-e89b-12d3-a456-426614174001",
+                "invalid",
+                ".pdf",
+            )
         assert "Invalid document_id" in str(exc_info.value)
 
     def test_build_object_key_invalid_extension(self, service):
@@ -179,7 +194,7 @@ class TestObjectStorageService:
                 "123e4567-e89b-12d3-a456-426614174000",
                 "123e4567-e89b-12d3-a456-426614174001",
                 "123e4567-e89b-12d3-a456-426614174002",
-                ".exe"
+                ".exe",
             )
         assert "Invalid extension" in str(exc_info.value)
 
@@ -189,7 +204,9 @@ class TestObjectStorageService:
         project_id = "123e4567-e89b-12d3-a456-426614174001"
         document_id = "123e4567-e89b-12d3-a456-426614174002"
 
-        result = service.upload_file(tenant_id, project_id, document_id, "test.pdf", valid_pdf_content)
+        result = service.upload_file(
+            tenant_id, project_id, document_id, "test.pdf", valid_pdf_content
+        )
 
         assert result == f"{tenant_id}/{project_id}/documents/{document_id}/original.pdf"
         service._client.put_object.assert_called_once()
@@ -206,14 +223,13 @@ class TestObjectStorageService:
                 "123e4567-e89b-12d3-a456-426614174001",
                 "123e4567-e89b-12d3-a456-426614174002",
                 "test.exe",
-                b"content"
+                b"content",
             )
 
     def test_upload_file_storage_error(self, service, valid_pdf_content):
         """Test upload with storage error."""
         service._client.put_object.side_effect = ClientError(
-            {"Error": {"Code": "InternalError", "Message": "Server error"}},
-            "PutObject"
+            {"Error": {"Code": "InternalError", "Message": "Server error"}}, "PutObject"
         )
         with pytest.raises(StorageError):
             service.upload_file(
@@ -221,7 +237,7 @@ class TestObjectStorageService:
                 "123e4567-e89b-12d3-a456-426614174001",
                 "123e4567-e89b-12d3-a456-426614174002",
                 "test.pdf",
-                valid_pdf_content
+                valid_pdf_content,
             )
 
     def test_download_file_success(self, service):
@@ -233,13 +249,14 @@ class TestObjectStorageService:
         result = service.download_file("test/key.pdf")
 
         assert result == b"file content"
-        service._client.get_object.assert_called_once_with(Bucket=service._bucket, Key="test/key.pdf")
+        service._client.get_object.assert_called_once_with(
+            Bucket=service._bucket, Key="test/key.pdf"
+        )
 
     def test_download_file_not_found(self, service):
         """Test download of non-existent file."""
         service._client.get_object.side_effect = ClientError(
-            {"Error": {"Code": "NoSuchKey", "Message": "Not found"}},
-            "GetObject"
+            {"Error": {"Code": "NoSuchKey", "Message": "Not found"}}, "GetObject"
         )
         with pytest.raises(StorageError) as exc_info:
             service.download_file("test/key.pdf")
@@ -248,8 +265,7 @@ class TestObjectStorageService:
     def test_download_file_storage_error(self, service):
         """Test download with storage error."""
         service._client.get_object.side_effect = ClientError(
-            {"Error": {"Code": "InternalError", "Message": "Server error"}},
-            "GetObject"
+            {"Error": {"Code": "InternalError", "Message": "Server error"}}, "GetObject"
         )
         with pytest.raises(StorageError):
             service.download_file("test/key.pdf")
@@ -257,13 +273,14 @@ class TestObjectStorageService:
     def test_delete_file_success(self, service):
         """Test successful file deletion."""
         service.delete_file("test/key.pdf")
-        service._client.delete_object.assert_called_once_with(Bucket=service._bucket, Key="test/key.pdf")
+        service._client.delete_object.assert_called_once_with(
+            Bucket=service._bucket, Key="test/key.pdf"
+        )
 
     def test_delete_file_storage_error(self, service):
         """Test deletion with storage error."""
         service._client.delete_object.side_effect = ClientError(
-            {"Error": {"Code": "InternalError", "Message": "Server error"}},
-            "DeleteObject"
+            {"Error": {"Code": "InternalError", "Message": "Server error"}}, "DeleteObject"
         )
         with pytest.raises(StorageError):
             service.delete_file("test/key.pdf")
@@ -276,9 +293,7 @@ class TestObjectStorageService:
 
         assert url == "https://example.com/presigned-url"
         service._client.generate_presigned_url.assert_called_once_with(
-            "get_object",
-            Params={"Bucket": service._bucket, "Key": "test/key.pdf"},
-            ExpiresIn=3600
+            "get_object", Params={"Bucket": service._bucket, "Key": "test/key.pdf"}, ExpiresIn=3600
         )
 
     def test_generate_presigned_url_max_expiry(self, service):
@@ -291,14 +306,13 @@ class TestObjectStorageService:
         service._client.generate_presigned_url.assert_called_once_with(
             "get_object",
             Params={"Bucket": service._bucket, "Key": "test/key.pdf"},
-            ExpiresIn=604800
+            ExpiresIn=604800,
         )
 
     def test_generate_presigned_url_storage_error(self, service):
         """Test presigned URL generation with storage error."""
         service._client.generate_presigned_url.side_effect = ClientError(
-            {"Error": {"Code": "InternalError", "Message": "Server error"}},
-            "GeneratePresignedUrl"
+            {"Error": {"Code": "InternalError", "Message": "Server error"}}, "GeneratePresignedUrl"
         )
         with pytest.raises(StorageError):
             service.generate_presigned_url("test/key.pdf")
@@ -311,16 +325,14 @@ class TestObjectStorageService:
     def test_file_exists_false(self, service):
         """Test file exists check - file not found."""
         service._client.head_object.side_effect = ClientError(
-            {"Error": {"Code": "404", "Message": "Not found"}},
-            "HeadObject"
+            {"Error": {"Code": "404", "Message": "Not found"}}, "HeadObject"
         )
         assert service.file_exists("test/key.pdf") is False
 
     def test_file_exists_storage_error(self, service):
         """Test file exists check with storage error."""
         service._client.head_object.side_effect = ClientError(
-            {"Error": {"Code": "InternalError", "Message": "Server error"}},
-            "HeadObject"
+            {"Error": {"Code": "InternalError", "Message": "Server error"}}, "HeadObject"
         )
         with pytest.raises(StorageError):
             service.file_exists("test/key.pdf")
@@ -332,7 +344,7 @@ class TestObjectStorageService:
             "ContentLength": 1024,
             "LastModified": "2024-01-01T00:00:00Z",
             "ETag": '"abc123"',
-            "Metadata": {"original_filename": "test.pdf"}
+            "Metadata": {"original_filename": "test.pdf"},
         }
 
         metadata = service.get_file_metadata("test/key.pdf")
@@ -344,8 +356,7 @@ class TestObjectStorageService:
     def test_get_file_metadata_not_found(self, service):
         """Test metadata retrieval for non-existent file."""
         service._client.head_object.side_effect = ClientError(
-            {"Error": {"Code": "404", "Message": "Not found"}},
-            "HeadObject"
+            {"Error": {"Code": "404", "Message": "Not found"}}, "HeadObject"
         )
         with pytest.raises(StorageError) as exc_info:
             service.get_file_metadata("test/key.pdf")
@@ -361,13 +372,14 @@ class TestObjectStorageService:
     def test_ensure_bucket_exists_create_new_us_east_1(self, service):
         """Test ensure_bucket_exists creates bucket in us-east-1."""
         service._client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "404", "Message": "Not found"}},
-            "HeadBucket"
+            {"Error": {"Code": "404", "Message": "Not found"}}, "HeadBucket"
         )
         service._client.create_bucket.return_value = {}
         service._client.put_public_access_block.return_value = {}
 
-        with patch("app.domain.services.object_storage.settings.object_storage_region", "us-east-1"):
+        with patch(
+            "app.domain.services.object_storage.settings.object_storage_region", "us-east-1"
+        ):
             service.ensure_bucket_exists()
 
         service._client.create_bucket.assert_called_once_with(Bucket=service._bucket)
@@ -376,29 +388,27 @@ class TestObjectStorageService:
     def test_ensure_bucket_exists_create_new_other_region(self, service):
         """Test ensure_bucket_exists creates bucket in non-us-east-1 region."""
         service._client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "404", "Message": "Not found"}},
-            "HeadBucket"
+            {"Error": {"Code": "404", "Message": "Not found"}}, "HeadBucket"
         )
         service._client.create_bucket.return_value = {}
         service._client.put_public_access_block.return_value = {}
 
-        with patch("app.domain.services.object_storage.settings.object_storage_region", "eu-west-1"):
+        with patch(
+            "app.domain.services.object_storage.settings.object_storage_region", "eu-west-1"
+        ):
             service.ensure_bucket_exists()
 
         service._client.create_bucket.assert_called_once_with(
-            Bucket=service._bucket,
-            CreateBucketConfiguration={"LocationConstraint": "eu-west-1"}
+            Bucket=service._bucket, CreateBucketConfiguration={"LocationConstraint": "eu-west-1"}
         )
 
     def test_ensure_bucket_exists_create_fails(self, service):
         """Test ensure_bucket_exists when creation fails."""
         service._client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "404", "Message": "Not found"}},
-            "HeadBucket"
+            {"Error": {"Code": "404", "Message": "Not found"}}, "HeadBucket"
         )
         service._client.create_bucket.side_effect = ClientError(
-            {"Error": {"Code": "BucketAlreadyExists", "Message": "Bucket exists"}},
-            "CreateBucket"
+            {"Error": {"Code": "BucketAlreadyExists", "Message": "Bucket exists"}}, "CreateBucket"
         )
         with pytest.raises(StorageError) as exc_info:
             service.ensure_bucket_exists()

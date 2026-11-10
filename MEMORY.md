@@ -475,3 +475,49 @@ or unlink/reopen workflow is included. Existing pre-deployment links can be
 explicitly replayed through the new endpoint. API/manual steps and limitations:
 `docs/RISK_RESOLUTION.md`. This supersedes the earlier vertical-slice limitation
 that later event linkage could not resolve an existing risk.
+
+## 2026-11-10: Review Queue & Delay Risk Conversion to Change-Order Draft
+
+Scope: Implement the commercial Review Queue and the complete 10-step conversion
+workflow turning an evidence-backed delay risk into a grounded change-order draft.
+
+### Review Queue Core Capabilities
+- Surfaces items across all six core review categories:
+  1. `insufficient_evidence_risk`
+  2. `low_confidence_extraction`
+  3. `missing_required_field`
+  4. `potential_duplicate`
+  5. `conflicting_evidence`
+  6. `high_severity_risk`
+- Displays all 8 mandatory fields on every review card: title, risk type, confidence score,
+  evidence links, source quotations with page citations, link to original document,
+  recommended action/correction, and current status.
+- Actions: Accept risk, Dismiss risk, Request more evidence, Convert risk to change order.
+- Invariants: Insufficient-evidence risks strictly blocked from acceptance as supported evidence
+  (throws 422 / error). Dismissal and overrides require mandatory justifications. Every action
+  appends an immutable `AuditEvent`.
+
+### Evidence-Backed Delay Risk to Change-Order Draft Flow & Constraints
+- Flow:
+  1. User selects "Create change-order draft" in Timeline or Review Queue.
+  2. Backend validates risk existence and verifies linked evidence links. If risk has status
+     `insufficient_evidence` or 0 evidence links, rejects with 422 HTTP exception ("Every draft must cite evidence").
+  3. LLM Model Gateway (`TaskType.DRAFTING`) drafts narrative text only, citing evidence sources ($E_1, E_2, \dots$).
+     Monetary and schedule calculations are strictly excluded from automated drafting.
+  4. Change order is created with `status="drafted"`, `amount=None`, `time_impact_days=None`, `cost_items=[]`,
+     `source_event_id=risk.project_event_id`, and `responsible_party` recorded from the risk.
+  5. Evidence package is copied/linked from the risk to the change order.
+  6. Original risk remains linked (`risk.change_order_id = order.id`, `risk.status = "converted"`).
+  7. User can edit the draft (`patch()`), entering cost items, deterministic total `amount`, and schedule impact.
+     Draft citations are preserved during human edits to keep submission validation intact.
+  8. User submits for approval (`drafted -> submitted`), requiring human cost confirmation and creating a pending `Approval`.
+  9. Explicit human approval or rejection requires non-empty reason; self-approval/rejection by creator or submitter
+     is strictly forbidden (`403 Forbidden`).
+  10. Every transition emits structured `AuditEvent` records. No automated external communication (emails/webhooks) is sent.
+
+### Verification & Quality Assurance
+- Backend unit and authorization tests: **63 passed, zero failures** (`pytest backend/tests/test_risk_to_change_order_draft.py backend/tests/test_review_queue_authorization.py`).
+- Frontend Node native test runner tests: **34 passed, zero failures** (`node --test src/test/*.test.ts`).
+- Frontend static typing & linting: `tsc --noEmit` exited `0` with zero errors; ESLint exited `0` with zero warnings.
+- Backend Ruff lint and format: `ruff check` and `ruff format` passed with zero errors.
+
