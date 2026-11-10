@@ -2,10 +2,10 @@
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.error_responses import error_response
 from app.core.config import get_settings
 from app.core.database import get_session
 from app.core.reset_mail import PasswordResetMailer, get_password_reset_mailer
@@ -30,9 +30,7 @@ class AuthRoute(APIRoute):
                 response = await handler(request)
             except RequestValidationError:
                 # FastAPI's default validation response echoes rejected secret input.
-                response = JSONResponse(
-                    {"detail": "Invalid authentication request"}, status_code=422
-                )
+                response = error_response(422, "Invalid authentication request")
             response.headers["Cache-Control"] = "no-store"
             response.headers["Pragma"] = "no-cache"
             return response
@@ -58,13 +56,9 @@ async def execute(service, operation):
             if exc.status == 401
             else {"Retry-After": str(get_settings().login_window_seconds)}
         )
-        return JSONResponse(
-            {
-                "detail": "Authentication failed"
-                if exc.status == 401
-                else "Too many authentication attempts"
-            },
-            status_code=exc.status,
+        return error_response(
+            exc.status,
+            "Authentication failed" if exc.status == 401 else "Too many authentication attempts",
             headers=headers,
         )
     await service.session.commit()

@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.exceptions import AuthorizationError, ChangeGuardException, ConflictError
 from app.domain.models import Project, User
 from app.domain.schemas.project import (
     PaginatedProjectResponse,
@@ -16,6 +17,8 @@ from app.domain.schemas.project import (
     ProjectUpdate,
 )
 from app.domain.services.audit import record_user_action
+from app.domain.services.project_access import ProjectAccessService
+from app.policy.decisions import Decision
 from app.policy.permissions import Action, has_permission
 
 
@@ -207,6 +210,18 @@ class ProjectService:
         changes = {}
         update_data = payload.model_dump(exclude_unset=True)
 
+        # Validate the resulting record, including dates omitted from a PATCH.
+        # The Pydantic boundary has already converted ISO strings to date objects.
+        start = update_data.get("start_date", project.start_date)
+        end = update_data.get("expected_end_date", project.end_date)
+        if start is not None and end is not None and end < start:
+            raise ChangeGuardException(
+                "Expected end date must be on or after start date",
+                "VALIDATION_ERROR",
+                422,
+                {"field": "expected_end_date"},
+            )
+
         for field, value in update_data.items():
             if field == "expected_end_date":
                 field = "end_date"
@@ -247,27 +262,14 @@ class ProjectService:
         return self._read(project, user)
 
     async def delete_project(self, project_id: UUID, user: User) -> None:
-        """Delete a project."""
-        project = await self.session.scalar(
-            select(Project).where(
-                Project.id == project_id,
-                Project.tenant_id == user.tenant_id,
-            )
-        )
-        if not project:
-            raise ValueError("Project not found")
+        """Fail closed until a verified human approval workflow exists.
 
-        # Record audit event before deletion
-        await self._record_audit(
-            "project.delete",
-            project,
-            user,
-            details={
-                "name": project.name,
-                "code": project.code,
-                "status": project.status,
-            },
+        A caller's role or self-declared confirmation is not an approval record.
+        The ORM deletion guard remains in place as a second boundary.
+        """
+        result = await ProjectAccessService(self.session, user).policy(
+            Action.PROJECT_DELETE, project_id
         )
-
-        await self.session.delete(project)
-        await self.session.flush()
+        if result.decision == Decision.DENIED:
+            raise AuthorizationError()
+        raise ConflictError("Human approval required", {"reason": "human_approval_required"})

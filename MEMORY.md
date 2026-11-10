@@ -405,3 +405,32 @@ Remaining: live broker/storage/model/OCR deployment verification; automatic risk
 resolution after later linking; deliberate historical backfill; broader language
 and project-packet evaluation. Original create-only storage still requires bucket
 retention/admin controls. Timeline follows existing commercial-read permissions.
+
+## 2026-11-10: Backend contract and baseline-test repairs
+
+Scope: repair the six reported failure areas without adding features or weakening
+tenant, membership, financial, audit or human-approval controls. Reproduced the
+starting project's 10 failures before editing.
+
+| Area | Root cause | Fix and regression coverage |
+| --- | --- | --- |
+| Error envelopes | Domain exceptions used `error`, HTTP/framework validation used `detail`, and authentication constructed its own responses. Tests incorrectly treated a validation error list as a string. OpenAPI also advertised the old `HTTPValidationError` contract. | Shared `error_responses.py` supplies `{error: {code, message, details}}` for domain, HTTP, authentication and validation failures; OpenAPI 422 uses the same envelope. Preserve statuses and `WWW-Authenticate`/`Retry-After` headers. Generic validation details contain location/type and safe messages, never rejected input, body, context or custom exception text. Authentication responses remain generic and non-enumerating. Regression tests cover 401/404/405/409/422/429/500, header preservation, OpenAPI and secret reflection through custom validators. |
+| Project list fixtures | Pagination/search/status fixtures inserted projects without assigning the non-admin caller. Correct membership filtering returned no rows, and the status test could pass vacuously on an empty list. | A fixture inserts active memberships in the proper tenant/project. Tests retain exact pagination/search assertions and now require an actual matching status result. Production membership filters are unchanged. |
+| Own-tenant project creation | A test expected a caller from another fixture tenant to be forbidden from creating in their own authenticated tenant, despite the request containing no foreign tenant target. Its JWT helper also supplied token version in the roles argument. | Correct the helper to pass roles and keyword version. Assert creation in the caller's tenant and subsequent membership-protected access; add a rejected foreign `tenant_id` override case. Production tenant assignment remains derived exclusively from the authenticated user. |
+| Project deletion | Tests expected project managers to hard-delete despite lacking delete permission and the policy/ORM requiring human approval. The service attempted a success audit/delete rather than reporting that policy outcome. | The service checks existing project policy before any mutation and returns 409 with `human_approval_required` for permitted owners/admins; unauthorized roles remain 403 and inaccessible/missing projects remain concealed. Keep the ORM guard. Tests verify project retention, no false success audit, rejection of self-declared confirmation, and service/ORM enforcement. No approval workflow was added: execution stays blocked until verified approval infrastructure exists. |
+| Dates | A fixture assigned an ISO string directly to an ORM Date column. Pydantic already parses API dates, but PATCH validation only considered dates supplied together and missed conflicts with stored dates. | Convert fixture strings with `date.fromisoformat`. Before mutating a project, validate the merged incoming/persisted date pair. Tests verify typed ORM dates, start-only/end-only invalid ranges, atomic rejection and explicit null versus omitted dates. |
+| Audit reads | Audit assertions queried using the request's project-manager session, which correctly lacks `audit.read`. | Read assertions through a separate, authenticated admin session on the test transaction, keeping the production audit guard unchanged. Add denial assertions for ORM rows, scalar IDs and aggregates from a project manager who otherwise has project access. Positive audit assertions still verify actor and recorded changes. |
+
+Compatibility: clients must consume the canonical `error` envelope; validation
+issues are under `error.details.errors`. The existing frontend recognizes the
+`error` envelope. Authentication failure commits, no-store headers, rate limiting,
+permissions and secret-redaction protections remain intact. No migration or new
+feature is required.
+
+Final validation: **942 passed, 13 skipped, zero failures** in the full backend
+suite against a disposable pgvector PostgreSQL database, with all migrations
+applied. The existing 13 skips cover unconfigured live MinIO/Redis integrations
+and unavailable native OCR tools; no skip was added. Focused Ruff, `pip check`,
+`git diff --check` and staged whitespace checks passed. Test temporary files used
+the workspace `.tmp` directory. The disposable database container was stopped;
+existing developer containers/databases were left unchanged.

@@ -61,7 +61,7 @@ def credentials(data, **extra):
 
 @pytest_asyncio.fixture
 async def protected_client(test_session):
-    probe = FastAPI()
+    probe = FastAPI(exception_handlers=app.exception_handlers)
     probe.add_middleware(RequestLoggingMiddleware)
 
     @probe.get("/protected")
@@ -129,7 +129,16 @@ async def test_login_errors_do_not_enumerate_accounts(client, account, test_sess
     )
     assert wrong.status_code == absent.status_code == absent_tenant.status_code == 401
     assert (
-        wrong.json() == absent.json() == absent_tenant.json() == {"detail": "Authentication failed"}
+        wrong.json()
+        == absent.json()
+        == absent_tenant.json()
+        == {
+            "error": {
+                "code": "AUTHENTICATION_ERROR",
+                "message": "Authentication failed",
+                "details": {},
+            }
+        }
     )
     assert (
         len(
@@ -171,7 +180,13 @@ async def test_expired_wrong_purpose_and_tampered_access_tokens(client, account,
             "/protected", headers={"Authorization": "Bearer " + value}
         )
         assert response.status_code == 401
-        assert response.json() == {"detail": "Authentication failed"}
+        assert response.json() == {
+            "error": {
+                "code": "AUTHENTICATION_ERROR",
+                "message": "Authentication failed",
+                "details": {},
+            }
+        }
     assert (await protected_client.get("/protected")).status_code == 401
 
 
@@ -315,7 +330,13 @@ async def test_validation_errors_never_echo_secrets(client):
     )
     assert response.status_code == 422
     assert "do-not-reflect-this" not in response.text
-    assert response.json() == {"detail": "Invalid authentication request"}
+    assert response.json() == {
+        "error": {
+            "code": "VALIDATION_ERROR",
+            "message": "Invalid authentication request",
+            "details": {},
+        }
+    }
 
 
 async def test_disabled_smtp_returns_same_error_for_every_account(client, account, monkeypatch):
