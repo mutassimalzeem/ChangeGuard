@@ -204,7 +204,7 @@ export const riskSchema = z
     risk_type: z.string().optional(),
     severity: z.string().default("medium"),
     title: z.string(),
-    description: z.string().default(""),
+    description: z.string().nullish().transform((value) => value ?? ""),
     financial_exposure: z.string().nullable().default(null),
     currency: z.string().nullable().default("USD"),
     schedule_impact_days: z.number().int().nullable().default(null),
@@ -227,7 +227,7 @@ export const riskDecisionSchema = z.object({
     "convert_to_change_order",
     "create_change_order_draft",
   ]),
-  reason: z.string().min(1, "Reason is mandatory").max(2000),
+  reason: z.string().trim().min(1, "Reason is mandatory").max(2000),
   severity: z.enum(RISK_SEVERITIES).optional(),
   schedule_impact_days: z.number().int().min(0).max(36500).optional(),
   change_order_reference: z.string().optional(),
@@ -261,6 +261,7 @@ export type PotentialChangeItem = z.infer<typeof potentialChangeSchema>;
 /* ------------------------------------------------------------- change orders */
 
 export const CHANGE_ORDER_STATUSES = [
+  "potential",
   "draft",
   "drafted",
   "under_review",
@@ -288,13 +289,21 @@ export const changeOrderSchema = z
     project_id: z.string(),
     reference: z.string(),
     title: z.string(),
-    description: z.string().default(""),
+    description: z.string().nullish().transform((value) => value ?? ""),
     status: z.string().default("drafted"),
     amount: z.string().nullable().default(null),
     currency: z.string().default("USD"),
     cost_items: z.union([z.record(z.string(), z.unknown()), z.array(z.unknown())]).nullable().default(null),
     time_impact_days: z.number().int().nullable().default(null),
-    draft: z.record(z.string(), z.unknown()).nullable().default(null),
+    draft: z.object({
+      sources: z.record(z.string(), z.object({
+        text: z.string(),
+        page: z.number().int().nullable().optional(),
+        source_type: z.string().optional(),
+        source_id: z.string().optional(),
+        document_id: z.string().nullable().optional(),
+      }).passthrough()).optional(),
+    }).passthrough().nullable().default(null),
     source_event_id: z.string().nullable().default(null),
     responsible_party: z.string().nullable().default(null),
     evidence_links: z.array(z.string()).default([]),
@@ -328,9 +337,13 @@ export type ChangeOrderCreateInput = z.infer<typeof changeOrderCreateSchema>;
 
 export const changeOrderPatchSchema = z.object({
   title: z.string().min(1).max(255).optional(),
-  description: z.string().optional(),
-  amount: z.string().regex(/^\d+(\.\d{1,2})?$/).nullable().optional(),
-  time_impact_days: z.number().int().min(0).nullable().optional(),
+  description: z.string().max(10000).nullable().optional(),
+  time_impact_days: z.number().int().min(0).max(36500).nullable().optional(),
+  cost_items: z.array(z.object({
+    description: z.string().trim().min(1).max(1000),
+    quantity: z.string().trim().regex(/^\d{1,15}(\.\d{1,6})?$/).refine((value) => Number(value) > 0),
+    unit_rate: z.string().trim().regex(/^-?\d{1,15}(\.\d{1,6})?$/),
+  })).max(100).optional(),
 });
 
 export type ChangeOrderPatchInput = z.infer<typeof changeOrderPatchSchema>;
@@ -456,201 +469,3 @@ export const investigationResultSchema = z
   .passthrough();
 
 export type InvestigationResult = z.infer<typeof investigationResultSchema>;
-
-/* ------------------------------------------------------------- review queue */
-
-export const REVIEW_CATEGORIES = [
-  "insufficient_evidence_risk",
-  "low_confidence_extraction",
-  "missing_required_field",
-  "potential_duplicate",
-  "conflicting_evidence",
-  "high_severity_risk",
-  "high_value_change",
-  "approval_request",
-] as const;
-
-export type ReviewCategory = (typeof REVIEW_CATEGORIES)[number];
-
-export const reviewCategorySchema = z.enum(REVIEW_CATEGORIES);
-
-export const reviewAuditRecordSchema = z.object({
-  id: z.string(),
-  timestamp: isoDateTimeSchema,
-  actor_name: z.string(),
-  actor_role: z.string(),
-  action: z.string(),
-  reason: z.string().nullable().default(null),
-  details: z.record(z.string(), z.unknown()).optional(),
-});
-
-export type ReviewAuditRecord = z.infer<typeof reviewAuditRecordSchema>;
-
-export const reviewEvidenceLinkSchema = z.object({
-  id: z.string(),
-  source_type: z.string(),
-  source_id: z.string(),
-  document_name: z.string(),
-  page_number: z.number().int().nullable().optional(),
-  source_page: z.number().int().nullable().optional(),
-  excerpt: z.string(),
-  source_quotation: z.string().optional(),
-  confidence: z.number().min(0).max(1).optional(),
-  document_id: z.string().optional(),
-  original_document_url: z.string().optional(),
-  download_url: z.string().optional(),
-});
-
-export type ReviewEvidenceLink = z.infer<typeof reviewEvidenceLinkSchema>;
-
-export const reviewItemSchema = z.object({
-  id: z.string(),
-  category: reviewCategorySchema,
-  title: z.string().min(1),
-  risk_type: z.string().nullable().optional().default("commercial_risk"),
-  confidence: z.number().min(0).max(1).nullable().optional(),
-  project_id: z.string(),
-  project_code: z.string(),
-  project_name: z.string(),
-  severity: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  system_found: z.string(),
-  why_review_needed: z.string(),
-  evidence_links: z.array(reviewEvidenceLinkSchema).default([]),
-  recommended_action: z.string().optional(),
-  recommended_correction: z.string(),
-  financial_exposure: z.string().nullable().default(null),
-  currency: z.string().default("USD"),
-  schedule_impact_days: z.number().int().nullable().default(null),
-  responsible_party: z.string().nullable().optional(),
-  status: z.enum([
-    "pending",
-    "approved",
-    "rejected",
-    "overridden",
-    "accepted",
-    "dismissed",
-    "evidence_requested",
-    "converted",
-    "insufficient_evidence",
-  ]).default("pending"),
-  entity_type: z.enum(["change_order", "risk", "document", "potential_change", "extraction"]),
-  entity_id: z.string(),
-  document_id: z.string().nullable().optional(),
-  original_document_url: z.string().nullable().optional(),
-  change_order_reference: z.string().nullable().optional(),
-  required_permission: z.string().default("approvals.decide"),
-  audit_history: z.array(reviewAuditRecordSchema).default([]),
-  created_at: isoDateTimeSchema,
-  updated_at: isoDateTimeSchema.optional(),
-});
-
-export type ReviewItem = z.infer<typeof reviewItemSchema>;
-
-export const reviewDecisionSchema = z.object({
-  action: z.enum(["approve", "reject", "override", "accept", "dismiss", "request_evidence", "convert_to_change_order"]),
-  reason: z.string().trim().min(1, "A justification reason is required for audited compliance"),
-  override_severity: z.enum(["low", "medium", "high", "critical"]).optional(),
-  override_schedule_impact_days: z.number().int().min(0).optional(),
-  override_financial_exposure: z.string().optional(),
-  change_order_reference: z.string().optional(),
-  change_order_title: z.string().optional(),
-});
-
-export type ReviewDecisionInput = z.infer<typeof reviewDecisionSchema>;
-
-export const riskAcceptDecisionSchema = z.object({
-  reason: z.string().trim().optional().default("Accepted risk in review queue"),
-});
-
-export const riskDismissDecisionSchema = z.object({
-  reason: z.string().trim().min(1, "A justification reason is required for dismissal"),
-});
-
-export const riskRequestEvidenceSchema = z.object({
-  reason: z.string().trim().min(1, "A reason explaining the evidence requested is required"),
-  requested_details: z.string().trim().optional(),
-});
-
-export const riskConvertChangeOrderSchema = z.object({
-  change_order_reference: z.string().trim().min(1, "Change order reference is required"),
-  change_order_title: z.string().trim().min(1, "Change order title is required"),
-  reason: z.string().trim().min(1, "A reason is mandatory to convert risk to change order"),
-  amount: z.string().optional(),
-  time_impact_days: z.number().int().min(0).optional(),
-});
-
-export type RiskAcceptDecisionInput = z.infer<typeof riskAcceptDecisionSchema>;
-export type RiskDismissDecisionInput = z.infer<typeof riskDismissDecisionSchema>;
-export type RiskRequestEvidenceInput = z.infer<typeof riskRequestEvidenceSchema>;
-export type RiskConvertChangeOrderInput = z.infer<typeof riskConvertChangeOrderSchema>;
-
-export const reviewEditSchema = z.object({
-  title: z.string().trim().min(1, "Title is required").optional(),
-  recommended_correction: z.string().trim().min(1, "Correction details are required").optional(),
-  financial_exposure: z.string().nullable().optional(),
-  schedule_impact_days: z.number().int().min(0).nullable().optional(),
-  reason: z.string().trim().min(1, "An audited change note is required"),
-});
-
-export type ReviewEditInput = z.infer<typeof reviewEditSchema>;
-
-export const REVIEW_CATEGORY_META: Record<
-  ReviewCategory,
-  {
-    label: string;
-    description: string;
-    defaultPermission: string;
-    tone: "neutral" | "brand" | "success" | "warning" | "danger";
-  }
-> = {
-  insufficient_evidence_risk: {
-    label: "Insufficient-evidence risk",
-    description: "Risk lacks contemporaneous documentation or certified proof and cannot be accepted as supported evidence.",
-    defaultPermission: "risks.accept",
-    tone: "danger",
-  },
-  low_confidence_extraction: {
-    label: "Low-confidence extraction",
-    description: "Automated OCR or model extraction fell below confidence threshold and requires manual verification.",
-    defaultPermission: "documents.write",
-    tone: "warning",
-  },
-  missing_required_field: {
-    label: "Missing required field",
-    description: "Subcontractor or supplier notice lacks mandatory statutory, temporal, or clause particulars.",
-    defaultPermission: "change_orders.write",
-    tone: "warning",
-  },
-  potential_duplicate: {
-    label: "Potential duplicate",
-    description: "Identical scope variance or notice has already been captured under an active instruction.",
-    defaultPermission: "change_orders.write",
-    tone: "neutral",
-  },
-  conflicting_evidence: {
-    label: "Conflicting evidence",
-    description: "Contemporaneous site records or weather logs contradict submitted claims.",
-    defaultPermission: "approvals.decide",
-    tone: "danger",
-  },
-  high_severity_risk: {
-    label: "High-severity risk",
-    description: "Critical risk exceeds schedule or cost tolerance and mandates commercial decision.",
-    defaultPermission: "risks.accept",
-    tone: "danger",
-  },
-  high_value_change: {
-    label: "High-value change",
-    description: "Financial exposure exceeds single-signoff delegated commercial authority.",
-    defaultPermission: "approvals.decide",
-    tone: "danger",
-  },
-  approval_request: {
-    label: "Approval request",
-    description: "Formal change order submitted for commercial approval workflow sign-off.",
-    defaultPermission: "approvals.decide",
-    tone: "brand",
-  },
-};
-
-

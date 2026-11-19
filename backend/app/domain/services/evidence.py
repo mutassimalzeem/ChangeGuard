@@ -58,6 +58,10 @@ class EvidenceService:
         return row
 
     async def source(self, project_id, source_type, source_id):
+        row, _ = await self.source_with_document(project_id, source_type, source_id)
+        return row
+
+    async def source_with_document(self, project_id, source_type, source_id):
         if source_type not in SOURCES:
             raise HTTPException(422, "Invalid evidence source")
         row = await self.record(SOURCES[source_type], project_id, source_id)
@@ -96,7 +100,7 @@ class EvidenceService:
             and document.uploaded_by_id != self.user.id
         ):
             raise HTTPException(404, "Evidence resource not found")
-        return row
+        return row, document
 
     async def append(
         self,

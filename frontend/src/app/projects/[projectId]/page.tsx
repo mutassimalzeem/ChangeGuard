@@ -17,7 +17,6 @@ import {
   IconArrowLeft,
   IconDocument,
   IconDownload,
-  IconFileCheck,
   IconHelpCircle,
   IconPlus,
   IconSearch,
@@ -31,7 +30,7 @@ import {
   risksApi,
 } from "@/lib/api/resources";
 import { errorMessage } from "@/lib/api/errors";
-import { useRole } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { hasPermission } from "@/lib/rbac";
 import {
   changeOrderCreateSchema,
@@ -53,13 +52,13 @@ interface PageProps {
 export default function ProjectWorkspacePage({ params }: PageProps) {
   const { projectId } = use(params);
   const queryClient = useQueryClient();
-  const role = useRole();
+  const { session } = useAuth();
+  const role = session?.roles[0];
 
   // Role permissions
   const canUpdateProject = role ? hasPermission(role, "project.update") : false;
   const canWriteDocs = role ? hasPermission(role, "documents.write") : false;
   const canWriteChanges = role ? hasPermission(role, "change_orders.write") : false;
-  const canSubmitChanges = role ? hasPermission(role, "change_orders.submit") : false;
   const canDecideApprovals = role ? hasPermission(role, "approvals.decide") : false;
   const canAcceptRisks = role ? hasPermission(role, "risks.accept") : false;
 
@@ -103,7 +102,22 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
   });
 
   // Local state for Change Orders inspection
-  const [changeOrdersList, setChangeOrdersList] = useState<ChangeOrderItem[]>([]);
+  const changeOrderKey = ["project-change-orders", projectId, session?.tenantId, session?.userId, role];
+  const orders = useQuery({
+    queryKey: changeOrderKey,
+    enabled: !!role && hasPermission(role, "financial.read"),
+    queryFn: async () => {
+      const items: ChangeOrderItem[] = [];
+      for (let offset = 0; ; offset += 50) {
+        const page = await changeOrdersApi.list(projectId, offset);
+        items.push(...page.items);
+        if (!page.has_more) return items;
+      }
+    },
+  });
+  const changeOrdersList = orders.data ?? [];
+  const setChangeOrdersList = (update: (previous: ChangeOrderItem[]) => ChangeOrderItem[]) =>
+    queryClient.setQueryData<ChangeOrderItem[]>(changeOrderKey, (previous) => update(previous ?? []));
   const [selectedChangeOrder, setSelectedChangeOrder] = useState<ChangeOrderItem | null>(null);
 
   // Edit Project Modal
@@ -842,7 +856,9 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                 ) : null}
               </div>
 
-              {changeOrdersList.length > 0 ? (
+              {orders.isLoading ? <LoadingSkeleton rows={3} /> : orders.isError ? (
+                <ErrorState title="Could not load change orders" message={errorMessage(orders.error)} onRetry={() => void orders.refetch()} />
+              ) : changeOrdersList.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {changeOrdersList.map((co) => {
                     const isSelected = selectedChangeOrder?.id === co.id;
@@ -865,7 +881,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                           <span className="font-mono font-semibold text-ink tabular">
                             {co.amount ? `${Number(co.amount).toLocaleString()} ${co.currency}` : "TBD"}
                           </span>
-                          <span>{co.time_impact_days ? `${co.time_impact_days} days` : "0 days"}</span>
+                          <span>{co.time_impact_days === null ? "Schedule impact pending" : `${co.time_impact_days} days`}</span>
                         </div>
                       </div>
                     );
@@ -923,23 +939,6 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                         <span>Export PDF</span>
                       </Button>
 
-                      {canSubmitChanges && selectedChangeOrder.status === "draft" && (
-                        <Button
-                          size="sm"
-                          onClick={async () => {
-                            try {
-                              const updated = await changeOrdersApi.submit(selectedChangeOrder.id);
-                              setSelectedChangeOrder(updated);
-                              setChangeOrdersList((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
-                            } catch (err) {
-                              alert(errorMessage(err, "Failed to submit for approval."));
-                            }
-                          }}
-                        >
-                          Submit for Approval
-                        </Button>
-                      )}
-
                       {canDecideApprovals && selectedChangeOrder.status === "submitted" && (
                         <Button
                           size="sm"
@@ -978,7 +977,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                       <div>
                         <span className="text-ink-muted">Time Extension:</span>
                         <div className="font-mono text-base font-bold text-ink mt-0.5">
-                          {selectedChangeOrder.time_impact_days ? `${selectedChangeOrder.time_impact_days} Days` : "None"}
+                          {selectedChangeOrder.time_impact_days === null ? "Pending assessment" : `${selectedChangeOrder.time_impact_days} days`}
                         </div>
                       </div>
                       <div>
@@ -989,24 +988,9 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                       </div>
                     </div>
 
-                    {/* Evidence Package Section */}
-                    <div>
-                      <h4 className="font-semibold uppercase tracking-wider text-ink-muted text-[11px] mb-2 flex items-center gap-1.5">
-                        <IconFileCheck className="size-3.5 text-brand" />
-                        <span>Substantiated Evidence Package</span>
-                      </h4>
-                      <div className="rounded-lg border border-border bg-subtle p-3.5 flex flex-col gap-2">
-                        <p className="text-ink-muted leading-relaxed">
-                          This change order is substantiated by {selectedChangeOrder.evidence_links.length} attached evidence records.
-                          Audited in conformance with FIDIC Clause 13 / 20 notification conditions.
-                        </p>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          <Badge tone="brand">Original Contract Clause</Badge>
-                          <Badge tone="brand">Site Variation Notice</Badge>
-                          <Badge tone="brand">RFI Clarification</Badge>
-                        </div>
-                      </div>
-                    </div>
+                    <Link className="text-sm font-medium text-brand underline" href={`/projects/${projectId}/change-orders/${selectedChangeOrder.id}`}>
+                      View evidence and workflow
+                    </Link>
 
                     {/* Approval Trail */}
                     {selectedChangeOrder.approval_history.length > 0 && (
@@ -1142,7 +1126,9 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
               </p>
             </div>
 
-            {changeOrdersList.filter((co) => co.status === "submitted").length > 0 ? (
+            {orders.isLoading ? <LoadingSkeleton rows={3} /> : orders.isError ? (
+              <ErrorState title="Could not load approvals" message={errorMessage(orders.error)} onRetry={() => void orders.refetch()} />
+            ) : changeOrdersList.some((co) => co.status === "submitted") ? (
               <div className="flex flex-col gap-3">
                 {changeOrdersList
                   .filter((co) => co.status === "submitted")
@@ -1161,7 +1147,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                           <p className="text-ink-muted mt-0.5">{co.description}</p>
                           <div className="flex items-center gap-4 mt-2 text-ink-muted">
                             <span>Amount: <strong className="text-ink tabular">{co.amount ? `${Number(co.amount).toLocaleString()} ${co.currency}` : "TBD"}</strong></span>
-                            <span>Time: <strong className="text-ink">{co.time_impact_days || 0} days</strong></span>
+                            <span>Time: <strong className="text-ink">{co.time_impact_days === null ? "Pending" : `${co.time_impact_days} days`}</strong></span>
                           </div>
                         </div>
 
@@ -1560,7 +1546,7 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                 approveMutation.mutate({
                   orderId: approvalCO.id,
                   action: approvalDecision,
-                  comments: approvalComments.trim() || (approvalDecision === "approve" ? "Approved" : "Rejected"),
+                  comments: approvalComments.trim(),
                 });
               }
             }}
@@ -1573,8 +1559,8 @@ export default function ProjectWorkspacePage({ params }: PageProps) {
                 <option value="reject">Reject (Decline Valuation)</option>
               </Select>
             </Field>
-            <Field id="appr-comm" label={approvalDecision === "reject" ? "Rejection Reason (Mandatory)" : "Approval Comments"} required={approvalDecision === "reject"}>
-              <Input id="appr-comm" value={approvalComments} onChange={(e) => setApprovalComments(e.target.value)} placeholder="State justification for audit log..." required={approvalDecision === "reject"} />
+            <Field id="appr-comm" label="Decision reason" required>
+              <Input id="appr-comm" value={approvalComments} onChange={(e) => setApprovalComments(e.target.value)} placeholder="State justification for audit log..." required maxLength={2000} />
             </Field>
           </form>
         </Modal>

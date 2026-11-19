@@ -69,6 +69,12 @@ def validate_risk_decision(
         raise HTTPException(422, "insufficient_evidence")
 
 
+def evidence_supported(risk, links):
+    return (
+        bool(links) and not risk.evidence_review_required and risk.status != "insufficient_evidence"
+    )
+
+
 class RiskService:
     def __init__(self, session, user):
         self.session, self.user = session, user
@@ -109,12 +115,14 @@ class RiskService:
             raise HTTPException(404, "Risk not found")
         links = list(
             await self.session.scalars(
-                select(EvidenceLink).where(
+                select(EvidenceLink)
+                .where(
                     EvidenceLink.tenant_id == self.user.tenant_id,
                     EvidenceLink.project_id == project_id,
                     EvidenceLink.subject_type == "risk",
                     EvidenceLink.subject_id == risk.id,
                 )
+                .order_by(EvidenceLink.created_at, EvidenceLink.id)
             )
         )
         # A partial evidence view would expose descriptions/amounts derived from hidden files.
@@ -153,20 +161,8 @@ class RiskService:
                 )
             )
             resolution = resolution_data(risk, link).model_dump(mode="json")
-        evidence_details = [
-            {
-                "id": str(link.id),
-                "source_type": link.source_type,
-                "source_id": str(link.source_id),
-                "document_id": str(link.source_id)
-                if link.source_type == "document"
-                else (str(risk.document_id) if risk.document_id else None),
-                "source_page": link.source_page,
-                "source_text_snippet": link.source_text_snippet,
-                "confidence": float(link.confidence) if link.confidence is not None else None,
-            }
-            for link in links
-        ]
+        evidence_details = await self.evidence_details(project_id, links)
+        supported = evidence_supported(risk, links)
         return {
             "id": risk.id,
             "risk_type": risk.risk_type or risk.category or "operational_risk",
@@ -182,25 +178,67 @@ class RiskService:
             "evidence_links": [link.id for link in links],
             "evidence_details": evidence_details,
             "document_id": str(risk.document_id) if risk.document_id else None,
-            "original_document_url": f"/api/v1/projects/{project_id}/documents/{risk.document_id}"
+            "original_document_url": f"/api/v1/documents/{risk.document_id}/download-url"
             if risk.document_id
             else None,
             "change_order_id": str(risk.change_order_id) if risk.change_order_id else None,
             "recommended_action": risk.recommended_action,
             "confidence": float(risk.confidence) if risk.confidence is not None else None,
-            "status": risk.status if links else "insufficient_evidence",
+            "status": "insufficient_evidence"
+            if risk.status == "open" and not supported
+            else risk.status,
+            "evidence_supported": supported,
             "resolution": resolution,
         }
 
+    async def evidence_details(self, project_id, links):
+        details = []
+        for link in links:
+            _, document = await self.evidence.source_with_document(
+                project_id, link.source_type, link.source_id
+            )
+            details.append(
+                {
+                    "id": str(link.id),
+                    "source_type": link.source_type,
+                    "source_id": str(link.source_id),
+                    "document_id": str(document.id) if document else None,
+                    "document_name": document.filename if document else None,
+                    "source_page": link.source_page,
+                    "source_text_snippet": link.source_text_snippet,
+                    "confidence": float(link.confidence) if link.confidence is not None else None,
+                }
+            )
+        return details
+
     async def decide(self, project_id: UUID, risk_id: UUID, payload: RiskDecision, request_id=None):
+        if not has_permission(self.user.role, Action.RISK_ACCEPT):
+            raise HTTPException(403, "Access denied")
         risk, links = await self.load(project_id, risk_id, lock=True)
         validate_risk_decision(
             self.user.role,
             risk.status,
-            bool(links),
+            evidence_supported(risk, links),
             payload.action,
             risk.resolution_link_id,
         )
+        if risk.change_order_id is not None:
+            raise HTTPException(409, "Risk has already been converted to a change order")
+        if payload.action in {"convert_to_change_order", "create_change_order_draft"}:
+            from app.domain.schemas.change_order import ChangeOrderDraftFromRisk
+            from app.domain.services.change_orders import ChangeOrderService
+
+            await ChangeOrderService(self.session, self.user).create_draft_from_risk(
+                project_id,
+                risk_id,
+                ChangeOrderDraftFromRisk(
+                    reference=payload.change_order_reference,
+                    title=payload.change_order_title,
+                    reason=payload.reason,
+                ),
+                request_id=request_id,
+            )
+            return await self.read(project_id, risk_id)
         before = {
             "status": risk.status,
             "severity": risk.severity,
@@ -211,33 +249,14 @@ class RiskService:
             "dismiss": "dismissed",
             "override": "overridden",
             "request_evidence": "evidence_requested",
-            "convert_to_change_order": "converted",
-            "create_change_order_draft": "converted",
         }
+        if risk.status == "insufficient_evidence":
+            risk.evidence_review_required = True
         risk.status = status_map[payload.action]
         if payload.severity is not None:
             risk.severity = payload.severity
         if payload.schedule_impact_days is not None:
             risk.schedule_impact_days = payload.schedule_impact_days
-        created_change_order_id = None
-        if payload.action in {"convert_to_change_order", "create_change_order_draft"}:
-            from app.domain.schemas.change_order import ChangeOrderDraftFromRisk
-            from app.domain.services.change_orders import ChangeOrderService
-
-            co_service = ChangeOrderService(self.session, self.user)
-            draft_order = await co_service.create_draft_from_risk(
-                project_id,
-                risk_id,
-                ChangeOrderDraftFromRisk(
-                    reference=payload.change_order_reference,
-                    title=payload.change_order_title,
-                    reason=payload.reason,
-                ),
-                request_id=request_id,
-            )
-            created_change_order_id = draft_order["id"]
-            return await self.read(project_id, risk_id)
-
         audit_details = {
             "reason": payload.reason,
             "before": before,
@@ -247,8 +266,6 @@ class RiskService:
                 "schedule_impact_days": risk.schedule_impact_days,
             },
         }
-        if created_change_order_id:
-            audit_details["change_order_id"] = str(created_change_order_id)
         audit = AuditEvent(
             tenant_id=self.user.tenant_id,
             project_id=project_id,

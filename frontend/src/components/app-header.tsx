@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth, useRole } from "@/lib/auth";
-import { hasAnyPermission, type Permission } from "@/lib/rbac";
+import { hasPermission } from "@/lib/rbac";
 import {
   IconLogOut,
   IconProjects,
@@ -66,18 +66,7 @@ export function AppHeader() {
       label: "Review Queue",
       href: "/review-queue",
       icon: IconReview,
-      // Visible to users who have review/decision/write actions
-      visible: role
-        ? hasAnyPermission(role, [
-            "approvals.decide",
-            "risks.accept",
-            "change_orders.submit",
-            "change_orders.write",
-            "risks.write",
-            "documents.write",
-            "project.read",
-          ] as readonly Permission[])
-        : true,
+      visible: role ? hasPermission(role, "risks.accept") : false,
       active: pathname.startsWith("/review-queue"),
     },
     {
@@ -160,4 +149,3 @@ export function AppHeader() {
     </header>
   );
 }
-

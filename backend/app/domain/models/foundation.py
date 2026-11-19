@@ -481,6 +481,7 @@ class Risk(ProjectRecord, Base):
     title: Mapped[str] = mapped_column(String(255))
     risk_type: Mapped[str | None] = mapped_column(String(64))
     rule_key: Mapped[str | None] = mapped_column(String(255), unique=True)
+    evidence_review_required: Mapped[bool] = mapped_column(server_default=sql_text("false"))
     schedule_impact_days: Mapped[int | None] = mapped_column(Integer)
     responsible_party: Mapped[str | None] = mapped_column(String(255))
     recommended_action: Mapped[str | None] = mapped_column(Text)
