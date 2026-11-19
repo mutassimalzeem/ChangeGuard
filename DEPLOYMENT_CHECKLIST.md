@@ -217,3 +217,11 @@ Before handing over the environment to pilot users, verify and sign off on each 
 - [ ] **Sentry Error Reporting**: Test exception captured and verified in Sentry dashboard with scrubbed credentials.
 - [ ] **Backup Script Scheduled**: Cron job / scheduled task configured to execute `backup_db.sh` daily with automated retention pruning.
 - [ ] **Pilot Admins Provisioned**: Owner and Admin tenant accounts created with strong credentials and verified login.
+
+## Operational review workspace verification
+
+1. Back up the database. Deploy the backend with `alembic upgrade head` and check `alembic current` shows `0018_review_workspace`. Serve the matching frontend bundle. For a frontend rollback, the existing project review-queue list remains available.
+2. Set `REVIEW_HIGH_VALUE_THRESHOLDS` to an approved JSON currency map in the API environment only when the business has specified thresholds. For a staging boundary test, `{"EUR":"1000.00"}` flags an existing EUR 1,000 change. Restart the API after configuration changes and verify an unconfigured currency stays out.
+3. Sign in as a project manager. Open Review Queue, select an assigned project, filter by type and date, change sort order, and inspect source page and quotation. Open the original, then close the dialog using the keyboard. Confirm a viewer cannot access the queue.
+4. Assign a reviewer, add a note to two items, request evidence and inspect the history. Verify an unsupported risk cannot be accepted. Convert a supported risk, open the draft and find the original under Converted to change order. Retry the original command key and verify one draft and one decision.
+5. Have a second eligible manager decide a submitted change with a reason. Confirm the creator cannot self-approve. Restrict a source, refresh as a different project manager, and verify the item disappears and an old command is denied. Verify the immutable audit records and original document are retained.

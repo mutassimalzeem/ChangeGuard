@@ -43,3 +43,15 @@ Use backend/.venv/Scripts/python.exe -m pytest and frontend npm scripts.
 Integration tests use a UUID-named disposable PostgreSQL database and external
 provider fakes. Live Celery/Redis/MinIO/provider verification is reported separately.
 See docs/DAILY_REPORT_SLICE.md for the final file map and manual procedure.
+
+## Operational Review Queue delivery
+
+Inspection of main at `7e4a7d4` and closed PRs #29–30 found an existing project-scoped list, six risk/extraction categories, authorized evidence reads, risk decisions, change-order draft conversion and a separate approval workflow. The list had a client-side type filter and lacked paging, a reviewer roster, notes, assignments, high-value and approval rows and manager-facing history. A separate worktree preserves local daily-delay changes.
+
+1. Extend the scoped projection, state model and command contract. Reuse risk, extraction, change-order, evidence and audit services.
+2. Connect the page to server filters, history and role-appropriate actions. Limit bulk selection to notes.
+3. Exercise the pgvector workflow, frontend components, deployment procedure and GitHub CI.
+
+The receipt index also updates `backend/app/domain/models/foundation.py`. Both Compose manifests and `.env.example` expose the optional currency map. The PDF integration assertion in `backend/tests/test_change_order_workflow.py` normalizes wrapped whitespace when it checks the complete decision reason.
+
+Implementation files are `backend/alembic/versions/0018_review_workspace.py`, `backend/app/core/config.py`, `backend/app/api/v1/routes/review_queue.py`, `backend/app/domain/schemas/review_workspace.py`, `backend/app/domain/services/{audit,change_orders,review_queue,review_workspace,risks}.py` and `backend/app/policy/scope.py`. Frontend files are `frontend/src/app/review-queue/page.tsx`, `frontend/src/components/review-controls.ts`, and `frontend/src/lib/{review-queue,review-workspace}.ts`. Verification uses `backend/tests/test_review_queue.py`, `frontend/src/test/review-workspace.test.ts` and `.github/workflows/ci.yml`. The product, architecture, design, test, security, decision, deployment and memory documents describe the shipped workflow.

@@ -787,7 +787,7 @@ class ChangeOrderService:
         )
         return await self.read(order.id)
 
-    async def decide(self, order_id, target, payload, request_id=None):
+    async def decide(self, order_id, target, payload, request_id=None, *, approval_id=None):
         self.permission(Action.APPROVAL_DECIDE)
         order = await self.load(order_id, lock=True)
         check_transition(order.status, target)
@@ -798,6 +798,7 @@ class ChangeOrderService:
         approval = await self.session.scalar(
             select(Approval)
             .where(
+                Approval.id == approval_id if approval_id else True,
                 Approval.tenant_id == order.tenant_id,
                 Approval.project_id == order.project_id,
                 Approval.change_order_id == order.id,
@@ -810,7 +811,15 @@ class ChangeOrderService:
         before, order.status = order.status, target
         approval.status, approval.comments = target, payload.reason
         approval.decided_by_id, approval.decided_at = self.user.id, datetime.now(UTC)
-        await self.flush_audit(order, target, before, payload.reason, request_id, approval)
+        await self.flush_audit(
+            order,
+            target,
+            before,
+            payload.reason,
+            request_id,
+            approval,
+            approval_id=str(approval.id),
+        )
         return await self.read(order.id)
 
     async def validate_current_draft(self, order):

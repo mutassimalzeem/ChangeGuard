@@ -390,3 +390,9 @@ The MVP is complete when:
 4. Validate pricing with 5 potential buyers.
 5. Build the ingestion and document-registry foundation.
 6. Create 20 golden test cases from real or realistic project packets.
+
+## Operational Review Queue
+
+Project and commercial managers open a project’s actionable queue to review insufficient evidence, low-confidence extraction, missing fields, duplicates, conflicting evidence, high-severity findings, high-value changes and approval requests. Owners and admins can also review. A reviewer can inspect the original quotation and page, assign a reviewer, leave a note, request evidence or take the applicable human decision. A supported risk can become a linked draft. The reviewer can find completed items through the review-state filter and inspect who acted, when and why.
+
+A deployment must configure a positive threshold for each currency it wants to flag. A change qualifies when its recorded amount meets or exceeds the threshold for that currency. Unknown amounts and unconfigured currencies do not qualify.

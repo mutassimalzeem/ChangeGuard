@@ -10,6 +10,8 @@ export const REVIEW_CATEGORIES = {
   missing_required_field: "Missing required fields",
   potential_duplicate: "Potential duplicate",
   conflicting_evidence: "Conflicting evidence",
+  high_value_change: "High-value change",
+  approval_request: "Approval request",
   high_severity_risk: "High-severity risk",
 } as const;
 
@@ -26,7 +28,7 @@ export type ReviewAction = keyof typeof REVIEW_ACTIONS;
 export const reviewQueueSchema = z.array(
   z.object({
     id: z.uuid(),
-    kind: z.enum(["risk", "extraction"]),
+    kind: z.enum(["risk", "extraction", "change_order", "approval"]),
     categories: z
       .array(
         z.custom<ReviewCategory>(
@@ -85,7 +87,7 @@ export function availableReviewActions(
   item: ReviewItem,
   canConvert: boolean,
 ): ReviewAction[] {
-  if (!item.reviewable) return [];
+  if (!item.reviewable || item.kind === "approval" || item.kind === "change_order") return [];
   const actions: ReviewAction[] = ["dismiss", "request_evidence"];
   if (item.kind === "risk" && item.evidence_supported) {
     if (item.status !== "accepted") actions.unshift("accept");

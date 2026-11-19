@@ -491,3 +491,9 @@ The MVP design is acceptable when:
 6. Low-confidence AI output enters a review queue.
 7. The mobile upload flow works with poor connectivity.
 8. The interface avoids presenting AI output as unquestionable truth.
+
+## Managing the review queue
+
+The workspace opens on actionable reviews in an accessible project. Filter by type, severity, review state, owner, UTC date range and confidence. Sort by creation time, severity, confidence or deadline. Each card shows the underlying workflow status alongside its review state, owner, severity, creation date and deadline. Evidence includes the source quote, page and access-checked document link. Unknown fields have explicit empty labels.
+
+Use the state filter to inspect accepted, dismissed, converted and resolved records. Expand audit history for actor, time and reason. Native filter, checkbox and disclosure controls support the keyboard. The action dialog collects a reason or note, and shows stale-state and permission errors. Bulk selection supports notes on the current page. A failure rolls back the batch.

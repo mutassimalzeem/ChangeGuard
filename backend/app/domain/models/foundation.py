@@ -617,6 +617,19 @@ class AuditEvent(TenantRecord, Base):
             ["project_id", "tenant_id"], ["projects.id", "projects.tenant_id"], ondelete="RESTRICT"
         ),
         Index("ix_audit_events_tenant_created", "tenant_id", "created_at"),
+        Index(
+            "uq_review_command_key",
+            "tenant_id",
+            "project_id",
+            "entity_type",
+            "entity_id",
+            "actor_id",
+            sql_text("(details->>'key')"),
+            unique=True,
+            postgresql_where=sql_text(
+                "action IN ('review.command','review.add_note','review.assign_owner')"
+            ),
+        ),
     )
     project_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)
     actor_id: Mapped[UUID | None] = mapped_column(Uuid, index=True)

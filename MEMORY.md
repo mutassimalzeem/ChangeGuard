@@ -521,3 +521,9 @@ workflow turning an evidence-backed delay risk into a grounded change-order draf
 - Frontend static typing & linting: `tsc --noEmit` exited `0` with zero errors; ESLint exited `0` with zero warnings.
 - Backend Ruff lint and format: `ruff check` and `ruff format` passed with zero errors.
 
+
+## 2026-11-19 — Operational review workspace
+
+Extended the merged review queue with high-value changes, approval requests, assignment, notes, filtered pages, retry-safe human commands and item-level history. The earlier queue already handled six categories and draft conversion. Approval decisions must acquire locks in the order used by the existing change-order workflow. Scope a retry key to its actor and subject, and check evidence again before returning a prior result.
+
+High-value review needs explicit currency configuration. The review owner is a workflow assignment and does not grant project access. Risk-only approvals support review notes and assignment; commercial approval decisions use the linked change-order workflow. Exact visible totals currently require hydrating matching candidates. Next task: measure query cost on representative large projects before moving more of the evidence-visibility projection into SQL.

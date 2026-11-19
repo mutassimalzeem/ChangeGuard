@@ -163,7 +163,8 @@ async def test_full_decision_workflow_and_pdf(workflow, decision):
     assert exported.status_code == 200, exported.text
     assert exported.headers["content-type"] == "application/pdf"
     pdf = PdfReader(BytesIO(exported.content))
-    content = "\n".join(page.extract_text() for page in pdf.pages)
+    # The PDF wraps long decision lines according to the rendered reviewer UUID.
+    content = " ".join(" ".join(page.extract_text().split()) for page in pdf.pages)
     for expected in (
         "CO-53",
         "300.02",

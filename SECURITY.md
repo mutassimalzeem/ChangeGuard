@@ -348,3 +348,9 @@ The MVP is acceptable when:
 6. Audit records are append-only and complete for critical actions.
 7. Secrets are not present in source control or logs.
 8. Backups and restore procedures are documented.
+
+## Review workspace authorization and audit
+
+The project, financial, document and commercial-review checks run on the server. Read and mutation paths recheck the underlying evidence before revealing a derived row or replaying a command. The reviewer directory projects names and IDs of active eligible users with project access. A review assignment only records responsibility. Approval decisions require the existing independent human approver policy.
+
+Manager history reads use a narrowly scoped audit projection for visible subjects. The API emits action, actor, timestamp, reason and assigned reviewer. The general audit endpoint retains its existing permission check. Notes, assignments and receipts use `review.add_note`, `review.assign_owner` and `review.command`. Domain decision audits continue to identify the actual workflow transition. Revision 0018 extends database append-only protection to extraction and approval subjects.

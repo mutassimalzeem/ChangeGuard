@@ -689,3 +689,9 @@ The architecture is acceptable when:
 6. Every approval is auditable.
 7. The system can recover from worker, model, and storage failures.
 8. The MVP can run locally with Docker Compose.
+
+## Operational review workspace
+
+Under `/api/v1/projects/{project_id}/review-queue`, `GET /workspace` returns a filtered, sorted page and its visible total. The default view is actionable. Page sizes range from 1 to 100. Dates are inclusive UTC calendar dates. Missing sort values fall last, with subject kind and UUID breaking ties. `GET /reviewers` returns eligible names and IDs. `POST /{kind}/{id}/commands` accepts a human action, reason, UUID retry key and the action-specific arguments. `POST /notes` applies a single note to up to 20 subjects in one transaction.
+
+The workspace projects existing risks, extraction tasks, approvals and change orders. A subject row lock serializes commands. Approval decisions lock the change order first. Assignment events overlay the original owner. Note and assignment events carry their command keys. Other commands write a receipt alongside the domain audit in the same transaction. A replay with the same actor, subject, key and arguments returns the original result after checking current access. Different arguments with the same key return 409. Migration `0018_review_workspace` adds a unique receipt index and database guards for approval and extraction audit records.
