@@ -110,6 +110,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      REVIEW_HIGH_VALUE_THRESHOLDS:
       ENVIRONMENT: staging
       DEBUG: "false"
       LOG_LEVEL: INFO

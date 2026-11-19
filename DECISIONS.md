@@ -258,3 +258,7 @@ Use this format:
 - **Alternatives:** Sell AI features or token-based access.  
 - **Consequences:** Requires pilot metrics and case studies. Creates stronger pricing power.  
 - **Revisit when:** Customer feedback reveals a different primary buying criterion.
+
+## ADR-022 — Review actions belong to the human workflow
+
+Accepted on 2026-11-19. Managers need a common place to triage findings with different evidence and approval policies. Project the queue from its source workflows and validate each command against those policies under a row lock. Store assignments and notes in immutable audit history. Restrict bulk operations to atomic notes. Keep financial classification deterministic and require explicit configuration per currency. This preserves reviewer accountability, source access decisions and human-entered valuations. Computing visible totals requires evaluating candidate visibility before pagination.

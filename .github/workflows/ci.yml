@@ -198,6 +198,12 @@ jobs:
         run: |
           pytest backend/tests/test_projects.py backend/tests/test_authorization.py -v
 
+      - name: Exercise review workflows against a disposable pgvector database
+        env:
+          TEST_DATABASE_ADMIN_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/postgres
+        working-directory: backend
+        run: python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py -q
+
   golden-evaluation:
     name: Golden Dataset Evaluation Gates
     runs-on: ubuntu-latest

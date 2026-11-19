@@ -1,5 +1,7 @@
 """Narrowly authorized user audit appends; worker audits use their own transaction."""
 
+from sqlalchemy import func
+
 from app.domain.models import AuditEvent
 
 
@@ -16,6 +18,9 @@ async def record_user_action(
         request_id=request_id,
         details=details or {},
     )
+    if action.startswith("review."):
+        # Use insertion time after the subject lock, including for competing assignments.
+        audit.created_at = func.clock_timestamp()
     session.add(audit)
     session.info["user_action_audit"] = audit
     try:

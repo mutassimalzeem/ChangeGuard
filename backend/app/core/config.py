@@ -1,10 +1,18 @@
 """Application configuration using Pydantic Settings."""
 
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, PostgresDsn, computed_field, field_validator, model_validator
+from pydantic import (
+    Field,
+    PostgresDsn,
+    StringConstraints,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.ai.gateway.config import ModelPricing, TaskPolicy, TaskType
@@ -54,6 +62,11 @@ class Settings(BaseSettings):
     smtp_from_email: str = "noreply@changeguard.invalid"
     smtp_starttls: bool = True
     password_hash_rounds: int = 12
+
+    review_high_value_thresholds: dict[
+        Annotated[str, StringConstraints(pattern=r"^[A-Z]{3}$")],
+        Annotated[Decimal, Field(gt=0, allow_inf_nan=False)],
+    ] = Field(default_factory=dict)
 
     # Database
     database_url: PostgresDsn | str = Field(

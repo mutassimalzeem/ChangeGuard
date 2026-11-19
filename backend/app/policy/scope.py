@@ -201,6 +201,12 @@ def enforce_query_scope(state):
     if principal is not None and not state.is_relationship_load:
         _validate_orm_shape(statement)
     descriptions = _entity_descriptions(statement)
+    roster_query = statement is state.session.info.get("review_roster_query")
+    history_query = statement is state.session.info.get("review_history_query")
+    if (roster_query or history_query) and (
+        principal is None or not has_permission(principal.role, Action.RISK_ACCEPT)
+    ):
+        raise AuthorizationError()
     if principal is not None:
         selected_tables = {
             inspect(d["entity"]).mapper.local_table.name
@@ -212,13 +218,17 @@ def enforce_query_scope(state):
             for node in visitors.iterate(statement)
             if getattr(node, "_annotations", {}).get("parentmapper") is not None
         )
+        if history_query and selected_tables != {"audit_events"}:
+            raise AuthorizationError("Unexpected resource in review history query")
+        if roster_query and selected_tables != {"users", "project_memberships"}:
+            raise AuthorizationError("Unexpected resource in reviewer directory")
         if selected_tables & {"auth_sessions", "password_reset_grants", "auth_rate_limits"}:
             raise AuthorizationError("Authentication state is not a business query resource")
         if selected_tables & {
             "audit_events",
             "authentication_events",
             "ai_traces",
-        } and not has_permission(principal.role, Action.AUDIT_READ):
+        } and not (history_query or has_permission(principal.role, Action.AUDIT_READ)):
             raise AuthorizationError()
     financial = principal is None or has_permission(principal.role, Action.FINANCIAL_READ)
     if financial:
@@ -256,7 +266,7 @@ def enforce_query_scope(state):
                     model, model.tenant_id == principal.tenant_id, include_aliases=True
                 )
             )
-        if table.name == "users" and principal.role not in TENANT_WIDE_ROLES:
+        if table.name == "users" and principal.role not in TENANT_WIDE_ROLES and not roster_query:
             statement = statement.options(
                 with_loader_criteria(model, model.id == principal.user_id, include_aliases=True)
             )
@@ -265,7 +275,7 @@ def enforce_query_scope(state):
                 with_loader_criteria(model, model.id.in_(project_ids), include_aliases=True)
             )
         elif model is ProjectMembership:
-            if principal.role not in TENANT_WIDE_ROLES:
+            if principal.role not in TENANT_WIDE_ROLES and not roster_query:
                 statement = statement.options(
                     with_loader_criteria(
                         model, model.user_id == principal.user_id, include_aliases=True
@@ -456,6 +466,13 @@ def enforce_write_scope(session, flush_context, instances):
                 "document.upload": (Action.DOCUMENT_WRITE, "document"),
                 "document.delete": (Action.DOCUMENT_WRITE, "document"),
             }.get(user_audit.action)
+            if user_audit.entity_type in {
+                "risk",
+                "document_review_task",
+                "change_order",
+                "approval",
+            } and user_audit.action in {"review.assign_owner", "review.add_note", "review.command"}:
+                required = (Action.RISK_ACCEPT, user_audit.entity_type)
             if (
                 required is None
                 or user_audit.actor_id != principal.user_id
@@ -519,7 +536,8 @@ def enforce_write_scope(session, flush_context, instances):
                 or {
                     "document_review_task.dismiss": "dismissed",
                     "document_review_task.request_evidence": "evidence_requested",
-                }.get(audit.action) != task.status
+                }.get(audit.action)
+                != task.status
             ):
                 raise AuthorizationError("Invalid extraction review")
             extraction_write = True

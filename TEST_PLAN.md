@@ -366,3 +366,9 @@ A feature is done when:
 | End-to-end tests | Before staging deployment |
 | Pilot feedback review | Weekly during pilot |
 | Performance test | Before each major release |
+
+## Operational review workspace
+
+Run `python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py` from `backend` with `TEST_DATABASE_ADMIN_URL` set to a disposable pgvector-capable PostgreSQL server with CREATEDB. Run `npm test`, `npm run typecheck`, `npm run lint` and `npm run build` from `frontend`.
+
+Exercise commercial authority, cross-project and tenant denial, restricted/deleted sources, unsupported acceptance, severity override followed by draft conversion, exact retry versus conflicting reuse, closed reviews, atomic bulk notes, database-enforced audit immutability, currency thresholds and approval reasons. Component tests render the actual filter, action and quotation controls. Use the deployment checklist for the interactive smoke test.

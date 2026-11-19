@@ -128,6 +128,8 @@ class RiskService:
         # A partial evidence view would expose descriptions/amounts derived from hidden files.
         for link in links:
             await self.evidence.source(project_id, link.source_type, link.source_id)
+        if risk.project_event_id:
+            await self.evidence.source(project_id, "project_event", risk.project_event_id)
         if risk.document_id:
             await self.evidence.source(project_id, "document", risk.document_id)
         if risk.resolution_link_id:
@@ -165,6 +167,8 @@ class RiskService:
         supported = evidence_supported(risk, links)
         return {
             "id": risk.id,
+            "created_at": risk.created_at,
+            "owner_id": risk.owner_id,
             "risk_type": risk.risk_type or risk.category or "operational_risk",
             "severity": risk.severity,
             "title": risk.title,
@@ -239,6 +243,8 @@ class RiskService:
                 request_id=request_id,
             )
             return await self.read(project_id, risk_id)
+        if risk.status in {"dismissed", "resolved", "converted"}:
+            raise HTTPException(409, "This risk review is closed")
         before = {
             "status": risk.status,
             "severity": risk.severity,

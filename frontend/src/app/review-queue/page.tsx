@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -18,18 +18,21 @@ import {
 import { errorMessage, isApiError } from "@/lib/api/errors";
 import { documentsApi, projectsApi } from "@/lib/api/resources";
 import { useAuth } from "@/lib/auth";
-import { RISK_SEVERITIES, type RiskSeverity } from "@/lib/contracts";
+import { RISK_SEVERITIES } from "@/lib/contracts";
 import { hasPermission } from "@/lib/rbac";
+import { REVIEW_CATEGORIES } from "@/lib/review-queue";
 import {
-  availableReviewActions,
-  REVIEW_ACTIONS,
-  REVIEW_CATEGORIES,
-  reviewDecisionSchema,
-  reviewQueueApi,
-  type ReviewAction,
-  type ReviewCategory,
-  type ReviewItem,
-} from "@/lib/review-queue";
+  FilterSelect,
+  ReviewActionButtons,
+  SourceQuotation,
+} from "@/components/review-controls";
+import {
+  labels,
+  states,
+  workspaceApi,
+  type WorkspaceItem,
+  type WorkspaceAction,
+} from "@/lib/review-workspace";
 
 function LoadError({ error, retry }: { error: unknown; retry: () => void }) {
   if (isApiError(error) && (error.isForbidden || error.isNotFound)) {
@@ -75,14 +78,15 @@ function DocumentLink({ id, label }: { id: string; label: string }) {
 
 function ReviewCard({
   item,
+  owner,
   canConvert,
   onAction,
 }: {
-  item: ReviewItem;
+  item: WorkspaceItem;
+  owner: string;
   canConvert: boolean;
-  onAction: (action: ReviewAction) => void;
+  onAction: (action: WorkspaceAction) => void;
 }) {
-  const actions = availableReviewActions(item, canConvert);
   return (
     <Card>
       <CardBody className="space-y-4">
@@ -101,7 +105,7 @@ function ReviewCard({
         </div>
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-ink-muted">Risk type</dt>
+            <dt className="text-ink-muted">Finding</dt>
             <dd>{item.risk_type.replaceAll("_", " ")}</dd>
           </div>
           <div>
@@ -112,7 +116,40 @@ function ReviewCard({
                 : `${Math.round(item.confidence * 100)}%`}
             </dd>
           </div>
+          {Object.entries({
+            "Review state": states[item.review_state as keyof typeof states],
+            Severity: item.severity ?? "Unavailable",
+            Owner: owner,
+            Created: new Date(item.created_at).toLocaleString(),
+            Deadline: item.deadline
+              ? new Date(item.deadline).toLocaleString()
+              : "None",
+          }).map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-ink-muted">{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
         </dl>
+        <details>
+          <summary>Audit history ({item.history.length})</summary>
+          {item.history.length === 0 && <p>No review actions recorded.</p>}
+          <ol>
+            {item.history.map((event, index) => (
+              <li key={index}>
+                {new Date(event.at).toLocaleString()} · {event.action} ·{" "}
+                {event.actor_id ?? "System"}{" "}
+                {event.owner_id && <> · Assigned to {event.owner_id}</>}{" "}
+                {event.reason && <p>{event.reason}</p>}
+              </li>
+            ))}
+          </ol>
+        </details>
+        {item.amount && (
+          <p>
+            Recorded amount: {item.currency} {item.amount}
+          </p>
+        )}
         {item.description && (
           <p className="text-sm text-ink-muted">{item.description}</p>
         )}
@@ -138,16 +175,7 @@ function ReviewCard({
                   {source.source_type.replaceAll("_", " ")}
                 </p>
               )}
-              <p className="text-ink-muted">
-                {source.source_page === null
-                  ? "Page unavailable"
-                  : `Page ${source.source_page}`}
-              </p>
-              {source.source_text_snippet ? (
-                <blockquote>“{source.source_text_snippet}”</blockquote>
-              ) : (
-                <p>Quotation unavailable</p>
-              )}
+              <SourceQuotation source={source} />
             </div>
           ))}
           {item.document_id && (
@@ -171,252 +199,390 @@ function ReviewCard({
             </p>
           )}
         </div>
-        {actions.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {actions.map((action) => (
-              <Button
-                key={action}
-                onClick={() => onAction(action)}
-                variant={action === "accept" ? "primary" : "secondary"}
-                size="sm"
-              >
-                {item.kind === "extraction" && action === "dismiss"
-                  ? "Dismiss review item"
-                  : REVIEW_ACTIONS[action]}
-              </Button>
-            ))}
-          </div>
-        )}
+        <ReviewActionButtons
+          item={item}
+          canConvert={canConvert}
+          onAction={onAction}
+        />
       </CardBody>
     </Card>
   );
 }
 
-function ReviewDecision({
+type Reviewer = { id: string; full_name: string };
+type Selection = { items: WorkspaceItem[]; action: WorkspaceAction };
+function CommandDialog({
   projectId,
-  item,
-  action,
-  canConvert,
+  selection,
+  reviewers,
   close,
   saved,
 }: {
   projectId: string;
-  item: ReviewItem;
-  action: ReviewAction;
-  canConvert: boolean;
+  selection: Selection;
+  reviewers: Reviewer[];
   close: () => void;
-  saved: (message: string) => Promise<void>;
+  saved: (draft: string | null) => Promise<void>;
 }) {
+  const { items, action } = selection;
   const [reason, setReason] = useState("");
-  const [severity, setSeverity] = useState<RiskSeverity>(
-    item.severity ?? "medium",
-  );
-  const [validation, setValidation] = useState("");
+  const [owner, setOwner] = useState("");
+  const [severity, setSeverity] = useState("");
+  const [key] = useState(() => crypto.randomUUID());
   const decision = useMutation({
-    mutationFn: (payload: Parameters<typeof reviewQueueApi.decide>[2]) =>
-      reviewQueueApi.decide(projectId, item, payload, canConvert),
-    onSuccess: (order) =>
-      saved(
-        order
-          ? `Draft change order ${order.reference} created.`
-          : "Review decision saved.",
-      ),
+    mutationFn: async () => {
+      if (items.length > 1) {
+        await workspaceApi.notes(projectId, items, reason.trim(), key);
+        return null;
+      }
+      const item = items[0];
+      if (!item) throw new Error("Select a review item.");
+      const response = await workspaceApi.command(projectId, item, {
+        key,
+        action,
+        reason: reason.trim(),
+        owner_id: action === "assign_owner" ? owner : undefined,
+        severity: action === "override" ? severity : undefined,
+      });
+      return response.change_order_id;
+    },
+    onSuccess: saved,
   });
-  const label =
-    item.kind === "extraction" && action === "dismiss"
-      ? "Dismiss review item"
-      : REVIEW_ACTIONS[action];
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const parsed = reviewDecisionSchema.safeParse({
-      action,
-      reason,
-      severity: action === "override" ? severity : undefined,
-    });
-    if (!parsed.success) {
-      setValidation(parsed.error.issues[0]?.message ?? "Check your decision.");
-      return;
-    }
-    setValidation("");
-    decision.mutate(parsed.data);
-  }
-
   return (
     <Modal
       open
-      title={label}
+      title={labels[action]}
       onClose={() => {
         if (!decision.isPending) close();
       }}
-      actions={
-        <Button
-          type="submit"
-          form="review-decision"
-          loading={decision.isPending}
-        >
-          {label}
-        </Button>
-      }
     >
-      <form id="review-decision" onSubmit={submit} className="space-y-4">
-        <p className="font-medium">{item.title}</p>
-        {action === "convert_to_change_order" && (
-          <p>
-            This action creates a draft change order with the linked evidence.
-          </p>
-        )}
-        {action === "override" && (
-          <Field id="review-severity" label="Severity">
-            <Select
-              id="review-severity"
-              value={severity}
-              onChange={(event) =>
-                setSeverity(event.target.value as RiskSeverity)
-              }
-            >
-              {RISK_SEVERITIES.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        )}
-        <Field
-          id="review-reason"
-          label="Reason"
-          required
-          error={validation || undefined}
+      <form
+        className="space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          decision.mutate();
+        }}
+      >
+        <p>
+          {items.length === 1
+            ? items[0]?.title
+            : `${items.length} selected reviews`}
+        </p>
+        <fieldset
+          disabled={
+            decision.isPending ||
+            (isApiError(decision.error) && decision.error.isTransient)
+          }
+          className="space-y-3"
         >
-          <textarea
-            id="review-reason"
-            required
-            maxLength={2000}
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            aria-describedby={validation ? "review-reason-error" : undefined}
-            className="min-h-24 w-full rounded-lg border border-border bg-surface p-3"
-          />
-        </Field>
+          {action === "assign_owner" && (
+            <Field label="Reviewer" id="assignee">
+              <Select
+                required
+                id="assignee"
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+              >
+                <option value="">Select reviewer</option>
+                {reviewers.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.full_name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          )}
+          {action === "override" && (
+            <Field label="New severity" id="severity">
+              <Select
+                id="severity"
+                value={severity}
+                onChange={(e) => setSeverity(e.target.value)}
+              >
+                <option value="">Select a severity</option>
+                {RISK_SEVERITIES.filter((s) => s !== items[0]?.severity).map(
+                  (s) => (
+                    <option key={s}>{s}</option>
+                  ),
+                )}
+              </Select>
+            </Field>
+          )}
+          <Field
+            label={action === "add_note" ? "Review note" : "Reason"}
+            id="command-reason"
+          >
+            <textarea
+              required
+              maxLength={2000}
+              id="command-reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="w-full rounded border p-2"
+            />
+          </Field>
+        </fieldset>
         {decision.isError && (
           <ErrorState
             title={
-              isApiError(decision.error) && decision.error.isForbidden
-                ? "Permission denied"
-                : "Decision could not be saved"
+              isApiError(decision.error) && decision.error.status === 409
+                ? "Review state changed"
+                : isApiError(decision.error) && decision.error.isForbidden
+                  ? "Permission denied"
+                  : "Could not save decision"
             }
             message={errorMessage(decision.error)}
           />
         )}
+        <Button
+          type="submit"
+          loading={decision.isPending}
+          disabled={
+            !reason.trim() ||
+            (action === "assign_owner" && !owner) ||
+            (action === "override" && !severity)
+          }
+        >
+          {labels[action]}
+        </Button>
       </form>
     </Modal>
   );
 }
 
+const defaultFilters = {
+  category: "",
+  severity: "",
+  status: "actionable",
+  owner_id: "",
+  created_from: "",
+  created_to: "",
+  min_confidence: "",
+  max_confidence: "",
+  sort: "created_at",
+  direction: "desc",
+};
 function ProjectReviewQueue({ projectId }: { projectId: string }) {
   const { session } = useAuth();
   const role = session?.roles[0];
   const canConvert = hasPermission(role ?? "", "change_orders.write");
   const queryClient = useQueryClient();
-  const [category, setCategory] = useState<ReviewCategory | "">("");
-  const [selection, setSelection] = useState<{
-    item: ReviewItem;
-    action: ReviewAction;
-  } | null>(null);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [dialog, setDialog] = useState<Selection | null>(null);
   const [notice, setNotice] = useState("");
-  const queryKey = [
-    "review-queue",
+  const [draft, setDraft] = useState<string | null>(null);
+  const key = [
+    "review-workspace",
     session?.tenantId,
     session?.userId,
     role,
     projectId,
   ];
   const queue = useQuery({
-    queryKey,
-    queryFn: () => reviewQueueApi.list(projectId),
+    queryKey: [...key, filters, page],
+    queryFn: () =>
+      workspaceApi.page(projectId, { ...filters, page, page_size: 20 }),
   });
-
-  if (queue.isPending) return <LoadingSkeleton rows={3} />;
-  if (queue.isError)
-    return <LoadError error={queue.error} retry={() => void queue.refetch()} />;
-  if (queue.data.length === 0)
-    return (
-      <div className="space-y-4">
-        {notice && <p role="status">{notice}</p>}
-        <EmptyState
-          title="Review queue is empty"
-          description="There are no findings or extraction reviews for this project."
-        />
-      </div>
-    );
-
-  const items = queue.data.filter(
-    (item) => !category || item.categories.includes(category),
+  const roster = useQuery({
+    queryKey: [...key, "reviewers"],
+    queryFn: () => workspaceApi.reviewers(projectId),
+  });
+  const choices = roster.data ?? [];
+  const ownerLabel = (id: string | null) =>
+    choices.find((x) => x.id === id)?.full_name ?? id ?? "Unassigned";
+  const changePage = (p: number) => {
+    setPage(p);
+    setSelected([]);
+  };
+  const update = (field: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+    changePage(1);
+  };
+  const dropdown = (
+    field: keyof typeof filters,
+    label: string,
+    options: Record<string, string>,
+  ) => (
+    <FilterSelect
+      field={field}
+      label={label}
+      value={filters[field]}
+      options={options}
+      onChange={(value) => update(field, value)}
+    />
+  );
+  const rows = queue.data?.items ?? [];
+  const rowKey = (i: WorkspaceItem) => i.kind + "/" + i.id;
+  const pending = rows.filter(
+    (i) => i.reviewable && selected.includes(rowKey(i)),
   );
   return (
-    <div className="space-y-4">
-      <Field id="review-category" label="Category" className="max-w-xs">
-        <Select
-          id="review-category"
-          value={category}
-          onChange={(event) =>
-            setCategory(event.target.value as ReviewCategory | "")
-          }
-        >
-          <option value="">All categories</option>
-          {Object.entries(REVIEW_CATEGORIES).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <p role="status" className="text-sm text-ink">
-        {notice}
+    <section className="space-y-5">
+      <fieldset className="grid gap-3 rounded-lg border p-4 sm:grid-cols-3">
+        <legend>Filter reviews</legend>
+        {dropdown("category", "Item type", {
+          "": "All types",
+          ...REVIEW_CATEGORIES,
+        })}
+        {dropdown("severity", "Severity", {
+          "": "All severities",
+          ...Object.fromEntries(RISK_SEVERITIES.map((s) => [s, s])),
+        })}
+        {dropdown("status", "Review state", states)}
+        {dropdown("owner_id", "Owner", {
+          "": "All owners",
+          ...Object.fromEntries(choices.map((u) => [u.id, u.full_name])),
+        })}
+        {(
+          [
+            "created_from",
+            "created_to",
+            "min_confidence",
+            "max_confidence",
+          ] as const
+        ).map((field, index) => (
+          <Field
+            key={field}
+            id={field}
+            label={
+              [
+                "Created from",
+                "Created through",
+                "Minimum confidence (0–1)",
+                "Maximum confidence (0–1)",
+              ][index]!
+            }
+          >
+            <input
+              className="w-full rounded border p-2"
+              id={field}
+              type={index < 2 ? "date" : "number"}
+              min={index < 2 ? undefined : 0}
+              max={index < 2 ? undefined : 1}
+              step={index < 2 ? undefined : 0.01}
+              value={filters[field]}
+              onChange={(e) => update(field, e.target.value)}
+            />
+          </Field>
+        ))}
+        {dropdown("sort", "Sort by", {
+          created_at: "Created date",
+          deadline: "Deadline",
+          severity: "Severity",
+          confidence: "Confidence",
+        })}
+        {dropdown("direction", "Direction", {
+          desc: "Descending",
+          asc: "Ascending",
+        })}
+      </fieldset>
+      {roster.isError && (
+        <LoadError error={roster.error} retry={() => void roster.refetch()} />
+      )}
+      {queue.isPending && <LoadingSkeleton rows={3} />}
+      {queue.isError && (
+        <LoadError error={queue.error} retry={() => void queue.refetch()} />
+      )}
+      <p role="status">
+        {notice}{" "}
+        {draft && (
+          <Link
+            className="underline"
+            href={`/projects/${projectId}/change-orders/${draft}`}
+          >
+            Open draft
+          </Link>
+        )}
       </p>
-      {items.length === 0 && <EmptyState title="No items in this category" />}
-      {items.map((item) => (
-        <div key={item.id}>
-          <ReviewCard
-            item={item}
-            canConvert={canConvert}
-            onAction={(action) => {
-              setNotice("");
-              setSelection({ item, action });
-            }}
-          />
-          {item.change_order_id && (
-            <Link
-              className="mt-2 inline-block text-sm text-brand underline"
-              href={`/projects/${projectId}/change-orders/${item.change_order_id}`}
-            >
-              Open change order for {item.title}
-            </Link>
+      {queue.isSuccess && (
+        <>
+          {rows.length === 0 && (
+            <EmptyState title="No reviews match these filters" />
           )}
-        </div>
-      ))}
-      {selection && (
-        <ReviewDecision
+          {pending.length > 0 && (
+            <Button
+              onClick={() => setDialog({ items: pending, action: "add_note" })}
+            >
+              Add note to {pending.length} selected
+            </Button>
+          )}
+          {rows.map((item) => (
+            <article key={rowKey(item)} className="space-y-2">
+              {item.reviewable && (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(rowKey(item))}
+                    onChange={(e) =>
+                      setSelected(
+                        e.target.checked
+                          ? [...selected, rowKey(item)]
+                          : selected.filter((id) => id !== rowKey(item)),
+                      )
+                    }
+                  />{" "}
+                  Select {item.title} for a note
+                </label>
+              )}
+              <ReviewCard
+                item={item}
+                owner={ownerLabel(item.owner_id)}
+                canConvert={canConvert}
+                onAction={(action) => setDialog({ items: [item], action })}
+              />
+              {item.change_order_id && (
+                <Link
+                  className="text-brand underline"
+                  href={`/projects/${projectId}/change-orders/${item.change_order_id}`}
+                >
+                  Open change order for {item.title}
+                </Link>
+              )}
+            </article>
+          ))}
+          <nav aria-label="Review pages" className="flex items-center gap-3">
+            <Button
+              variant="secondary"
+              disabled={page === 1}
+              onClick={() => changePage(page - 1)}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {page} · {queue.data.total} items
+            </span>
+            <Button
+              variant="secondary"
+              disabled={page * 20 >= queue.data.total}
+              onClick={() => changePage(page + 1)}
+            >
+              Next
+            </Button>
+          </nav>
+        </>
+      )}
+      {dialog && (
+        <CommandDialog
           projectId={projectId}
-          item={selection.item}
-          action={selection.action}
-          canConvert={canConvert}
-          close={() => setSelection(null)}
-          saved={async (message) => {
-            await Promise.all([
-              queryClient.invalidateQueries({ queryKey }),
-              queryClient.invalidateQueries({ queryKey: ["risks", projectId] }),
-              queryClient.invalidateQueries({
-                queryKey: ["project-change-orders", projectId],
-              }),
-            ]);
-            setSelection(null);
-            setNotice(message);
+          selection={dialog}
+          reviewers={choices}
+          close={() => {
+            setDialog(null);
+            void queryClient.invalidateQueries({ queryKey: key });
+          }}
+          saved={async (draftId) => {
+            setDialog(null);
+            setSelected([]);
+            setNotice("Review saved.");
+            setDraft(draftId);
+            changePage(1);
+            await queryClient.invalidateQueries({ queryKey: key });
           }}
         />
       )}
-    </div>
+    </section>
   );
 }
 

@@ -69,7 +69,18 @@ class ReviewQueueService:
             DocumentReviewTask.reason.in_(EXTRACTION_REASONS)
         )
 
-    async def list(self, project_id):
+    async def list(
+        self,
+        project_id,
+        *,
+        item_id=None,
+        previous_high=(),
+        created_since=None,
+        created_before=None,
+        kind=None,
+        actionable=False,
+        severity=None,
+    ):
         await self.evidence.access.project(project_id)
         linked = (
             self.scoped(EvidenceLink, project_id)
@@ -88,8 +99,20 @@ class ReviewQueueService:
                     Risk.status == "insufficient_evidence",
                     Risk.evidence_review_required,
                     ~linked,
+                    Risk.id.in_(previous_high),
                 )
             )
+            .where(
+                kind != "extraction",
+                Risk.change_order_id.is_(None) if actionable else True,
+                Risk.status.not_in(("accepted", "dismissed", "resolved", "converted"))
+                if actionable
+                else True,
+                Risk.severity == severity if severity else True,
+                Risk.created_at >= created_since if created_since else True,
+                Risk.created_at < created_before if created_before else True,
+            )
+            .where(Risk.id == item_id if item_id else True)
             .order_by(Risk.detected_at.desc(), Risk.id)
         ):
             try:
@@ -103,7 +126,7 @@ class ReviewQueueService:
                 categories.append("insufficient_evidence_risk")
             if category := RISK_CATEGORIES.get(risk["risk_type"]):
                 categories.append(category)
-            if risk["severity"] in {"high", "critical"}:
+            if risk["severity"] in {"high", "critical"} or risk_id in previous_high:
                 categories.append("high_severity_risk")
             if categories:
                 risk["document_id"] = risk["document_id"] or next(
@@ -126,9 +149,17 @@ class ReviewQueueService:
                 )
 
         for task in await self.session.scalars(
-            self.extraction_tasks(project_id).order_by(
-                DocumentReviewTask.created_at.desc(), DocumentReviewTask.id
+            self.extraction_tasks(project_id)
+            .where(
+                kind != "risk" and not severity,
+                DocumentReviewTask.status.in_(("pending", "evidence_requested"))
+                if actionable
+                else True,
+                DocumentReviewTask.created_at >= created_since if created_since else True,
+                DocumentReviewTask.created_at < created_before if created_before else True,
             )
+            .where(DocumentReviewTask.id == item_id if item_id else True)
+            .order_by(DocumentReviewTask.created_at.desc(), DocumentReviewTask.id)
         ):
             try:
                 document = await self.evidence.source(project_id, "document", task.document_id)
@@ -146,7 +177,8 @@ class ReviewQueueService:
                     "categories": ["low_confidence_extraction"],
                     "title": document.filename,
                     "risk_type": task.reason,
-                    "description": None,
+                    "description": "The extraction needs human verification.",
+                    "created_at": task.created_at,
                     "confidence": confidence,
                     "document_id": document.id,
                     "evidence_details": extraction_evidence(task, document),
