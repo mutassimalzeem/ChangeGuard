@@ -3,7 +3,7 @@
 # ruff: noqa: B008
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,6 +48,17 @@ async def create_order(
         )
     except IntegrityError:
         raise HTTPException(409, "Conflicting change-order reference or source") from None
+
+
+@router.get("/projects/{project_id}/change-orders")
+async def list_orders(
+    project_id: UUID,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    user: User = Depends(require_authenticated_user),
+    session: AsyncSession = Depends(get_session),
+):
+    return await ChangeOrderService(session, user).list(project_id, offset, limit)
 
 
 @router.get("/change-orders/{change_order_id}")

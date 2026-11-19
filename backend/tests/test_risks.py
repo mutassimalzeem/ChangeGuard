@@ -250,7 +250,14 @@ async def test_risk_engine_idempotency_preserves_review(test_session, tenant, pr
     await test_session.flush()
     assert ids == await run_risk_checks(document, test_session)
     assert row.status == "dismissed"
-    assert len(list(await test_session.scalars(select(EvidenceLink)))) == 2
+    subjects = await test_session.scalars(
+        select(EvidenceLink.subject_id).where(
+            EvidenceLink.tenant_id == tenant.id,
+            EvidenceLink.project_id == project_id,
+            EvidenceLink.subject_type == "risk",
+        )
+    )
+    assert sorted(str(subject) for subject in subjects) == sorted(ids)
 
 
 async def test_audit_is_append_only(test_session, project, user, risks_setup):

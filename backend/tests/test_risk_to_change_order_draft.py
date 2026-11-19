@@ -391,6 +391,7 @@ def test_edit_draft_enters_human_cost_and_schedule():
         time_impact_days=None,
         cost_items=[],
         draft_content={
+            "converted_from_risk_id": str(uuid4()),
             "paragraphs": [{"text": "Rock excavation required", "citations": ["E1"]}],
             "sources": {
                 "E1": {

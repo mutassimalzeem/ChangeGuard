@@ -3,7 +3,8 @@
 # ruff: noqa: B008
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, Query, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import require_authenticated_user, require_permission
@@ -68,6 +69,9 @@ async def create_change_order_draft(
     user: User = Depends(require_authenticated_user),
     session: AsyncSession = Depends(get_session),
 ):
-    return await ChangeOrderService(session, user).create_draft_from_risk(
-        project_id, risk_id, payload, getattr(request.state, "request_id", None)
-    )
+    try:
+        return await ChangeOrderService(session, user).create_draft_from_risk(
+            project_id, risk_id, payload, getattr(request.state, "request_id", None)
+        )
+    except IntegrityError:
+        raise HTTPException(409, "Conflicting change-order reference or source event") from None

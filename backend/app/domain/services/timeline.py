@@ -65,15 +65,19 @@ class TimelineService:
                         project_id, record.id
                     )
                     resolution = risk_data["resolution"]
-                elif record.document_id:
-                    await self.evidence.source(project_id, "document", record.document_id)
-                for link in links:
-                    await self.evidence.source(project_id, link.source_type, link.source_id)
+                    supported = risk_data["evidence_supported"]
+                    status = risk_data["status"]
+                else:
+                    if record.document_id:
+                        await self.evidence.source(project_id, "document", record.document_id)
+                    for link in links:
+                        await self.evidence.source(project_id, link.source_type, link.source_id)
+                    supported = bool(links) and record.status != "insufficient_evidence"
+                    status = record.status if supported else "insufficient_evidence"
             except HTTPException as exc:
                 if exc.status_code != 404:
                     raise
                 continue
-            supported = bool(links) and record.status != "insufficient_evidence"
             items.append(
                 TimelineItem(
                     id=record.id,
@@ -84,7 +88,7 @@ class TimelineService:
                     event_type=record.risk_type or record.category
                     if kind == "risk"
                     else record.event_type,
-                    status=record.status if supported else "insufficient_evidence",
+                    status=status,
                     confidence=record.confidence,
                     severity=record.severity if kind == "risk" else None,
                     evidence=[EvidenceRead.model_validate(link) for link in links],

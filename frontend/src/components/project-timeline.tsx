@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRole } from "@/lib/auth";
+import { hasPermission } from "@/lib/rbac";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { timelineApi, documentsApi, changeOrdersApi } from "@/lib/api/resources";
@@ -14,6 +17,8 @@ import type { TimelineItem } from "@/lib/contracts";
 
 export function ProjectTimeline({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
+  const role = useRole() ?? "";
+  const canConvert = hasPermission(role, "risks.accept") && hasPermission(role, "change_orders.write");
   const [offset, setOffset] = useState(0);
   const [sourceError, setSourceError] = useState<string | null>(null);
 
@@ -45,9 +50,10 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
       });
     },
     onSuccess: (order) => {
-      setDraftSuccessMessage(
-        `Draft change order "${order.reference}" successfully created with status "${order.status}". Financial & schedule fields remain null for human review.`
-      );
+      setDraftSuccessMessage(`Draft change order ${order.reference} created.`);
+      void queryClient.invalidateQueries({ queryKey: ["project-change-orders", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["review-queue"] });
+      void queryClient.invalidateQueries({ queryKey: ["risks", projectId] });
       setDraftingRisk(null);
       setDraftRef("");
       setDraftTitle("");
@@ -63,8 +69,8 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   function handleStartDraft(item: TimelineItem) {
     setDraftingRisk(item);
     setDraftRef(`CO-DR-${item.id.slice(0, 8).toUpperCase()}`);
-    setDraftTitle(`Delay Mitigation: ${item.title}`);
-    setDraftReason("Substantiated delay risk converted to formal change-order draft citing evidence");
+    setDraftTitle("");
+    setDraftReason("");
     setDraftError(null);
     setDraftSuccessMessage(null);
   }
@@ -146,10 +152,10 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
                 {item.kind === "risk" && (
                   <div className="mt-1 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                     {item.status === "converted" || item.change_order_id ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">
-                        ✓ Change order draft created
-                      </span>
-                    ) : (
+                      item.change_order_id && <Link className="text-sm text-brand underline" href={`/projects/${projectId}/change-orders/${item.change_order_id}`}>
+                        Open change order
+                      </Link>
+                    ) : canConvert && !["resolved", "dismissed"].includes(item.status) ? (
                       <div className="flex flex-wrap items-center gap-2">
                         <Button
                           size="sm"
@@ -163,7 +169,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
                           <span className="text-xs text-ink-muted">Every draft must cite evidence</span>
                         )}
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </CardBody></Card>
@@ -206,17 +212,15 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
               </div>
             )}
 
-            <div className="rounded-lg border border-border bg-surface-raised p-3 text-xs text-ink-muted space-y-1">
-              <p className="font-semibold text-ink">Grounded Drafting Rules:</p>
-              <p>• The narrative will cite only the {draftingRisk.evidence.length} linked evidence item(s).</p>
-              <p>• Cost and schedule impacts strictly remain null until a human reviewer enters them.</p>
-              <p>• No external communications will be sent automatically.</p>
-            </div>
+            <p className="text-sm text-ink-muted">
+              The draft will include the linked evidence. Enter cost and schedule impact when you edit the draft.
+            </p>
 
             <div className="grid grid-cols-2 gap-3">
               <Field id="draft-ref" label="Change Order Reference">
                 <Input
                   id="draft-ref"
+                  maxLength={100}
                   value={draftRef}
                   onChange={(e) => setDraftRef(e.target.value)}
                   placeholder="CO-DR-..."
@@ -226,6 +230,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
               <Field id="draft-title" label="Draft Title">
                 <Input
                   id="draft-title"
+                  maxLength={255}
                   value={draftTitle}
                   onChange={(e) => setDraftTitle(e.target.value)}
                   placeholder="Delay Mitigation: ..."
@@ -241,6 +246,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
             >
               <textarea
                 id="draft-reason"
+                maxLength={2000}
                 rows={3}
                 value={draftReason}
                 onChange={(e) => setDraftReason(e.target.value)}

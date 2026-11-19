@@ -499,6 +499,32 @@ def enforce_write_scope(session, flush_context, instances):
                 or pilot_member.project_id != pilot_audit.project_id
             ):
                 raise AuthorizationError("Invalid pilot creator membership")
+        extraction = session.info.get("extraction_review")
+        if extraction and (instance is extraction[0] or instance is extraction[1]):
+            task, audit = extraction
+            if (
+                not has_permission(principal.role, Action.RISK_ACCEPT)
+                or inspect(task).mapper.local_table.name != "document_review_tasks"
+                or task not in session.dirty
+                or task in session.deleted
+                or audit not in session.new
+                or audit.actor_id != principal.user_id
+                or task.tenant_id != principal.tenant_id
+                or audit.tenant_id != task.tenant_id
+                or audit.project_id != task.project_id
+                or audit.entity_type != "document_review_task"
+                or audit.entity_id != task.id
+                or not audit.details.get("reason", "").strip()
+                or audit.details.get("after") != task.status
+                or {
+                    "document_review_task.dismiss": "dismissed",
+                    "document_review_task.request_evidence": "evidence_requested",
+                }.get(audit.action) != task.status
+            ):
+                raise AuthorizationError("Invalid extraction review")
+            extraction_write = True
+        else:
+            extraction_write = False
         action = _WRITE_ACTIONS.get(table.name)
         if table.name == "projects" and instance in session.new:
             action = Action.PROJECT_CREATE
@@ -515,6 +541,7 @@ def enforce_write_scope(session, flush_context, instances):
             or is_link
             or is_link_audit
             or resolution_audit
+            or extraction_write
         ) and (action is None or not has_permission(principal.role, action)):
             raise AuthorizationError()
         if table.name == "change_orders" and instance not in session.new and not workflow_order:
@@ -528,6 +555,7 @@ def enforce_write_scope(session, flush_context, instances):
                 "responsible_party",
                 "recommended_action",
                 "confidence",
+                "evidence_review_required",
             )
             if any(state.attrs[name].history.has_changes() for name in reviewed_fields):
                 raise AuthorizationError("Risk overrides require an audited human review")
