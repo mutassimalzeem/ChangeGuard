@@ -363,6 +363,8 @@ async def test_workspace_scoped_history_and_retry(
     page = (await client.get(f"{root}/workspace?status=dismissed")).json()
     assert page["total"] == 1 and page["items"][0]["id"] == str(risk)
     assert (await client.get(f"{root}/workspace?page_size=101")).status_code == 422
+    exact = await client.get(f"{root}/workspace?min_confidence=0.42&max_confidence=0.42")
+    assert [item["id"] for item in exact.json()["items"]] == [str(task)]
     assert (
         await client.get(f"{root}/workspace?min_confidence=0.8&max_confidence=0.3")
     ).status_code == 422

@@ -179,7 +179,7 @@ class ReviewQueueService:
                     "risk_type": task.reason,
                     "description": "The extraction needs human verification.",
                     "created_at": task.created_at,
-                    "confidence": confidence,
+                    "confidence": float(confidence) if confidence is not None else None,
                     "document_id": document.id,
                     "evidence_details": extraction_evidence(task, document),
                     "evidence_supported": False,
