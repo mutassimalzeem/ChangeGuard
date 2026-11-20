@@ -420,16 +420,20 @@ async def test_thresholds_and_pending_approval(
     )
     test_session.add(approval)
     await test_session.flush()
+    order_id, approval_id = order.id, approval.id
     root = f"{base}/review-queue"
-    monkeypatch.setattr(get_settings(), "review_high_value_thresholds", {"USD": Decimal("100")})
-    assert (await client.get(f"{root}/workspace?category=high_value_change")).json()["total"] == 0
+    for thresholds in ({}, {"USD": Decimal("100")}, {"EUR": Decimal("1000.01")}):
+        monkeypatch.setattr(get_settings(), "review_high_value_thresholds", thresholds)
+        assert (await client.get(f"{root}/workspace?category=high_value_change")).json()[
+            "total"
+        ] == 0
     monkeypatch.setattr(get_settings(), "review_high_value_thresholds", {"EUR": Decimal("1000")})
     page = (await client.get(f"{root}/workspace?category=high_value_change")).json()
-    assert page["items"][0]["id"] == str(order.id)
+    assert page["items"][0]["id"] == str(order_id)
     page = (await client.get(f"{root}/workspace?category=approval_request")).json()
     assert page["items"][0]["deadline"] and page["items"][0]["can_decide"]
     body = {"action": "reject", "reason": " ", "key": str(uuid4())}
-    url = f"{root}/approval/{approval.id}/commands"
+    url = f"{root}/approval/{approval_id}/commands"
     assert (await client.post(url, json=body)).status_code == 422
     for _ in range(2):
         res = await client.post(url, json={**body, "reason": "No supporting evidence"})
@@ -478,8 +482,20 @@ async def test_bulk_note_is_atomic_and_tenant_scoped(client, test_session, user,
     project = Project(tenant_id=foreign.id, code="OTHER", name="Other")
     test_session.add(project)
     await test_session.flush()
-    other_project = project.id
+    foreign_risk = Risk(tenant_id=foreign.id, project_id=project.id, title="Private foreign notice")
+    test_session.add(foreign_risk)
+    await test_session.flush()
+    other_project, foreign_id = project.id, str(foreign_risk.id)
     root = f"{base}/review-queue"
+    for url in (
+        f"{root}/workspace/risk/{foreign_id}",
+        f"/api/v1/projects/{other_project}/review-queue/workspace/risk/{foreign_id}",
+    ):
+        denied = await client.get(url)
+        assert denied.status_code == 404 and foreign_id not in denied.text
+    own_page = await client.get(f"{root}/workspace")
+    assert own_page.status_code == 200
+    assert foreign_id not in own_page.text and "Private foreign notice" not in own_page.text
     payload = {
         "key": str(uuid4()),
         "reason": "Verify signed documents",
@@ -507,39 +523,72 @@ async def test_bulk_note_is_atomic_and_tenant_scoped(client, test_session, user,
     ).status_code == 404
 
 
-def test_workspace_sort_limits_and_ranges():
-    from app.domain.schemas.review_workspace import QueueFilters
-    from app.domain.services.review_workspace import page_items
-
+async def test_workspace_sort_limits_and_ranges(client, test_session, user, project, tenant, queue):
     now = datetime.now(UTC)
-    items = [
-        dict(
-            id=i,
-            kind="risk",
-            severity=s,
-            deadline=None,
-            confidence=c,
-            reviewable=True,
-            categories=["high_severity_risk"],
-            review_state="review_required",
+    user.role = "owner"
+    records = [
+        Risk(
+            tenant_id=tenant.id,
+            project_id=project.id,
+            title=f"Risk {i}",
             created_at=now,
+            risk_type="duplicate_change_order_claim",
+            severity=severity,
+            confidence=confidence,
         )
-        for i, s, c in [(1, "medium", None), (2, "high", 0.4), (3, "critical", 0.9)]
+        for i, (severity, confidence) in enumerate(
+            [("medium", None), ("high", 0.4), ("critical", 0.9)]
+        )
     ]
+    test_session.add_all(records)
+    await test_session.flush()
+    ids = [str(row.id) for row in records]
+    root = f"{queue[0]}/review-queue/workspace"
     for field in ("severity", "confidence"):
-        page = page_items(items, QueueFilters(sort=field, page=2, page_size=1, direction="desc"))
-        assert page["total"] == 3 and page["items"][0]["id"] == 2
-    page = page_items(
-        items,
-        QueueFilters(
-            sort="deadline",
-            min_confidence=0.3,
-            max_confidence=0.5,
-            created_from=now.date(),
-            created_to=now.date(),
-        ),
-    )
-    assert [i["id"] for i in page["items"]] == [2]
+        page_ids = []
+        for page in (1, 2, 3, 4):
+            result = (
+                await client.get(
+                    root,
+                    params={
+                        "category": "potential_duplicate",
+                        "sort": field,
+                        "direction": "desc",
+                        "page_size": 1,
+                        "page": page,
+                    },
+                )
+            ).json()
+            assert result["total"] == 3
+            page_ids.extend(row["id"] for row in result["items"])
+        assert page_ids == list(reversed(ids))
+    # All timestamps tie. UUID is the final stable sort key, irrespective of primary direction.
+    for direction in ("asc", "desc"):
+        page = (
+            await client.get(
+                root,
+                params={
+                    "category": "potential_duplicate",
+                    "sort": "created_at",
+                    "direction": direction,
+                },
+            )
+        ).json()
+        assert [i["id"] for i in page["items"]] == sorted(ids)
+    page = (
+        await client.get(
+            root,
+            params={
+                "category": "potential_duplicate",
+                "sort": "deadline",
+                "min_confidence": 0.3,
+                "max_confidence": 0.5,
+                "created_from": now.date(),
+                "created_to": now.date(),
+            },
+        )
+    ).json()
+    assert [i["id"] for i in page["items"]] == [ids[1]]
 
 
 async def test_extraction_audit_is_immutable_in_postgres(client, test_session, user, queue):

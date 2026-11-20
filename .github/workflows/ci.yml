@@ -202,7 +202,16 @@ jobs:
         env:
           TEST_DATABASE_ADMIN_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/postgres
         working-directory: backend
-        run: python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py -q
+        run: python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py tests/test_review_visibility.py -q
+
+      - name: Benchmark the authorized review queue
+        env:
+          TEST_DATABASE_ADMIN_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/postgres
+          REVIEW_BENCHMARK: '1'
+        working-directory: backend
+        run: |
+          python -m pytest tests/test_review_queue_performance.py -qs
+          REVIEW_ITEMS=10000 REVIEW_SAMPLES=3 python -m pytest tests/test_review_queue_performance.py -qs
 
   golden-evaluation:
     name: Golden Dataset Evaluation Gates

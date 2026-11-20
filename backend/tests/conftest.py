@@ -2,6 +2,7 @@
 
 import os
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from uuid import uuid4
@@ -30,8 +31,8 @@ def migration_config(connection=None) -> Config:
     return config
 
 
-@pytest_asyncio.fixture(scope="session", loop_scope="session")
-async def test_database_url() -> AsyncIterator[str]:
+@asynccontextmanager
+async def disposable_database_url() -> AsyncIterator[str]:
     """Use an admin connection only to create/drop a new UUID-named database."""
     admin_url = os.environ.get("TEST_DATABASE_ADMIN_URL")
     if not admin_url:
@@ -56,6 +57,12 @@ async def test_database_url() -> AsyncIterator[str]:
             async with admin.connect() as connection:
                 await connection.execute(text(f'DROP DATABASE "{database_name}" WITH (FORCE)'))
         await admin.dispose()
+
+
+@pytest_asyncio.fixture(scope="session", loop_scope="session")
+async def test_database_url() -> AsyncIterator[str]:
+    async with disposable_database_url() as url:
+        yield url
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")

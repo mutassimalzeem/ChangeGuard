@@ -262,3 +262,9 @@ Use this format:
 ## ADR-022 — Review actions belong to the human workflow
 
 Accepted on 2026-11-19. Managers need a common place to triage findings with different evidence and approval policies. Project the queue from its source workflows and validate each command against those policies under a row lock. Store assignments and notes in immutable audit history. Restrict bulk operations to atomic notes. Keep financial classification deterministic and require explicit configuration per currency. This preserves reviewer accountability, source access decisions and human-entered valuations. Computing visible totals requires evaluating candidate visibility before pagination.
+
+## ADR-023 — Compute review visibility and exact totals in one PostgreSQL statement
+
+Accepted on 2026-11-20. A 25-item workspace page previously caused 3,861 SQL statements on a 500-item project. The UI needs an exact authorized total, consistent sort order, and complete quotations. Compute project and source access in sets, require every linked source to pass, then select the page before hydrating evidence or history. Restriction, deletion, membership and role changes take effect on the next statement. The scope listener binds caller identity to one reviewed SQL projection.
+
+Maintaining visibility flags per actor would require invalidation across memberships, uploads, chunks and indirect evidence. A time-limited cache would create a revocation interval. Keyset pagination alone would still require evaluating visibility for the exact count. Retain offset pagination and existing indexes. This trades a project-wide metadata scan and a SQL implementation of the policy for bounded statement count and page hydration. Run the source-policy parity tests whenever evidence types or permissions change. Revisit indexing and pagination after profiling skewed tenant data and deep offsets.

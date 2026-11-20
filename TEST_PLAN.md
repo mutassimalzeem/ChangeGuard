@@ -372,3 +372,9 @@ A feature is done when:
 Run `python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py` from `backend` with `TEST_DATABASE_ADMIN_URL` set to a disposable pgvector-capable PostgreSQL server with CREATEDB. Run `npm test`, `npm run typecheck`, `npm run lint` and `npm run build` from `frontend`.
 
 Exercise commercial authority, cross-project and tenant denial, restricted/deleted sources, unsupported acceptance, severity override followed by draft conversion, exact retry versus conflicting reuse, closed reviews, atomic bulk notes, database-enforced audit immutability, currency thresholds and approval reasons. Component tests render the actual filter, action and quotation controls. Use the deployment checklist for the interactive smoke test.
+
+### Review Queue performance and visibility
+
+CI exercises 1,000 documents with 500 mixed review items, 25 items per page. Enforce nearest-rank p95 below 500 ms for the first page, 750 ms for a severity/confidence filter, and 750 ms for evidence inspection after one warm-up and 20 measured HTTP requests per operation. The 10,000-item case enforces the same ceiling of two application SQL statements per request and checks exact visible totals. CI uses three samples per operation at that scale. Benchmark checkout, setup, workload and measured results are in the [performance report](docs/REVIEW_QUEUE_PERFORMANCE.md).
+
+Run `tests/test_review_visibility.py` alongside the review workflow and authorization suites. It exercises all six evidence source types with a visible sibling link, inherited commercial visibility, the restricted-source uploader exception, committed role/membership changes and a concurrent restriction writer. Check that hidden items disappear from list, detail, count and history together. The workspace suite exercises stable multi-page sorting in both directions, empty pages, filters, explicit currency thresholds, receipts and audit completeness.
