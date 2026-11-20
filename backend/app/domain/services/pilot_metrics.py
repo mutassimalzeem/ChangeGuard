@@ -1,5 +1,6 @@
 """Deterministic project pilot metrics; unknown measurements remain explicit."""
 
+from collections import Counter
 from datetime import UTC, datetime
 from decimal import Decimal
 from math import floor
@@ -176,7 +177,67 @@ def calculate_metrics(
     selected_traces = [
         t for t in traces if in_window(t.created_at) and t.operation != "investigation_run"
     ]
+    detected = [r for r in risks if in_window(r.detected_at)]
+    first_risk_review = {}
+    for event in reviews:
+        if (
+            event.action
+            in {
+                "risk.accept",
+                "risk.dismiss",
+                "risk.override",
+                "risk.converted_to_change_order",
+                "risk.request_evidence",
+                "review.add_note",
+                "review.assign_owner",
+            }
+            and event.created_at < end
+        ):
+            first_risk_review[event.entity_id] = min(
+                event.created_at, first_risk_review.get(event.entity_id, event.created_at)
+            )
+    risk_waits = [
+        (first_risk_review[r.id] - r.detected_at).total_seconds()
+        for r in detected
+        if getattr(r, "id", None) in first_risk_review and first_risk_review[r.id] >= r.detected_at
+    ]
+    confidence = Counter({"below_0.5": 0, "0.5_to_below_0.8": 0, "0.8_and_above": 0, "unknown": 0})
+    for doc in docs:
+        score = getattr(doc, "extraction_confidence", None)
+        band = (
+            "unknown"
+            if score is None
+            else "below_0.5"
+            if score < 0.5
+            else "0.5_to_below_0.8"
+            if score < 0.8
+            else "0.8_and_above"
+        )
+        confidence[band] += 1
+    present = {
+        getattr(d, "document_type", None)
+        for d in by_id.values()
+        if d.status in {"linked", "review_required"}
+    }
     return {
+        "risk_time_to_first_review": duration(risk_waits),
+        "missing_document_types": {
+            kind: int(kind not in present)
+            for kind in ("contract", "boq", "drawing", "daily_report", "rfi")
+        },
+        "processing_failures_by_type": dict(
+            Counter((d.processing_data or {}).get("error_type") or "unknown" for d in failed)
+        ),
+        "extraction_confidence_distribution": dict(confidence),
+        "risks_by_type": dict(
+            Counter(getattr(r, "risk_type", None) or "unclassified" for r in detected)
+        ),
+        "risks_by_severity": dict(
+            Counter(getattr(r, "severity", None) or "unknown" for r in detected)
+        ),
+        "risks_converted": len(
+            {r.entity_id for r in events if r.action == "risk.converted_to_change_order"}
+        ),
         "documents_uploaded": len(docs),
         "documents_processed_successfully": len(successful),
         "documents_failed": len(failed),
@@ -226,13 +287,12 @@ class PilotMetricsService:
             AuditEvent,
             ChangeOrder,
             Document,
-            DocumentChunk,
             DocumentReviewTask,
-            EvidenceLink,
             Risk,
         )
         from app.domain.schemas.pilot_metrics import MetricsReport
         from app.policy.permissions import Action, has_permission
+        from app.policy.review_page import pilot_visibility
 
         if not all(
             has_permission(self.user.role, a) for a in (Action.AUDIT_READ, Action.FINANCIAL_READ)
@@ -271,11 +331,16 @@ class PilotMetricsService:
             Document.created_at,
             Document.status,
             Document.processing_status,
+            Document.document_type,
+            Document.extraction_confidence,
             Document.classification_result,
             Document.structured_extraction,
-            func.jsonb_build_object("metrics", Document.processing_data["metrics"]).label(
-                "processing_data"
-            ),
+            func.jsonb_build_object(
+                "metrics",
+                Document.processing_data["metrics"],
+                "error_type",
+                Document.processing_data["error_type"],
+            ).label("processing_data"),
         )
         reviews = await rows(
             AuditEvent,
@@ -284,56 +349,74 @@ class PilotMetricsService:
             AuditEvent.created_at,
             AuditEvent.action,
             AuditEvent.entity_id,
+            AuditEvent.entity_type,
             AuditEvent.details,
-            actions={"pilot.review", "risk.accept", "risk.dismiss", "risk.override"},
+            actions={
+                "pilot.review",
+                "risk.accept",
+                "risk.dismiss",
+                "risk.override",
+                "risk.converted_to_change_order",
+                "risk.request_evidence",
+                "review.add_note",
+                "review.assign_owner",
+            },
         )
-        links = await rows(
-            EvidenceLink, EvidenceLink.created_at, EvidenceLink.source_id, EvidenceLink.source_type
+        risks = await rows(
+            Risk, Risk.detected_at, Risk.id, Risk.detected_at, Risk.risk_type, Risk.severity
         )
-        covered = {link.source_id for link in links if link.source_type == "document"}
-        chunk_ids = {link.source_id for link in links if link.source_type == "document_chunk"}
-        if chunk_ids:
-            chunks = await self.session.execute(
-                select(DocumentChunk.id, DocumentChunk.document_id).where(
-                    DocumentChunk.tenant_id == self.user.tenant_id,
-                    DocumentChunk.project_id == project_id,
-                    DocumentChunk.id.in_(chunk_ids),
-                    DocumentChunk.created_at < end,
-                )
-            )
-            covered.update(row.document_id for row in chunks)
+        changes = await rows(
+            ChangeOrder, ChangeOrder.created_at, ChangeOrder.id, ChangeOrder.created_at
+        )
+        approvals = await rows(
+            Approval,
+            Approval.created_at,
+            Approval.id,
+            Approval.created_at,
+            Approval.decided_at,
+            Approval.status,
+        )
+        tasks = await rows(
+            DocumentReviewTask,
+            DocumentReviewTask.created_at,
+            DocumentReviewTask.document_id,
+            DocumentReviewTask.created_at,
+            DocumentReviewTask.status,
+        )
+        traces = await rows(
+            AITrace,
+            AITrace.created_at,
+            AITrace.created_at,
+            AITrace.operation,
+            AITrace.cost,
+            AITrace.attributes,
+        )
+        visible = await pilot_visibility(self.session, project_id, end)
+        doc_ids = {str(d) for d in visible["document"]}
         metrics = calculate_metrics(
-            documents=documents,
-            reviews=reviews,
-            risks=await rows(Risk, Risk.detected_at, Risk.id, Risk.detected_at),
-            changes=await rows(
-                ChangeOrder, ChangeOrder.created_at, ChangeOrder.id, ChangeOrder.created_at
-            ),
-            approvals=await rows(
-                Approval,
-                Approval.created_at,
-                Approval.created_at,
-                Approval.decided_at,
-                Approval.status,
-            ),
-            tasks=await rows(
-                DocumentReviewTask,
-                DocumentReviewTask.created_at,
-                DocumentReviewTask.document_id,
-                DocumentReviewTask.created_at,
-                DocumentReviewTask.status,
-            ),
-            traces=await rows(
-                AITrace,
-                AITrace.created_at,
-                AITrace.created_at,
-                AITrace.operation,
-                AITrace.cost,
-                AITrace.attributes,
-            ),
-            covered_document_ids=covered,
+            documents=[d for d in documents if d.id in visible["document"]],
+            reviews=[
+                e
+                for e in reviews
+                if (e.action == "pilot.review" and e.details.get("document_id") in doc_ids)
+                or (e.entity_type == "risk" and e.entity_id in visible["risk"])
+            ],
+            risks=[r for r in risks if r.id in visible["risk"]],
+            changes=[c for c in changes if c.id in visible["change_order"]],
+            approvals=[a for a in approvals if a.id in visible["approval"]],
+            tasks=[t for t in tasks if t.document_id in visible["document"]],
+            traces=[
+                t
+                for t in traces
+                if not (t.attributes or {}).get("document_id")
+                or t.attributes["document_id"] in doc_ids
+            ],
+            covered_document_ids=visible["covered"],
             start=start,
             end=end,
+        )
+        metrics["outstanding_risks_missing_evidence"] = sum(
+            r.id in visible["needs_evidence"] for r in risks
         )
         return MetricsReport(
             project_id=project_id,
@@ -341,16 +424,36 @@ class PilotMetricsService:
             end=end,
             generated_at=observed_at,
             metrics=metrics,
+            next_actions=next_actions(metrics),
             limitations=[
                 "Cohort metrics use current record state; this is not an immutable historical snapshot.",
                 "Accuracy uses human-reviewed factual values, not model confidence; unreviewed data is excluded.",
                 "Timing and resource-attributed AI costs are prospective; historical missing measurements remain unknown.",
                 "AI costs are USD estimates for persisted calls; persistence failures and legacy log-only calls cannot be reconstructed.",
                 "Cost means cover resources with recorded calls; resources without calls have unmeasured cost.",
-                "Queue time measures first review; reopened tasks are not separate episodes.",
+                "Queue time measures document review task creation to first pilot document review. Reopened tasks and time spent reading the workspace are unmeasured.",
                 "The effective end is capped at observation time; the current week may be partial.",
             ],
         )
+
+
+def next_actions(metrics):
+    actions = []
+    if missing := [k.replace("_", " ") for k, v in metrics["missing_document_types"].items() if v]:
+        actions.append("Collect or process these supporting documents: " + ", ".join(missing) + ".")
+    if metrics["documents_failed"] or metrics["documents_quarantined"]:
+        actions.append("Inspect failed and quarantined documents before retrying eligible files.")
+    if not metrics["classification_accuracy"]["denominator"]:
+        actions.append(
+            "Review original classification predictions to establish an accuracy sample."
+        )
+    if (
+        metrics["documents_awaiting_review"]
+        or metrics["risks_detected"]
+        or metrics["outstanding_risks_missing_evidence"]
+    ):
+        actions.append("Open the Review Queue and inspect evidence before recording a decision.")
+    return actions or ["Review the report with the project team."]
 
 
 def weekly_csv(report):
@@ -368,7 +471,11 @@ def weekly_csv(report):
                     report.start.isoformat() if report.start else "",
                     report.end.isoformat(),
                     metric,
-                    statistic,
+                    (
+                        "\u0027" + statistic
+                        if statistic.lstrip().startswith(("=", "+", "-", "@"))
+                        else statistic
+                    ),
                     "" if item is None else item,
                 ]
             )

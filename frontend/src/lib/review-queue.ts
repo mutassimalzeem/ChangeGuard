@@ -8,6 +8,7 @@ export const REVIEW_CATEGORIES = {
   insufficient_evidence_risk: "Insufficient evidence",
   low_confidence_extraction: "Low-confidence extraction",
   missing_required_field: "Missing required fields",
+  pilot_risk: "Pilot risk",
   potential_duplicate: "Potential duplicate",
   conflicting_evidence: "Conflicting evidence",
   high_value_change: "High-value change",

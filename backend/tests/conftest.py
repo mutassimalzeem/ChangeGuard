@@ -151,6 +151,12 @@ async def pilot_engine(test_database_url):
                 if t.name not in {"document_chunks", "pilot_onboarding"}
             ]
             Base.metadata.create_all(conn, tables=tables)
+            # Lightweight pilot mode omits vector storage but still resolves chunk ACLs.
+            conn.execute(
+                text(
+                    "CREATE TABLE document_chunks (id uuid PRIMARY KEY, document_id uuid NOT NULL, tenant_id uuid NOT NULL, project_id uuid NOT NULL, access_level varchar NOT NULL)"
+                )
+            )
             conn.execute(
                 text(
                     "CREATE FUNCTION changeguard_set_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END $$"

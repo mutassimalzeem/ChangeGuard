@@ -5,6 +5,7 @@ export const pilotDocumentSchema = z.object({
   document_id: z.string().uuid(),
   file_name: z.string(),
   status: z.string(),
+  processing_status: z.string().optional(),
   document_type: z.string().nullable(),
   version: z.number().int(),
   extraction: z.record(z.string(), z.unknown()).nullable(),
@@ -39,17 +40,15 @@ export const pilotApi = {
       .parse((await client.get("/pilot/projects")).data);
   },
   async create(name: string, currency: string) {
-    return z
-      .object({ project_id: z.string().uuid() })
-      .parse(
-        (
-          await client.post("/pilot/projects", {
-            name,
-            currency,
-            template: "construction-v1",
-          })
-        ).data,
-      );
+    return z.object({ project_id: z.string().uuid() }).parse(
+      (
+        await client.post("/pilot/projects", {
+          name,
+          currency,
+          template: "construction-v1",
+        })
+      ).data,
+    );
   },
   async documents(id: string) {
     return z
@@ -99,15 +98,40 @@ export const pilotApi = {
       version: doc.version,
     });
   },
+  async value(id: string) {
+    return z
+      .object({
+        end: z.string(),
+        rows: z.array(z.object({ label: z.string(), value: z.string() })),
+      })
+      .parse(
+        (
+          await client.get(
+            `/projects/${encodeURIComponent(id)}/metrics/value/json`,
+          )
+        ).data,
+      );
+  },
+  async exportValue(id: string, end: string, format: "csv" | "pdf") {
+    const response = await client.get(
+      `/projects/${encodeURIComponent(id)}/metrics/value/${format}`,
+      { params: { end }, responseType: "blob" },
+    );
+    download(response.data, `pilot-value-${id}.${format}`);
+  },
   async pdf(id: string) {
     const response = await client.get(`${root(id)}/readiness.pdf`, {
       responseType: "blob",
     });
-    const url = URL.createObjectURL(response.data);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "pilot-readiness.pdf";
-    anchor.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    download(response.data, "pilot-readiness.pdf");
   },
 };
+
+function download(data: Blob, name: string) {
+  const url = URL.createObjectURL(data);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = name;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

@@ -23,6 +23,7 @@ from app.domain.models import (
     Contract,
     DocumentChunk,
     EvidenceLink,
+    PilotOnboarding,
     ProjectEvent,
     Risk,
 )
@@ -764,6 +765,16 @@ class ChangeOrderService:
         total = calculate_cost(items)
         if total is None or total != order.amount:
             raise HTTPException(422, "Human-reviewed cost items are required")
+        pilot = await self.session.scalar(
+            select(PilotOnboarding.id).where(
+                PilotOnboarding.tenant_id == order.tenant_id,
+                PilotOnboarding.project_id == order.project_id,
+            )
+        )
+        if pilot and (not payload.reason or order.time_impact_days is None):
+            raise HTTPException(
+                422, "Enter the submission reason and schedule impact in days (zero is valid)"
+            )
         before, order.status = order.status, "submitted"
         order.submitted_at = datetime.now(UTC)
         order.submitted_by_id = self.user.id

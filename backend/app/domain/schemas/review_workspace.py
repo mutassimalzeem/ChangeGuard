@@ -11,6 +11,7 @@ Category = Literal[
     "insufficient_evidence_risk",
     "low_confidence_extraction",
     "missing_required_field",
+    "pilot_risk",
     "potential_duplicate",
     "conflicting_evidence",
     "high_severity_risk",

@@ -197,6 +197,7 @@ async def test_seeded_project_service(pilot_session, metrics_seed):
     assert values.evidence_link_coverage.value == 0.5
     assert values.risks_detected == values.risks_accepted == values.change_orders_created == 1
     assert values.approval_cycle_time.value == 7200
+    assert values.risk_time_to_first_review.value == 7200
     assert values.time_in_review_queue.value == 3600
     assert values.ai_cost_per_document.value == "0.100000"
     assert values.ai_cost_per_investigation.value == "0.200000"
@@ -470,3 +471,46 @@ async def test_usage_commits_independently_of_business_rollback(pilot_engine):
             assert saved.cost == Decimal(".010000")
         finally:
             sync_engine.dispose()
+
+
+async def test_value_exports_and_deleted_source(metrics_client, pilot_session, metrics_seed):
+    import csv
+    from io import BytesIO, StringIO
+
+    from pypdf import PdfReader
+
+    user, project, _, foreign = metrics_seed
+    root = f"/api/v1/projects/{project}/metrics/value"
+    panel = (await metrics_client.get(root + "/json")).json()
+    exported = await metrics_client.get(root + "/csv", params={"end": panel["end"]})
+    assert list(csv.reader(StringIO(exported.text)))[1:] == [
+        [r["label"], r["value"]] for r in panel["rows"]
+    ]
+    pdf = await metrics_client.get(root + "/pdf")
+    assert "Recommended next action" in "".join(
+        p.extract_text() for p in PdfReader(BytesIO(pdf.content)).pages
+    )
+    for fmt in ("json", "csv", "pdf"):
+        assert (
+            await metrics_client.get(f"/api/v1/projects/{foreign}/metrics/value/{fmt}")
+        ).status_code == 404
+    pilot_session.info.clear()
+    doc = await pilot_session.scalar(
+        select(Document).where(Document.project_id == project, Document.filename == "processed.pdf")
+    )
+    doc.deleted_at = NOW
+    await pilot_session.flush()
+    updated = (await metrics_client.get(f"/api/v1/projects/{project}/metrics")).json()["metrics"]
+    assert updated["documents_uploaded"] == 1
+    assert (
+        updated["risks_detected"]
+        == updated["risks_accepted"]
+        == updated["approval_cycle_time"]["samples"]
+        == 0
+    )
+    assert updated["ai_cost_per_document"]["resources"] == 0
+    assert updated["evidence_link_coverage"]["numerator"] == 0
+    user.role = "viewer"
+    await pilot_session.flush()
+    for fmt in ("json", "csv", "pdf"):
+        assert (await metrics_client.get(root + "/" + fmt)).status_code == 403

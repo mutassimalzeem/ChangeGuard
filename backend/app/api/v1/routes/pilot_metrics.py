@@ -1,16 +1,20 @@
 """Project pilot metrics, dashboard payload and on-demand weekly CSV export."""
 
 from datetime import UTC, date, datetime, time, timedelta
+from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import require_authenticated_user, require_permission, require_rate_limit
 from app.core.database import get_session
 from app.domain.models import User
 from app.domain.schemas.pilot_metrics import Dashboard, MetricsReport
 from app.domain.services.pilot_metrics import PilotMetricsService, weekly_csv
+from app.domain.services.pilot_value import export_report, report_rows
 from app.policy.permissions import Action
 
 router = APIRouter(
@@ -92,4 +96,24 @@ async def weekly_export(project_id: UUID, week_start: date, service=Depends(metr
             "Content-Disposition": f'attachment; filename="pilot-metrics-{project_id}-{week_start.isoformat()}.csv"',
             "Cache-Control": "no-store",
         },
+    )
+
+
+@router.get("/value/{format}")
+async def value_report(
+    project_id: UUID,
+    format: Literal["json", "csv", "pdf"],
+    end: datetime | None = None,
+    service=Depends(metrics_service),
+):
+    report = await service.report(project_id, end=end)
+    rows = report_rows(report)
+    headers = {"Cache-Control": "no-store"}
+    if format == "json":
+        return JSONResponse({"end": report.end.isoformat(), "rows": rows}, headers=headers)
+    headers["Content-Disposition"] = f'attachment; filename="pilot-value-{project_id}.{format}"'
+    return Response(
+        await run_in_threadpool(export_report, rows, format),
+        headers=headers,
+        media_type={"csv": "text/csv", "pdf": "application/pdf"}[format],
     )

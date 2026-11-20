@@ -14,7 +14,7 @@ from app.api.exceptions import AuthorizationError
 from app.core.database import Base
 from app.domain.models import Project, ProjectMembership, Tenant
 from app.policy.permissions import TENANT_WIDE_ROLES, Action, Role, has_permission
-from app.policy.review_page import REVIEW_PAGE, bind_review_read
+from app.policy.review_page import PILOT_VISIBLE, REVIEW_PAGE, bind_review_read
 
 SCOPE_KEY = "access_principal"
 FINANCIAL_FIELDS = {
@@ -174,7 +174,7 @@ def _validate_orm_shape(statement):
 @event.listens_for(Session, "do_orm_execute")
 def enforce_query_scope(state):
     principal = state.session.info.get(SCOPE_KEY)
-    if state.statement is REVIEW_PAGE:
+    if state.statement is REVIEW_PAGE or state.statement is PILOT_VISIBLE:
         bind_review_read(state, principal)
         return
     if principal is None and state.session.info.get("require_project_scope"):

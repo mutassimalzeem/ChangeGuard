@@ -6,10 +6,10 @@ Endpoints: GET `/api/v1/projects/{project_id}/metrics`, `/metrics/dashboard`, `/
 
 Metrics use project-scoped source records and return values with sample counts/denominators. Access requires both `audit.read` and `financial.read` (currently owner/admin); no audit or financial permissions are broadened. No raw source text is returned. Nonmembers and other tenants cannot access metrics.
 
-- Uploaded: documents created in range, including quarantined/failed and soft-deleted records for historical accounting.
+- Uploaded: documents created in range, including visible quarantined and failed records. Deleted sources and any subject whose evidence is inaccessible are excluded.
 - Processed successfully: upload cohort with processing_status=completed/status=linked. Failed: terminal failed/dead_letter; failure rate failed/(successful+failed). Quarantine and review-required reported separately, excluded from that denominator.
 - Classification: original prediction versus latest human-confirmed type, reviewed within range and by report end. Extraction: original field values/missing flags versus latest explicitly reviewed extraction of the same schema, field-level equality. Confidence is not accuracy. Unknown without reviews.
-- Evidence coverage: distinct cohort documents used as evidence sources / uploaded documents; direct document links and document-chunk source links resolve to their owning document, deduplicated.
+- Evidence coverage: distinct cohort documents used as evidence sources / uploaded documents; visible risk and change-order links across all six evidence source types resolve to their owning document, deduplicated.
 - Risks detected/accepted/dismissed and change orders: created/detected cohorts; decisions use dated audit events. Override rate: explicit risk overrides or changed pilot type/extraction values / applicable human risk or document review events, never automated actions.
 - Approval cycle: decision timestamp minus approval created_at for decided approvals in range, in seconds. Queue time: first pending review task created_at to its first subsequent human pilot review by report end; unresolved ages reported separately, never substitute mutable updated_at for decision timestamps.
 - AI costs: durable final gateway-call records, including retry/fallback totals once per call; resource attribution uses trusted document/investigation IDs. USD Decimal amounts. Unknown cost traces make the complete total/mean unknown; known subtotal and sample coverage remain available. Historical log-only calls cannot be reconstructed.
@@ -25,10 +25,11 @@ All endpoints require a bearer access token. Access currently requires an owner/
 GET /api/v1/projects/{project_id}/metrics
 GET /api/v1/projects/{project_id}/metrics?start=2026-11-02T00:00:00Z&end=2026-11-09T00:00:00Z
 GET /api/v1/projects/{project_id}/metrics/dashboard
+GET /api/v1/projects/{project_id}/metrics/value/{json|csv|pdf}
 GET /api/v1/projects/{project_id}/metrics/weekly.csv?week_start=2026-11-02
 ```
 
-The dashboard response groups the same typed report into processing, quality, commercial, review and AI-cost sections. No browser page is added. Reports are `Cache-Control: no-store`. Values for rates are fractions from 0 to 1; durations/latencies are seconds. CSV rows use `metric,statistic,value` with project and UTC bounds; an empty value means unknown. Inputs are validated, and future ends are capped at observation time so current-week exports are partial rather than counting future queue time. A wholly future range is rejected.
+The dashboard response groups the same typed report into processing, quality, commercial, review and AI-cost sections. The pilot onboarding page displays the cumulative value report and downloads CSV and PDF. Reports are `Cache-Control: no-store`. Values for rates are fractions from 0 to 1; durations/latencies are seconds. CSV rows use `metric,statistic,value` with project and UTC bounds; an empty value means unknown. Inputs are validated, and future ends are capped at observation time so current-week exports are partial rather than counting future queue time. A wholly future range is rejected.
 
 The AI cost mean uses distinct resource IDs with recorded calls as its denominator. `resources`, `calls`, `known_cost_calls`, `known_subtotal` and `total` expose coverage. A resource with no recorded calls has unmeasured cost; its cost is not assumed to be zero. `total` is complete only among recorded calls, not a reconciliation against a provider invoice. Model pricing must be configured in the existing `MODEL_GATEWAY_PRICES` setting; no rates are hardcoded or inferred. Amounts use the existing six-decimal USD trace storage.
 

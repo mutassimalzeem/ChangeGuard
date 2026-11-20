@@ -229,9 +229,27 @@ async def test_insufficient_delay_keeps_original_link_and_cannot_be_accepted(
     assert response.status_code == 422, response.text
 
 
-@pytest.mark.parametrize("extension", ["pdf", "png"])
+@pytest.mark.parametrize("extension", ["pdf", "png", "pilot_zip"])
 async def test_full_worker_to_timeline(client, test_session, owner, storage, extension):
-    project_id, document_id = await create_and_upload(client, owner, storage, extension)
+    if extension == "pilot_zip":
+        from tests.test_pilot import archive
+
+        headers = bearer(owner)
+        project = await client.post(
+            "/api/v1/pilot/projects", headers=headers, json={"name": "Controlled pilot"}
+        )
+        assert project.status_code == 201, project.text
+        project_id = UUID(project.json()["project_id"])
+        uploaded = await client.post(
+            f"/api/v1/pilot/projects/{project_id}/zip",
+            headers=headers,
+            files={"file": ("reports.zip", archive([("daily-report.pdf", pdf_bytes())]))},
+        )
+        item = uploaded.json()["items"][0]
+        assert item["status"] == 201
+        document_id = UUID(item["document_id"])
+    else:
+        project_id, document_id = await create_and_upload(client, owner, storage, extension)
     test_session.info.pop(SCOPE_KEY, None)
     fields, source = case("daily_report")
     source.blocks.append(TextBlock(text="Work was delayed by late steel delivery.", page_number=1))
@@ -281,3 +299,52 @@ async def test_full_worker_to_timeline(client, test_session, owner, storage, ext
     )
     assert len(audits) == len(STAGES)
     assert all(a.request_id == document.processing_data["request_id"] for a in audits)
+
+    if extension == "pilot_zip":
+        queue = f"/api/v1/projects/{project_id}/review-queue/workspace"
+        page = await client.get(queue, headers=headers)
+        assert page.status_code == 200, page.text
+        risk = next(
+            r for r in page.json()["items"] if r["risk_type"] == "daily_report_delay_without_link"
+        )
+        assert risk["evidence_supported"] and risk["evidence_details"]
+        converted = await client.post(
+            f"/api/v1/projects/{project_id}/risks/{risk['id']}/change-order-draft",
+            headers=headers,
+            json={"reason": "Verified the signed daily report"},
+        )
+        assert converted.status_code == 201, converted.text
+        draft = converted.json()
+        assert draft["amount"] is None and draft["time_impact_days"] is None
+        order = f"/api/v1/change-orders/{draft['id']}"
+        assert (
+            await client.post(f"{order}/submit", headers=headers, json={"cost_confirmed": True})
+        ).status_code == 422
+        edited = await client.patch(
+            order,
+            headers=headers,
+            json={
+                "cost_items": [{"description": "Labour", "quantity": "1", "unit_rate": "12"}],
+            },
+        )
+        assert edited.status_code == 200, edited.text
+        missing_schedule = await client.post(
+            f"{order}/submit",
+            headers=headers,
+            json={"cost_confirmed": True, "reason": "Reviewed cost"},
+        )
+        assert missing_schedule.status_code == 422 and "schedule impact" in missing_schedule.text
+        scheduled = await client.patch(order, headers=headers, json={"time_impact_days": 0})
+        assert scheduled.status_code == 200, scheduled.text
+        assert (
+            await client.post(f"{order}/submit", headers=headers, json={"cost_confirmed": True})
+        ).status_code == 422
+        submitted = await client.post(
+            f"{order}/submit",
+            headers=headers,
+            json={"cost_confirmed": True, "reason": "Verified labour and zero additional days"},
+        )
+        assert submitted.status_code == 200, submitted.text
+        measured = await client.get(f"/api/v1/projects/{project_id}/metrics", headers=headers)
+        assert measured.status_code == 200, measured.text
+        assert measured.json()["metrics"]["risks_converted"] == 1

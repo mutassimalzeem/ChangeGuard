@@ -205,6 +205,7 @@ async def progress(project_id: UUID, service=Depends(get_document_service)):
             document_id=str(d.id),
             file_name=d.filename,
             status=d.status,
+            processing_status=d.processing_status,
             document_type=d.document_type,
             version=d.document_version,
             extraction=d.attributes.get("pilot_review", {}).get(
@@ -230,6 +231,8 @@ async def review(
         .with_for_update()
         .execution_options(populate_existing=True)
     )
+    if doc is None:
+        raise HTTPException(404, "Document not found")
     if payload.version != doc.document_version:
         raise HTTPException(409, "Document changed; refresh before saving")
     if doc.status not in {"linked", "review_required"}:
@@ -341,6 +344,13 @@ async def readiness(project_id, service):
         )
 
     risks, approvals, changes = await rows(Risk), await rows(Approval), await rows(ChangeOrder)
+    from app.policy.review_page import pilot_visibility
+
+    visible = await pilot_visibility(service.session, project_id, datetime.now(UTC))
+    docs = [d for d in docs if d.id in visible["document"]]
+    changes = [c for c in changes if c.id in visible["change_order"]]
+    risks = [r for r in risks if r.id in visible["risk"]]
+    approvals = [a for a in approvals if a.id in visible["approval"]]
     exposure, unknown = {}, 0
     for change in changes:
         if change.status not in {"potential", "under_review", "drafted", "submitted", "disputed"}:

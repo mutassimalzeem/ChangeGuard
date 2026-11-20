@@ -4,10 +4,16 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  PilotFileStatus,
+  PilotImportResults,
+  PilotValueReport,
+} from "@/components/pilot-value-report";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/form";
-import { useRole } from "@/lib/auth";
+import { isApiError } from "@/lib/api/errors";
+import { useAuth, useRole } from "@/lib/auth";
 import { hasPermission } from "@/lib/rbac";
 import { pilotApi, type PilotDocument } from "@/lib/api/pilot";
 
@@ -246,8 +252,36 @@ function ReviewDocument({
 }
 
 function PilotFlow() {
-  const router = useRouter();
   const projectId = useSearchParams().get("project");
+  const { session } = useAuth();
+  const role = useRole();
+  if (
+    projectId !== null &&
+    !/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i.test(projectId)
+  )
+    return (
+      <p role="alert">
+        Invalid pilot project. <Link href="/pilot">Select a pilot</Link>
+      </p>
+    );
+  const actor = [session?.tenantId, session?.userId, role].join("/");
+  return (
+    <PilotProject
+      key={actor + "/" + projectId}
+      actor={actor}
+      projectId={projectId}
+    />
+  );
+}
+
+function PilotProject({
+  actor,
+  projectId,
+}: {
+  actor: string;
+  projectId: string | null;
+}) {
+  const router = useRouter();
   const role = useRole();
   const write = role ? hasPermission(role, "documents.write") : false;
   const finance = role ? hasPermission(role, "financial.read") : false;
@@ -257,26 +291,26 @@ function PilotFlow() {
   const [currency, setCurrency] = useState("USD");
   const [file, setFile] = useState<File | null>(null);
   const refresh = () => {
-    void cache.invalidateQueries({ queryKey: ["pilot", projectId] });
+    void cache.invalidateQueries({ queryKey: ["pilot", actor, projectId] });
   };
   const pilots = useQuery({
-    queryKey: ["pilot-list"],
+    queryKey: ["pilot-list", actor],
     queryFn: pilotApi.list,
     enabled: !projectId,
   });
   const docs = useQuery({
-    queryKey: ["pilot", projectId, "documents"],
+    queryKey: ["pilot", actor, projectId, "documents"],
     queryFn: () => pilotApi.documents(projectId!),
     enabled: !!projectId,
     refetchInterval: 5000,
   });
   const checklist = useQuery({
-    queryKey: ["pilot", projectId, "checklist"],
+    queryKey: ["pilot", actor, projectId, "checklist"],
     queryFn: () => pilotApi.checklist(projectId!),
     enabled: !!projectId,
   });
   const report = useQuery({
-    queryKey: ["pilot", projectId, "report"],
+    queryKey: ["pilot", actor, projectId, "report"],
     queryFn: () => pilotApi.report(projectId!),
     enabled: !!projectId && finance,
     refetchInterval: 10000,
@@ -294,7 +328,31 @@ function PilotFlow() {
       pilotApi.saveChecklist(projectId!, completed),
     onSuccess: refresh,
   });
+  const measure = finance && !!role && hasPermission(role, "audit.read");
+  const value = useQuery({
+    queryKey: ["pilot", actor, projectId, "value"],
+    queryFn: () => pilotApi.value(projectId!),
+    enabled: !!projectId && measure,
+    refetchInterval: 30000,
+  });
+  const exportValue = useMutation({
+    mutationFn: (format: "pdf" | "csv") =>
+      pilotApi.exportValue(projectId!, value.data!.end, format),
+  });
   const pdf = useMutation({ mutationFn: () => pilotApi.pdf(projectId!) });
+  if (
+    [docs, checklist, report, value].some(
+      (q) =>
+        isApiError(q.error) &&
+        (q.error.isForbidden || q.error.isNotFound || q.error.isAuthError),
+    )
+  )
+    return (
+      <p role="alert">
+        This pilot or report is unavailable with your current access.{" "}
+        <Link href="/pilot">Select a pilot</Link>
+      </p>
+    );
   return (
     <main className="mx-auto grid max-w-5xl gap-6 px-4 py-8">
       <header>
@@ -424,20 +482,7 @@ function PilotFlow() {
                 </Button>
               </form>
             )}
-            {upload.data && (
-              <ul className="mt-3">
-                {upload.data.items.map((item, i) => (
-                  <li key={i}>
-                    {item.file_name}:{" "}
-                    {item.status === 201
-                      ? "Queued"
-                      : item.status === 409
-                        ? "Duplicate — skipped"
-                        : (item.error ?? "Quarantined")}
-                  </li>
-                ))}
-              </ul>
-            )}
+            {upload.data && <PilotImportResults items={upload.data.items} />}
           </section>
           <section className="rounded-xl border border-border bg-surface p-6">
             <h2 className="text-xl font-semibold">3. Processing and review</h2>
@@ -455,9 +500,7 @@ function PilotFlow() {
                   <div className="flex flex-wrap justify-between gap-2">
                     <strong>{doc.file_name}</strong>
                     <span>
-                      {doc.status.replaceAll("_", " ")} ·{" "}
-                      {doc.document_type ?? "Awaiting classification"}{" "}
-                      {doc.reviewed ? "· Reviewed" : ""}
+                      <PilotFileStatus doc={doc} />
                     </span>
                   </div>
                   {doc.error && <p className="text-sm">{doc.error}</p>}
@@ -469,6 +512,14 @@ function PilotFlow() {
               ))}
             </ul>
           </section>
+          {finance && (
+            <Link
+              className="text-brand underline"
+              href={`/review-queue?project=${encodeURIComponent(projectId)}`}
+            >
+              Inspect risks and create drafts in the Review Queue
+            </Link>
+          )}
           <section className="rounded-xl border border-border bg-surface p-6">
             <h2 className="text-xl font-semibold">4. Pilot readiness</h2>
             {!finance && (
@@ -478,7 +529,7 @@ function PilotFlow() {
               </p>
             )}
             {finance && report.isPending && <p>Preparing report…</p>}
-            {report.data && (
+            {finance && report.data && (
               <>
                 <h3 className="my-3 font-semibold">
                   {report.data.project_name}
@@ -520,6 +571,25 @@ function PilotFlow() {
               </>
             )}
           </section>
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h2 className="text-xl font-semibold">5. Pilot value report</h2>
+            {!measure ? (
+              <p>
+                Audit and financial read permissions are required for pilot
+                measurements.
+              </p>
+            ) : value.isPending ? (
+              <p role="status">Preparing measurements…</p>
+            ) : (
+              value.data && (
+                <PilotValueReport
+                  rows={value.data.rows}
+                  exporting={exportValue.isPending}
+                  onExport={(format) => exportValue.mutate(format)}
+                />
+              )
+            )}
+          </section>
         </>
       )}
       {!projectId && (
@@ -541,7 +611,7 @@ function PilotFlow() {
           </ul>
         </section>
       )}
-      {[creation, upload, check, pdf].map(
+      {[creation, upload, check, pdf, exportValue].map(
         (m, i) =>
           m.isError && (
             <p key={i} role="alert" className="text-danger">
@@ -549,7 +619,7 @@ function PilotFlow() {
             </p>
           ),
       )}
-      {[docs, checklist, report, pilots].map(
+      {[docs, checklist, report, pilots, value].map(
         (q, i) =>
           q.isError && (
             <div key={i} role="alert">

@@ -352,3 +352,42 @@ async def test_pilot_list_respects_membership(pilot_session):
     await pilot_session.flush()
     bind_scope(pilot_session, viewer)
     assert await list_pilots(viewer, pilot_session) == []
+
+
+async def test_readiness_excludes_order_and_approval_with_hidden_source(pilot_session):
+    from app.domain.models import Approval, EvidenceLink
+
+    user, project = await setup_pilot(pilot_session, role="project_manager")
+    pilot_session.info.clear()
+    scope = dict(tenant_id=user.tenant_id, project_id=project)
+    doc = Document(
+        **scope,
+        filename="Hidden",
+        size_bytes=1,
+        storage_key="hidden",
+        mime_type="text/plain",
+        access_level="restricted",
+    )
+    change = ChangeOrder(**scope, title="Private", reference="H", amount=100, currency="USD")
+    pilot_session.add_all([doc, change])
+    await pilot_session.flush()
+    pilot_session.add_all(
+        [
+            EvidenceLink(
+                **scope,
+                subject_type="change_order",
+                subject_id=change.id,
+                source_type="document",
+                source_id=doc.id,
+            ),
+            Approval(
+                **scope,
+                change_order_id=change.id,
+                status="pending",
+                due_at=datetime.now(UTC) - timedelta(days=1),
+            ),
+        ]
+    )
+    await pilot_session.flush()
+    result = await readiness(project, DocumentService(pilot_session, user, None))
+    assert result["pending_exposure"] == {} and result["overdue_approvals"] == 0

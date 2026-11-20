@@ -282,9 +282,10 @@ export const changeOrdersApi = {
     return parse(changeOrderSchema, response.data);
   },
 
-  async submit(orderId: string, costConfirmed: true): Promise<ChangeOrderItem> {
+  async submit(orderId: string, costConfirmed: true, reason?: string): Promise<ChangeOrderItem> {
     const response = await client.post(`/change-orders/${orderId}/submit`, {
       cost_confirmed: costConfirmed,
+      reason: reason?.trim() || undefined,
     });
     return parse(changeOrderSchema, response.data);
   },
