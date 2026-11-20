@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import require_authenticated_user, require_permission
+from app.api.exceptions import ChangeGuardException
 from app.core.database import get_session
 from app.domain.models import User
 from app.domain.schemas.review_workspace import Category, Kind, QueueFilters, ReviewCommand
@@ -125,6 +126,22 @@ async def workspace_page(
     session: AsyncSession = Depends(get_session),
 ):
     return await ReviewWorkspace(session, user).page(project_id, filters)
+
+
+@router.get("/workspace/{kind}/{item_id}", response_model=WorkspaceItem)
+async def inspect_review(
+    project_id: UUID,
+    kind: Kind,
+    item_id: UUID,
+    user: User = Depends(require_authenticated_user),
+    session: AsyncSession = Depends(get_session),
+):
+    page = await ReviewWorkspace(session, user).page(
+        project_id, QueueFilters(status="all", page_size=1), kind=kind, item_id=item_id
+    )
+    if not page["items"]:
+        raise ChangeGuardException("Review item not found", "NOT_FOUND", 404)
+    return page["items"][0]
 
 
 @router.get("/reviewers", response_model=list[Reviewer])
