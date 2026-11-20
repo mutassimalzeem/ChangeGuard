@@ -204,6 +204,12 @@ jobs:
         working-directory: backend
         run: python -m pytest tests/test_review_queue.py tests/test_review_queue_authorization.py tests/test_review_visibility.py -q
 
+      - name: Verify pilot import, review, conversion and measurement
+        env:
+          TEST_DATABASE_ADMIN_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/postgres
+        working-directory: backend
+        run: python -m pytest tests/test_pilot.py tests/test_pilot_integration.py tests/test_pilot_metrics.py tests/test_pilot_metrics_integration.py tests/test_daily_report_integration.py -q
+
       - name: Benchmark the authorized review queue
         env:
           TEST_DATABASE_ADMIN_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/postgres

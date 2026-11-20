@@ -189,7 +189,7 @@ function Workflow({
   const [notice, setNotice] = useState("");
   const transition = useMutation({
     mutationFn: (action: "submit" | "approve" | "reject") => {
-      if (action === "submit") return changeOrdersApi.submit(order.id, true);
+      if (action === "submit") return changeOrdersApi.submit(order.id, true, reason);
       return changeOrdersApi[action](order.id, reason);
     },
     onSuccess: (result) => {
@@ -303,8 +303,11 @@ function Workflow({
                       />{" "}
                       I confirm the reviewed cost items
                     </label>
+                    <label>Submission reason
+                      <Input value={reason} maxLength={2000} onChange={(event) => setReason(event.target.value)} />
+                    </label>
                     <Button
-                      disabled={!confirmed}
+                      disabled={!confirmed || !reason.trim()}
                       loading={transition.isPending}
                       onClick={() => transition.mutate("submit")}
                     >

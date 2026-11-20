@@ -396,3 +396,7 @@ The MVP is complete when:
 Project and commercial managers open a project’s actionable queue to review insufficient evidence, low-confidence extraction, missing fields, duplicates, conflicting evidence, high-severity findings, high-value changes and approval requests. Owners and admins can also review. A reviewer can inspect the original quotation and page, assign a reviewer, leave a note, request evidence or take the applicable human decision. A supported risk can become a linked draft. The reviewer can find completed items through the review-state filter and inspect who acted, when and why.
 
 A deployment must configure a positive threshold for each currency it wants to flag. A change qualifies when its recorded amount meets or exceeds the threshold for that currency. Unknown amounts and unconfigured currencies do not qualify.
+
+## Controlled project pilot
+
+A pilot follows one project from ZIP intake of daily reports, RFIs, drawings and supporting records through human-reviewed evidence and change-order decisions. A manager can inspect every visible pilot risk in the Review Queue, open its timeline evidence and convert an eligible finding into a draft. Before submitting, a person supplies the cost items, schedule impact in days (including an explicit zero), cost confirmation and reason. An independent authorized reviewer records the approval or rejection reason. The project team uses measured outcomes and outstanding evidence at sign-off. The audit/financial reader can export the cumulative value report as CSV or PDF.

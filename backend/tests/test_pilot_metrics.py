@@ -240,3 +240,24 @@ async def test_metrics_requires_authentication():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/api/v1/projects/{uuid4()}/metrics")
     assert response.status_code == 401
+
+
+def test_confidence_bands_failure_types_risk_breakdowns_and_conversions():
+    docs = [document(extraction_confidence=value) for value in (None, 0.49, 0.5, 0.79, 0.8, 1)]
+    docs.append(document("failed", processing_data={"error_type": "TimeoutError"}))
+    converted = event("risk.converted_to_change_order")
+    result = calculate(
+        documents=docs,
+        risks=[Row(detected_at=NOW - timedelta(days=1), risk_type="delay", severity="high")],
+        reviews=[converted, converted],
+    )
+    assert result["extraction_confidence_distribution"] == {
+        "below_0.5": 1,
+        "0.5_to_below_0.8": 2,
+        "0.8_and_above": 2,
+        "unknown": 2,
+    }
+    assert result["processing_failures_by_type"] == {"TimeoutError": 1}
+    assert result["risks_by_type"] == {"delay": 1}
+    assert result["risks_by_severity"] == {"high": 1}
+    assert result["risks_converted"] == 1

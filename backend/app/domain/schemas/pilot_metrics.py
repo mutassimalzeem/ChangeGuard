@@ -37,6 +37,13 @@ class Latency(BaseModel):
 
 
 class PilotMetrics(BaseModel):
+    missing_document_types: dict[str, int]
+    processing_failures_by_type: dict[str, int]
+    extraction_confidence_distribution: dict[str, int]
+    risks_by_type: dict[str, int]
+    risks_by_severity: dict[str, int]
+    risks_converted: int
+    outstanding_risks_missing_evidence: int = 0
     documents_uploaded: int
     documents_processed_successfully: int
     documents_failed: int
@@ -53,6 +60,7 @@ class PilotMetrics(BaseModel):
     change_orders_created: int
     approval_cycle_time: Duration
     time_in_review_queue: Duration
+    risk_time_to_first_review: Duration
     open_review_queue_age: Duration
     ai_cost_per_document: Cost
     ai_cost_per_investigation: Cost
@@ -67,6 +75,7 @@ class MetricsReport(BaseModel):
     generated_at: datetime
     metrics: PilotMetrics
     limitations: list[str]
+    next_actions: list[str]
 
 
 class Dashboard(BaseModel):

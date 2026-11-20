@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -588,7 +589,8 @@ function ProjectReviewQueue({ projectId }: { projectId: string }) {
 
 function ReviewQueue() {
   const { session } = useAuth();
-  const [selectedProject, setSelectedProject] = useState("");
+  const requested = useSearchParams().get("project");
+  const [selectedProject, setSelectedProject] = useState(requested ?? "");
   const projects = useQuery({
     queryKey: [
       "review-queue-projects",
@@ -609,7 +611,7 @@ function ReviewQueue() {
   });
   const projectId =
     projects.data?.find((project) => project.id === selectedProject)?.id ??
-    projects.data?.[0]?.id;
+    (selectedProject ? undefined : projects.data?.[0]?.id);
   return (
     <main className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6">
       <h1 className="text-2xl font-semibold text-ink">Review Queue</h1>
@@ -651,7 +653,9 @@ function ReviewQueue() {
 export default function ReviewQueuePage() {
   return (
     <ProtectedRoute requiredPermission="risks.accept">
-      <ReviewQueue />
+      <Suspense fallback={<LoadingSkeleton rows={3} />}>
+        <ReviewQueue />
+      </Suspense>
     </ProtectedRoute>
   );
 }

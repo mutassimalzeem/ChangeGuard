@@ -497,3 +497,9 @@ The MVP design is acceptable when:
 The workspace opens on actionable reviews in an accessible project. Filter by type, severity, review state, owner, UTC date range and confidence. Sort by creation time, severity, confidence or deadline. Each card shows the underlying workflow status alongside its review state, owner, severity, creation date and deadline. Evidence includes the source quote, page and access-checked document link. Unknown fields have explicit empty labels.
 
 Use the state filter to inspect accepted, dismissed, converted and resolved records. Expand audit history for actor, time and reason. Native filter, checkbox and disclosure controls support the keyboard. The action dialog collects a reason or note, and shows stale-state and permission errors. Bulk selection supports notes on the current page. A failure rolls back the batch.
+
+## Pilot onboarding and value review
+
+The pilot page keeps creation, checklist, ZIP outcomes, processing status and correction forms together. Managers can jump from the selected pilot to its Review Queue or project timeline. A human enters the submission reason alongside cost confirmation. Invalid pilot links offer a return to the project picker. Access changes hide unavailable reports and clear project-specific form state when switching pilots.
+
+The final dashboard section displays measurement, observation, coverage, missing evidence and next actions. CSV and PDF share its labels and values. The value report requires financial and audit access. Other participants can use their permitted onboarding actions. Empty samples display “Unmeasured”; a measured count of zero displays zero.
